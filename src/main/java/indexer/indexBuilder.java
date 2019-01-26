@@ -31,20 +31,26 @@ public class indexBuilder
 
 
     /**
-     * Prepares the indexwriter for use in searching later.
+     * Create an index of the cbor file passed as a parameter.
      * @throws IOException
      */
     public void performIndex(String cborLoc) throws IOException {
 
-        int counter = 0;
+        int increment = 0;
         for (Data.Paragraph p : IndexUtils.createParagraphIterator(cborLoc)) {
+            System.out.println("Indexing "+ p.getParaId());
             Document doc = new Document();
-            doc.add(new StringField("id", p.getParaId(), Field.Store.YES));
-            doc.add(new TextField("text", p.getTextOnly(), Field.Store.YES));
+
+            FieldType contentType = new FieldType();
+            contentType.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS);
+            contentType.setStored(true);
+            contentType.setTokenized(true);
+            contentType.setStoreTermVectors(true);
+
+            // Then we add the paragraph id and the paragraph body for searching.
             indexWriter.addDocument(doc);
-            counter++;
-            if (counter % 20 == 0) {
-                System.out.println("Commited data");
+            increment++;
+            if (increment % 50 == 0) {
                 indexWriter.commit();
             }
         }
@@ -52,7 +58,7 @@ public class indexBuilder
     }
 
     /**
-     * Closes the indexwriter so that we can use it in searching
+     * Closes the indexwriter so that we can use it in searching.
      * @throws IOException
      */
     private void closeIndexWriter()
