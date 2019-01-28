@@ -29,15 +29,14 @@ public class projectRunner
         }
         else if (option.equals("index")) {
 
-            //dest = System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
-            //System.out.print(dest);
-            //constants.setDirectoryName(dest);
-            //constants.setIndexFileName(args[1]);
+            dest = System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+            System.out.print(dest);
+            constants.setDirectoryName(dest);
+            constants.setIndexFileName(args[1]);
 
             //Get the path of the index
-            //String indexDir = constants.DIRECTORY_NAME;
-            String path = args[1]
-            indexBuilder ib = new indexBuilder("paragraphs");
+            String indexDir = constants.DIRECTORY_NAME;
+            indexBuilder ib = new indexBuilder(indexDir);
 
             try {
                 ib.performIndex(constants.FILE_NAME);

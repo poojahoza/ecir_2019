@@ -27,7 +27,7 @@ public class indexBuilder
 {
     private final IndexWriter indexWriter;
 
-    public indexBuilder(String indexDir) { indexWriter = IndexUtils.createIndexWriter(indexDir); }
+    public indexBuilder(String indexDir) throws IOException { indexWriter = IndexUtils.createIndexWriter(indexDir); }
 
 
     /**

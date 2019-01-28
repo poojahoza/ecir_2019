@@ -44,7 +44,7 @@ public class IndexUtils {
      * @param indexLoc: Location of where to create a new Lucene index directory.
      * @return IndexWriter that writes to the user-supplied directory
      */
-    public static IndexWriter createIndexWriter(String indexLoc) {
+    public static IndexWriter createIndexWriter(String indexLoc) throws IOException {
 
         Path indexPath = Paths.get(indexLoc);
         try {
