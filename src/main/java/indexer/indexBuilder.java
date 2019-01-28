@@ -48,6 +48,8 @@ public class indexBuilder
             contentType.setStoreTermVectors(true);
 
             // Then we add the paragraph id and the paragraph body for searching.
+            doc.add(new StringField("id", p.getParaId(), Field.Store.YES));
+            doc.add(new TextField("text", p.getTextOnly(), Field.Store.YES));
             indexWriter.addDocument(doc);
             increment++;
             if (increment % 50 == 0) {
