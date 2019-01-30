@@ -1,14 +1,12 @@
 package main.java;
 
-import main.java.util.Util;
 import main.java.util.constants;
 import main.java.indexer.indexBuilder;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
+import main.java.searcher.baseSearcher;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Map;
+import main.java.util.Util;
 
 public class projectRunner
 {
@@ -23,15 +21,15 @@ public class projectRunner
         System.setProperty("file.encoding", "UTF-8");
         String option = args[0];
         String dest;
+        dest = System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+        System.out.print(dest);
+        constants.setDirectoryName(dest);
 
         if (args.length < 2) {
             usage();
         }
         else if (option.equals("index")) {
 
-            dest = System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
-            System.out.print(dest);
-            constants.setDirectoryName(dest);
             constants.setIndexFileName(args[1]);
 
             //Get the path of the index
@@ -46,13 +44,10 @@ public class projectRunner
         }
         else if (option.equals("search")) {
 
-            // To be implemented
-
-            /*Map<String,String> p = Util.readOutline(args[1]);
-            for(Map.Entry<String,String> obj:p.entrySet())
-            {
-                System.out.println(obj.getKey()+"------------->"+obj.getValue());
-            }*/
+            Map<String,String> p = Util.readOutline(args[1]);
+            Map<String, Map<String, Float>> ranking_paragraphs = null;
+            baseSearcher bs = new baseSearcher();
+            bs.writeRankings(p, "output_BM25_ranking.txt");
         }
 
     }
