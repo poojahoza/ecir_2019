@@ -13,8 +13,8 @@ function usage()
 function call_maven()
 {
 echo "Executing the Maven for the dependency"
-mvn compile
-mvn package
+sudo mvn clean compile
+sudo mvn package
 sleep 4
 }
 
