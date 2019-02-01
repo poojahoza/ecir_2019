@@ -35,12 +35,17 @@ public class SearchUtils
         for (Data.Page page : DeserializeData.iterableAnnotations(qrelStream))
         {
             StringBuilder queryBuilder = new StringBuilder();
-            queryBuilder.append(page.getPageName());
 
             for (List<Data.Section> sectionPath : page.flatSectionPaths())
             {
                 queryBuilder.append(" ");
-                queryBuilder.append(String.join(" ", Data.sectionPathHeadings(sectionPath)).replaceAll("[^\\w\\s]",""));
+                queryBuilder.append(page.getPageName());
+                for(Data.Section sec:sectionPath)
+                {
+                    queryBuilder.append(" ");
+                    queryBuilder.append(sec.getHeading().replaceAll("[^\\w\\s]",""));
+                }
+                //queryBuilder.append(String.join(" ", Data.sectionPathHeadings(sectionPath)).replaceAll("[^\\w\\s]",""));
             }
             //System.out.println(queryBuilder.toString());
             data.put(page.getPageId(), queryBuilder.toString());
