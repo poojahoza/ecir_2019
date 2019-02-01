@@ -71,7 +71,7 @@
                     <!-- MainClass in mainfest make a executable jar -->
                     <archive>
                         <manifest>
-                            <mainClass> main.java.projectRunner </mainClass>
+                            <mainClass> main.java.ProjectRunner </mainClass>
                         </manifest>
                     </archive>
 
