@@ -39,13 +39,10 @@ public class Util
 
             for (List<Data.Section> sectionPath : page.flatSectionPaths())
             {
-                for(Data.Section section:sectionPath)
-                {
-                    queryBuilder.append(" ");
-                    String  result = section.getHeading().replaceAll("[^\\w\\s]","");
-                    queryBuilder.append(result);
-                }
+                queryBuilder.append(" ");
+                queryBuilder.append(String.join(" ", Data.sectionPathHeadings(sectionPath)).replaceAll("[^\\w\\s]",""));
             }
+            //System.out.println(queryBuilder.toString());
             data.put(page.getPageId(), queryBuilder.toString());
         }
         return data;

@@ -93,7 +93,6 @@ public class projectRunner
                     bs.writeRankings(sp, "output_BM25_section_ranking.txt");
                 }
             }
-
         }
         else
         {
