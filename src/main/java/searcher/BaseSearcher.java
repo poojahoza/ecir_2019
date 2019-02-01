@@ -13,7 +13,7 @@ import org.apache.lucene.search.ScoreDoc;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import main.java.util.constants;
+import main.java.utils.Constants;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.nio.file.Path;
@@ -24,16 +24,16 @@ import java.util.List;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
-public class baseSearcher {
+public class BaseSearcher {
 
     protected IndexSearcher searcher = null;
     protected QueryParser parser = null;
     protected Query queryObj = null;
     protected Map<String, Map<String, Float>> query_doc_pair = new LinkedHashMap<String, Map<String, Float>>();
 
-    public baseSearcher() throws IOException{
+    public BaseSearcher() throws IOException{
 
-        searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(Paths.get(constants.DIRECTORY_NAME))));
+        searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(Paths.get(Constants.DIRECTORY_NAME))));
         parser = new QueryParser("text", new EnglishAnalyzer());
     }
     /**

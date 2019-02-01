@@ -1,10 +1,10 @@
-package main.java.util;
+package main.java.utils;
 import edu.unh.cs.treccar_v2.read_data.DeserializeData;
 import edu.unh.cs.treccar_v2.Data;
 import java.io.*;
 import java.util.*;
 
-public class Util
+public class SearchUtils
 {
     static public Map<String, String> readOutline(String filename) {
         Map<String, String> data = new LinkedHashMap<String, String>();

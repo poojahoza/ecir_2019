@@ -1,6 +1,6 @@
-package main.java.util;
+package main.java.utils;
 
-public class constants
+public class Constants
 {
     public static String FILE_NAME="";
     public static String DIRECTORY_NAME="";

@@ -1,33 +1,25 @@
 package main.java.indexer;
 
 /*Lucene imports*/
-import main.java.util.IndexUtils;
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import main.java.utils.IndexUtils;
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexOptions;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 
 /*TREC tools imports*/
-import edu.unh.cs.treccar_v2.read_data.DeserializeData;
 import edu.unh.cs.treccar_v2.Data;
 
 /*Project specific imports*/
-import main.java.util.constants;
 
 /*Java specific imports*/
 import java.io.*;
-import java.nio.file.Paths;
-import java.util.stream.StreamSupport;
 
 
-public class indexBuilder
+public class IndexBuilder
 {
     private final IndexWriter indexWriter;
 
-    public indexBuilder(String indexDir) throws IOException { indexWriter = IndexUtils.createIndexWriter(indexDir); }
+    public IndexBuilder(String indexDir) throws IOException { indexWriter = IndexUtils.createIndexWriter(indexDir); }
 
 
     /**

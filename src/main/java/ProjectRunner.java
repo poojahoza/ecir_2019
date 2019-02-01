@@ -1,14 +1,14 @@
 package main.java;
 
-import main.java.util.constants;
-import main.java.indexer.indexBuilder;
-import main.java.searcher.baseSearcher;
+import main.java.utils.Constants;
+import main.java.indexer.IndexBuilder;
+import main.java.searcher.BaseSearcher;
 
 import java.io.IOException;
 import java.util.Map;
-import main.java.util.Util;
+import main.java.utils.SearchUtils;
 
-public class projectRunner
+public class ProjectRunner
 {
     private static void  generalhelp()
     {
@@ -60,16 +60,16 @@ public class projectRunner
             {
                 indexUsage();
             }
-            constants.setIndexFileName(args[1]);
+            Constants.setIndexFileName(args[1]);
             dest = System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
-            constants.setDirectoryName(dest);
+            Constants.setDirectoryName(dest);
 
             //Get the path of the index
-            String indexDir = constants.DIRECTORY_NAME;
-            indexBuilder ib = new indexBuilder(indexDir);
+            String indexDir = Constants.DIRECTORY_NAME;
+            IndexBuilder ib = new IndexBuilder(indexDir);
 
             try {
-                ib.performIndex(constants.FILE_NAME);
+                ib.performIndex(Constants.FILE_NAME);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -80,16 +80,16 @@ public class projectRunner
                 searchUsage();
             }
             dest = args[1];
-            constants.setDirectoryName(dest);
-            Map<String,String> p = Util.readOutline(args[2]);
-            baseSearcher bs = new baseSearcher();
+            Constants.setDirectoryName(dest);
+            Map<String,String> p = SearchUtils.readOutline(args[2]);
+            BaseSearcher bs = new BaseSearcher();
             bs.writeRankings(p, "output_BM25_ranking.txt");
 
             if(args.length >= 4)
             {
                 if(args[3].equals("--section"))
                 {
-                    Map<String,String> sp = Util.readOutlineSectionPath(args[2]);
+                    Map<String,String> sp = SearchUtils.readOutlineSectionPath(args[2]);
                     bs.writeRankings(sp, "output_BM25_section_ranking.txt");
                 }
             }
