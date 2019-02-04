@@ -81,16 +81,17 @@ public class ProjectRunner
             }
             dest = args[1];
             Constants.setDirectoryName(dest);
-            Map<String,String> p = SearchUtils.readOutline(args[2]);
-            BaseSearcher bs = new BaseSearcher();
-            bs.writeRankings(p, "output_BM25_ranking.txt");
+            String cborOutlineLoc = args[2];
+            // 1) Creating an iterable is now taken care of when the searcher is instantiated in IndexUtils.
+
+            BaseSearcher baseSearcher = new BaseSearcher(dest, cborOutlineLoc); // 2) Pass the constructor new parameters: Location of the index, and the location of the outline.
+            baseSearcher.run(); // 3) WriteRankings is now simply run(). Hands off iterating over TopDocs to performSearch().
 
             if(args.length >= 4)
             {
                 if(args[3].equals("--section"))
                 {
-                    Map<String,String> sp = SearchUtils.readOutlineSectionPath(args[2]);
-                    bs.writeRankings(sp, "output_BM25_section_ranking.txt");
+                    baseSearcher.sectionOutlineRun();
                 }
             }
         }
