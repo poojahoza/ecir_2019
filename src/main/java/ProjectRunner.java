@@ -82,10 +82,7 @@ public class ProjectRunner
             dest = args[1];
             Constants.setDirectoryName(dest);
             String cborOutlineLoc = args[2];
-            // 1) Creating an iterable is now taken care of when the searcher is instantiated in IndexUtils.
-
-            BaseSearcher baseSearcher = new BaseSearcher(dest, cborOutlineLoc); // 2) Pass the constructor new parameters: Location of the index, and the location of the outline.
-            baseSearcher.run(); // 3) WriteRankings is now simply run(). Hands off iterating over TopDocs to performSearch().
+            BaseSearcher baseSearcher = new BaseSearcher(dest, cborOutlineLoc);
 
             if(args.length >= 4)
             {
@@ -93,6 +90,9 @@ public class ProjectRunner
                 {
                     baseSearcher.sectionOutlineRun();
                 }
+            }
+            else {
+                baseSearcher.run();
             }
         }
         else
