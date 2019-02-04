@@ -32,6 +32,23 @@ public class IndexUtils {
     }
 
     /**
+     * Function: createPageIterator
+     * Desc: Using TREC Tools, create an iterator over pages that have been read from an outlines .cbor file.
+     * @param cborLoc: Location of the paragraph cbor file to open.
+     * @return Iterator over Data.Page
+     */
+    public static Iterable<Data.Page> createPageIterator(String cborLoc) {
+        File file = new File(cborLoc);
+        InputStream inputStream = null;
+        try {
+            inputStream = new BufferedInputStream(new FileInputStream(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return DeserializeData.iterableAnnotations(inputStream);
+    }
+
+    /**
      * Function: createIndexWriter
      * Desc: Creates an IndexWriter that is responsible for writing new documents to a Lucene index directory.
      *       Note that its OpenMode is set to "create", which means it overwrites existing indexes, so be careful!
