@@ -81,17 +81,18 @@ public class ProjectRunner
             }
             dest = args[1];
             Constants.setDirectoryName(dest);
-            Map<String,String> p = SearchUtils.readOutline(args[2]);
-            BaseSearcher bs = new BaseSearcher();
-            bs.writeRankings(p, "output_BM25_ranking.txt");
+            String cborOutlineLoc = args[2];
+            BaseSearcher baseSearcher = new BaseSearcher(dest, cborOutlineLoc);
 
             if(args.length >= 4)
             {
                 if(args[3].equals("--section"))
                 {
-                    Map<String,String> sp = SearchUtils.readOutlineSectionPath(args[2]);
-                    bs.writeRankings(sp, "output_BM25_section_ranking.txt");
+                    baseSearcher.sectionOutlineRun();
                 }
+            }
+            else {
+                baseSearcher.run();
             }
         }
         else
