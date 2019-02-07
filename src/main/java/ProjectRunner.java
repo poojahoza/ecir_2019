@@ -1,5 +1,6 @@
 package main.java;
 
+import main.java.commandparser.CommandParser;
 import main.java.searcher.BaseBM25;
 import main.java.utils.Constants;
 import main.java.indexer.IndexBuilder;
@@ -49,69 +50,88 @@ public class ProjectRunner
 
     public static void main(String[] args) throws IOException
     {
-        if (args.length < 1) {
-            generalhelp();
-        }
+//        if (args.length < 1) {
+//            generalhelp();
+//        }
+//
+//        System.setProperty("file.encoding", "UTF-8");
+//        String option = args[0];
+//        String dest;
+//
+//        if(option.equals("index"))
+//        {
+//            if(args.length < 2 )
+//            {
+//                indexUsage();
+//            }
+//            Constants.setIndexFileName(args[1]);
+//            dest = System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+//            Constants.setDirectoryName(dest);
+//
+//            //Get the path of the index
+//            String indexDir = Constants.DIRECTORY_NAME;
+//            IndexBuilder ib = new IndexBuilder(indexDir);
+//            ib.performIndex(Constants.FILE_NAME);
+//
+//        }
+//        else if (option.equals("search")) {
+//
+//            if (args.length < 3) {
+//                searchUsage();
+//            }
+//            dest = args[1];
+//            Constants.setDirectoryName(dest);
+//            Map<String,String> p = SearchUtils.readOutline(args[2]);
+//            BaseSearcher bs = new BaseSearcher();
+//            bs.writeRankings(p, "output_BM25_ranking.txt");
+//            BaseBM25 bm= new BaseBM25(1000);
+//            Map<String,Map<String, Container>> out = bm.getRanking(p);
+//
+//
+//            int count=0;
+//            for(Map.Entry<String,Map<String,Container>> outer:out.entrySet())
+//            {
+//                count++;
+//                for(Map.Entry<String,Container> inner:outer.getValue().entrySet()) {
+//
+//                    System.out.println(outer.getKey() + "," + inner.getKey() + "," + inner.getValue().getDocID() + "," + inner.getValue().getScore() + "," + inner.getValue().getRanking());
+//                    System.out.println(inner.getValue().getEntity());
+//
+//                }
+//                if(count==1) break;
+//
+//            }
+//            if(args.length >= 4)
+//            {
+//                if(args[3].equals("--section"))
+//                {
+//                    Map<String,String> sp = SearchUtils.readOutlineSectionPath(args[2]);
+//                    bs.writeRankings(sp, "output_BM25_section_ranking.txt");
+//                }
+//            }
+//        }
+//        else
+//        {
+//            help();
+//        }
 
-        System.setProperty("file.encoding", "UTF-8");
-        String option = args[0];
-        String dest;
+        CommandParser com = new CommandParser(args);
+        String commandReceived = com.getParser().getParsedCommand();
 
-        if(option.equals("index"))
+
+
+        if(commandReceived.equals("index"))
         {
-            if(args.length < 2 )
-            {
-                indexUsage();
-            }
-            Constants.setIndexFileName(args[1]);
-            dest = System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
-            Constants.setDirectoryName(dest);
-
-            //Get the path of the index
-            String indexDir = Constants.DIRECTORY_NAME;
-            IndexBuilder ib = new IndexBuilder(indexDir);
-            ib.performIndex(Constants.FILE_NAME);
-
-        }
-        else if (option.equals("search")) {
-
-            if (args.length < 3) {
-                searchUsage();
-            }
-            dest = args[1];
-            Constants.setDirectoryName(dest);
-            Map<String,String> p = SearchUtils.readOutline(args[2]);
-            BaseSearcher bs = new BaseSearcher();
-            bs.writeRankings(p, "output_BM25_ranking.txt");
-            BaseBM25 bm= new BaseBM25(1000);
-            Map<String,Map<String, Container>> out = bm.getRanking(p);
-
-
-            int count=0;
-            for(Map.Entry<String,Map<String,Container>> outer:out.entrySet())
-            {
-                count++;
-                for(Map.Entry<String,Container> inner:outer.getValue().entrySet()) {
-
-                    System.out.println(outer.getKey() + "," + inner.getKey() + "," + inner.getValue().getDocID() + "," + inner.getValue().getScore() + "," + inner.getValue().getRanking());
-                    System.out.println(inner.getValue().getEntity());
-
-                }
-                if(count==1) break;
-
-            }
-            if(args.length >= 4)
-            {
-                if(args[3].equals("--section"))
-                {
-                    Map<String,String> sp = SearchUtils.readOutlineSectionPath(args[2]);
-                    bs.writeRankings(sp, "output_BM25_section_ranking.txt");
-                }
-            }
+            System.out.println("Passed in Index"+ com.getIndexCommand());
+        }else if(commandReceived.equals("--help"))
+        {
+            com.getParser().usage();
         }
         else
         {
-            help();
+
         }
+
+
     }
 }
