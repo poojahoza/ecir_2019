@@ -1,11 +1,14 @@
 package main.java;
 
+import main.java.searcher.BaseBM25;
 import main.java.utils.Constants;
 import main.java.indexer.IndexBuilder;
 import main.java.searcher.BaseSearcher;
 
 import java.io.IOException;
 import java.util.Map;
+
+import main.java.containers.Container;
 import main.java.utils.SearchUtils;
 
 public class ProjectRunner
@@ -67,12 +70,8 @@ public class ProjectRunner
             //Get the path of the index
             String indexDir = Constants.DIRECTORY_NAME;
             IndexBuilder ib = new IndexBuilder(indexDir);
+            ib.performIndex(Constants.FILE_NAME);
 
-            try {
-                ib.performIndex(Constants.FILE_NAME);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         else if (option.equals("search")) {
 
@@ -84,7 +83,23 @@ public class ProjectRunner
             Map<String,String> p = SearchUtils.readOutline(args[2]);
             BaseSearcher bs = new BaseSearcher();
             bs.writeRankings(p, "output_BM25_ranking.txt");
+            BaseBM25 bm= new BaseBM25(1000);
+            Map<String,Map<String, Container>> out = bm.getRanking(p);
 
+
+            int count=0;
+            for(Map.Entry<String,Map<String,Container>> outer:out.entrySet())
+            {
+                count++;
+                for(Map.Entry<String,Container> inner:outer.getValue().entrySet()) {
+
+                    System.out.println(outer.getKey() + "," + inner.getKey() + "," + inner.getValue().getDocID() + "," + inner.getValue().getScore() + "," + inner.getValue().getRanking());
+                    System.out.println(inner.getValue().getEntity());
+
+                }
+                if(count==1) break;
+
+            }
             if(args.length >= 4)
             {
                 if(args[3].equals("--section"))
