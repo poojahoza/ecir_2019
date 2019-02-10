@@ -26,16 +26,10 @@ public class BaseBM25 extends BaseSearcher
     private Map<String, Map<String, Container>> ranks=null;
     private int k;
 
-    BaseBM25() throws IOException
+    public BaseBM25(int k,String indexLoc) throws IOException
     {
-        super();
-        k=100;
+        super(indexLoc);
         if(ranks==null) this.ranks= new LinkedHashMap<String, Map<String, Container>>();
-    }
-
-    public BaseBM25(int k) throws IOException
-    {
-        this();
         this.k=k;
     }
 

@@ -72,9 +72,11 @@ public class RegisterCommands
           @Parameter(names = {"-k","--candidate-set-val"}, description = "How many candidate set to retrieve using BM25")
           private Integer kVAL=100;
 
-          @Parameter(names = "--rerank",description ="Rerank the initial retrieved cluster using document similarity" +
-                  "--rarank <Path_glove_file> ", arity = 1)
-          private List<String> rerank_data;
+          @Parameter(names = "--rerank",description ="Rerank the initial retrieved cluster using document similarity")
+          private boolean isReRank =false;
+
+         @Parameter(names = {"--we","--word-embedding"},description ="Rerank the initial retrieved cluster using document similarity")
+         private String word_embedding_file = null;
 
           public String getIndexlocation() {
                return indexlocation;
@@ -84,15 +86,21 @@ public class RegisterCommands
                return queryfile;
           }
 
-          public List<String> getRerankData()
+          public boolean isReRankEnabled()
           {
-               return rerank_data;
+               return isReRank;
           }
 
           public Integer getkVAL()
           {
                return kVAL;
           }
+
+          public String getWordEmbeddingFile()
+          {
+              return word_embedding_file;
+          }
+
 
           boolean isHelp() {
                return help;

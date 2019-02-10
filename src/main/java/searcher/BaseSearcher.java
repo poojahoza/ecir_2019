@@ -31,9 +31,9 @@ public class BaseSearcher {
     protected Query queryObj = null;
 
 
-    public BaseSearcher() throws IOException
+    public BaseSearcher(String indexLocation) throws IOException
     {
-        searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(Paths.get(Constants.DIRECTORY_NAME))));
+        searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(Paths.get(indexLocation))));
         parser = new QueryParser("text", new EnglishAnalyzer());
     }
 

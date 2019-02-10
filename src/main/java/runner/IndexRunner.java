@@ -2,6 +2,7 @@ package main.java.runner;
 
 import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
+import main.java.commandparser.ValidateCommands;
 import main.java.indexer.IndexBuilder;
 
 import java.io.IOException;
@@ -13,10 +14,12 @@ There are helper methods to get the data.
 public class IndexRunner implements ProgramRunner
 {
     private RegisterCommands.CommandIndex indexParser = null;
+    private ValidateCommands.ValidateIndexCommands validate = null;
 
     public IndexRunner(CommandParser parser)
     {
         indexParser = parser.getIndexCommand();
+        validate = new ValidateCommands.ValidateIndexCommands(indexParser);
     }
 
     @Override

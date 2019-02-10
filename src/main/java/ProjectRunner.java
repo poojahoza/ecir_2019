@@ -13,10 +13,12 @@ import main.java.searcher.BaseSearcher;
 
 import java.io.IOException;
 
+import java.util.List;
 import java.util.Map;
 
 import main.java.containers.Container;
 import main.java.utils.SearchUtils;
+import main.java.utils.StopWord;
 
 
 public class ProjectRunner
@@ -32,22 +34,16 @@ public class ProjectRunner
         {
             parser.getParser().usage();
         }
-        else
-        {
-           if(parser.getParser().getParsedCommand().equals("index"))
-            {
+        else {
+            if (parser.getParser().getParsedCommand().equals("index")) {
                 runner = new IndexRunner(parser);
                 runner.run();
+            } else if (parser.getParser().getParsedCommand().equals("search")) {
+                runner = new SearchRunner(parser);
+                runner.run();
+            } else {
+                parser.getParser().usage();
             }
-           else if(parser.getParser().getParsedCommand().equals("search"))
-           {
-               runner = new SearchRunner(parser);
-               runner.run();
-           }
-           else
-           {
-               parser.getParser().usage();
-           }
         }
     }
 }
