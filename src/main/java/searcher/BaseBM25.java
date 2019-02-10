@@ -99,4 +99,21 @@ public class BaseBM25 extends BaseSearcher
         return ranks;
     }
 
+    public String getDocument(int docID)
+    {
+        String docString=null;
+        try
+        {
+            Document rankedDoc = searcher.doc(docID);
+            docString = rankedDoc.getField("text").stringValue();
+        }
+        catch (IOException io)
+        {
+            System.out.println(io.getMessage());
+        }
+        return docString;
+    }
+
+
+
 }

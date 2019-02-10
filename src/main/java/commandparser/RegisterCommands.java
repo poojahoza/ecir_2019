@@ -10,7 +10,7 @@ public class RegisterCommands
      {
 
           @Parameter(names = {"-i","--corpus-file"},description = "Corpus file to index",required=true)
-          private String IndexPath=null;
+          private String IndexPath;
 
           @Parameter(names = {"-d","--dest-location"},description = "Location to save the index file")
           private String destpath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
@@ -23,12 +23,12 @@ public class RegisterCommands
                return help;
           }
 
-          String getIndexPath()
+          public String getIndexPath()
           {
                return IndexPath;
           }
 
-          String getDestpath()
+          public String getDestpath()
           {
                return destpath;
           }
@@ -41,10 +41,13 @@ public class RegisterCommands
           @Parameter(names = {"-i", "--index-loc"}, description = "Indexed directory to search", required = true)
           private String indexlocation = null;
 
+          @Parameter(names = {"-q", "--query-cbor"}, description = "Query file (CBOR file)", required = true)
+          private String queryfile = null;
+
           @Parameter(names = "--help", help = true)
           private boolean help;
 
-          String getIndexlocation() {
+          public String getIndexlocation() {
                return indexlocation;
           }
 
