@@ -6,6 +6,10 @@ import main.java.indexer.IndexBuilder;
 
 import java.io.IOException;
 
+/*
+The indexParser object will hold all the information that is passed as the command line argument.
+There are helper methods to get the data.
+ */
 public class IndexRunner implements ProgramRunner
 {
     private RegisterCommands.CommandIndex indexParser = null;
@@ -30,6 +34,5 @@ public class IndexRunner implements ProgramRunner
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }

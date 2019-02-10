@@ -21,7 +21,11 @@ import main.java.utils.SearchUtils;
 
 public class ProjectRunner
 {
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
+        /*
+          Parses the command line and creates the parser
+        */
         CommandParser parser = new CommandParser(args);
         ProgramRunner runner = null;
         if(args.length < 1)

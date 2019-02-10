@@ -2,6 +2,11 @@ package main.java.commandparser;
 
 import com.beust.jcommander.JCommander;
 
+
+/*
+This class creates the Commands such as index and search.
+index and search is added as sub commands.
+*/
 public class CommandParser
 {
     private  JCommander  parse = null;

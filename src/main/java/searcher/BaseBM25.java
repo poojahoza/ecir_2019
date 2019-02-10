@@ -10,12 +10,23 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+
+/*
+This class extends the BaseSearcher and this is used to retrieve the initial set candidate generation using BM25.
+What it gives is
+
+            <QID ,  PARA_ID,    Container>> //Container holds all the information for the PARA.
+private Map<String, Map<String, Container>> ranks=null;
+
+                                   <QID,   Query>
+getRanking ==> Will take in the MAP<String,String> as input and returns the above mentioned map as return value
+*/
 public class BaseBM25 extends BaseSearcher
 {
     private Map<String, Map<String, Container>> ranks=null;
     private int k;
 
-     BaseBM25() throws IOException
+    BaseBM25() throws IOException
     {
         super();
         k=100;
@@ -27,7 +38,6 @@ public class BaseBM25 extends BaseSearcher
         this();
         this.k=k;
     }
-
 
     private void createRankingQueryDocPair(String outer_key, String inner_key, Container rank)
     {
@@ -99,6 +109,10 @@ public class BaseBM25 extends BaseSearcher
         return ranks;
     }
 
+    /*
+      On fly document retrieval, given the document ID
+    */
+
     public String getDocument(int docID)
     {
         String docString=null;
@@ -113,7 +127,4 @@ public class BaseBM25 extends BaseSearcher
         }
         return docString;
     }
-
-
-
 }
