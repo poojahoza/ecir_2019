@@ -3,6 +3,7 @@ package main.java.searcher;
 import main.java.containers.Container;
 import main.java.containers.EntityContainer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 
@@ -121,4 +122,46 @@ public class BaseBM25 extends BaseSearcher
         }
         return docString;
     }
+
+    public Map<String, Container> getRanking(String query)
+    {
+         Map<String,Container> temp;
+
+
+        TopDocs topDocuments = null;
+        try {
+            topDocuments = this.performSearch(query ,this.k);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+            ScoreDoc[] scoringDocuments = topDocuments.scoreDocs;
+
+            temp = new LinkedHashMap<>();
+
+            int ranking=1;
+            for(ScoreDoc s:scoringDocuments)
+            {
+                Document rankedDoc = null;
+                try {
+                    rankedDoc = searcher.doc(s.doc);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String paraId = rankedDoc.getField("id").stringValue();
+                String entity = rankedDoc.getField("entities").stringValue();
+
+                //Container that holds all the information
+                Container c = new Container(s.score,ranking,s.doc);
+                c.addEntityContainer(new EntityContainer(entity));
+
+                temp.put(paraId,c);
+                ranking++;
+            }
+       return temp;
+    }
+
+
 }

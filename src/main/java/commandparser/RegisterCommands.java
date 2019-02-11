@@ -48,13 +48,11 @@ public class RegisterCommands
      The required parameter is set to true because its mandatory
 
      Example command for your search implementation.
-     --rerank one of the method implementation requires word embeddings file, whatever data you need, you can accept it
-     using the postional arguments for the --rerank.
+     --rerank one of the method implementation requires word embeddings file, whatever data you need, you can accept it.
 
-     arity =1 because I am expecting if users use --rerank option, they will pass in the Glove file as argument.
-     if arity=2 I can expect two other data the user needs to pass in.
+     There are some helper functions that needs to be implemented to validate the inputs for your method, if the user missed any
+     data, the program should exit with a status message
 
-     Note: for the options such as --rerank, all the data passed acts in as positional argument.
      */
 
      @Parameters(separators = "=",commandDescription = "Command to search")
@@ -75,14 +73,21 @@ public class RegisterCommands
           @Parameter(names = "--rerank",description ="Rerank the initial retrieved cluster using document similarity")
           private boolean isReRank =false;
 
-         @Parameter(names = {"--we","--word-embedding"},description ="Rerank the initial retrieved cluster using document similarity")
+         @Parameter(names = {"--we","--word-embedding"},description ="Pass the word embedding file GloVe/ Word2Vec")
          private String word_embedding_file = null;
 
-          public String getIndexlocation() {
+
+         @Parameter(names = {"--dim","--word-dimension"},description ="Dimension of the Word embeddings")
+         private Integer dimension=0;
+
+
+         public String getIndexlocation()
+          {
                return indexlocation;
           }
 
-          public String getQueryfile() {
+          public String getQueryfile()
+          {
                return queryfile;
           }
 
@@ -101,6 +106,10 @@ public class RegisterCommands
               return word_embedding_file;
           }
 
+          public Integer getDimension()
+          {
+              return dimension;
+          }
 
           boolean isHelp() {
                return help;

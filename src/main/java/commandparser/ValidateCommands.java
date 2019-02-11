@@ -10,8 +10,13 @@ public class ValidateCommands
         {
             this.indexParser = indexParser;
         }
-    }
 
+        private void CALLEXIT(int status)
+        {
+            System.exit(status);
+        }
+
+    }
 
 
     public static class ValidateSearchCommands
@@ -24,16 +29,27 @@ public class ValidateCommands
             this.searchParser = searchParser;
         }
 
+
+        private void CALLEXIT(int status)
+        {
+            System.exit(status);
+        }
+
         public void ValidateReRank()
         {
             if(searchParser.getWordEmbeddingFile()== null)
             {
                 System.out.println("Please pass the word Embeddings file");
-                System.exit(-1);
+                CALLEXIT(-1);
             }
+
+            if(searchParser.getDimension()==0)
+            {
+                System.out.println("Please pass the dimension of the word vectors");
+                CALLEXIT(-1);
+            }
+
         }
-
-
 
     }
 
