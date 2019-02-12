@@ -110,7 +110,6 @@ abstract public class LabelPredictor {
      */
     //public void evaluate() { KotlinEvaluator.Companion.evaluate(this); }
 
-
     /**
      * Desc: For each spam email in training corpus, retrieves its tokens.
      * @return A list where each element is a list of tokens from a particular spam email
