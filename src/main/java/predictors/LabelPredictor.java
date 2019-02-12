@@ -1,7 +1,7 @@
 package main.java.predictors;
 
 import main.java.utils.SearchUtils;
-import main.kotlin.evaluation.KotlinEvaluator;
+//import main.kotlin.evaluation.KotlinEvaluator;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -108,9 +108,7 @@ abstract public class LabelPredictor {
      * The labels will be used to compute the F1 Score of your label prediction method.
      *
      */
-    public void evaluate() {
-        KotlinEvaluator.Companion.evaluate(this);
-    }
+    //public void evaluate() { KotlinEvaluator.Companion.evaluate(this); }
 
 
     /**

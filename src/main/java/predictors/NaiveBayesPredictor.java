@@ -32,7 +32,7 @@ public class NaiveBayesPredictor extends LabelPredictor {
     public static void main(String[] args) throws IOException {
         IndexSearcher searcher = SearchUtils.createIndexSearcher("index");
         LabelPredictor predictor = new NaiveBayesPredictor(searcher);
-        predictor.evaluate();
+        //predictor.evaluate();
     }
 
 }

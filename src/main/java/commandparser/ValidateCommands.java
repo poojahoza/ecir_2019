@@ -52,5 +52,20 @@ public class ValidateCommands
         }
 
     }
+    public static class ValidateClassifyCommands
+    {
+        private final RegisterCommands.CommandClassify classifyParser;
+
+        public ValidateClassifyCommands(RegisterCommands.CommandClassify classifyParser)
+        {
+            this.classifyParser = classifyParser;
+        }
+
+        private void CALLEXIT(int status)
+        {
+            System.exit(status);
+        }
+
+    }
 
 }

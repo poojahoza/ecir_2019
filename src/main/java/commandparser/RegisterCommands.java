@@ -116,6 +116,18 @@ public class RegisterCommands
           }
      }
 
+    @Parameters(separators = "=",commandDescription = "Command to classify a document as ham or spam")
+    public static class CommandClassify
+    {
+
+        @Parameter(names = "--help", help = true)
+        private boolean help;
+
+        boolean isHelp() {
+            return help;
+        }
+    }
+
      @Parameters(separators = "=",commandDescription = "Help Information")
      public static class CommandHelp
      {
