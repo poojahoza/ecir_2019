@@ -27,21 +27,21 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>7.4.0</version>
+            <version>7.7.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-analyzers-common -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
-            <version>7.4.0</version>
+            <version>7.7.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-queryparser -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>7.4.0</version>
+            <version>7.7.0</version>
         </dependency>
 
         <dependency>
@@ -49,6 +49,20 @@
             <artifactId>jcommander</artifactId>
             <version>1.72 </version>
         </dependency>
+
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-core</artifactId>
+            <version>1.0.0-beta3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>nd4j-native-platform</artifactId>
+            <version>1.0.0-beta3</version>
+        </dependency>
+
+
 
     </dependencies>
 

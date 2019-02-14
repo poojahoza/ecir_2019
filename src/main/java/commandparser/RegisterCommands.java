@@ -70,15 +70,18 @@ public class RegisterCommands
           @Parameter(names = {"-k","--candidate-set-val"}, description = "How many candidate set to retrieve using BM25")
           private Integer kVAL=100;
 
-          @Parameter(names = "--rerank",description ="Rerank the initial retrieved cluster using document similarity")
+          @Parameter(names = "-rerank",description ="Rerank the initial retrieved document using document similarity")
           private boolean isReRank =false;
 
-         @Parameter(names = {"--we","--word-embedding"},description ="Pass the word embedding file GloVe/ Word2Vec")
+         @Parameter(names = {"-we","--word-embedding"},description ="Pass the word embedding file GloVe/ Word2Vec")
          private String word_embedding_file = null;
 
 
-         @Parameter(names = {"--dim","--word-dimension"},description ="Dimension of the Word embeddings")
+         @Parameter(names = {"-dim","--word-dimension"},description ="Dimension of the Word embeddings")
          private Integer dimension=0;
+
+         @Parameter(names = {"-bm25","--default-bm25"},description ="Rerank the initial retrieved cluster using document similarity")
+         private boolean isBM25 =false;
 
 
          public String getIndexlocation()

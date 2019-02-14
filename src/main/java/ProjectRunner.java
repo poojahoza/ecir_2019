@@ -1,24 +1,12 @@
 package main.java;
 
-import com.beust.jcommander.JCommander;
+
 import main.java.commandparser.CommandParser;
-import main.java.commandparser.RegisterCommands;
 import main.java.runner.IndexRunner;
 import main.java.runner.ProgramRunner;
 import main.java.runner.SearchRunner;
-import main.java.searcher.BaseBM25;
-import main.java.utils.Constants;
-import main.java.indexer.IndexBuilder;
-import main.java.searcher.BaseSearcher;
 
-import java.io.IOException;
 
-import java.util.List;
-import java.util.Map;
-
-import main.java.containers.Container;
-import main.java.utils.SearchUtils;
-import main.java.utils.StopWord;
 
 
 public class ProjectRunner

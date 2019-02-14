@@ -28,7 +28,7 @@ public class IndexBuilder
 
     private void writePara(Data.Paragraph p,IndexWriter i)
     {
-        int incrementFactor=2000;
+        int incrementFactor=10000;
         System.out.println("Indexing "+ p.getParaId());
         Document doc = new Document();
 
@@ -37,6 +37,7 @@ public class IndexBuilder
         contentType.setStored(true);
         contentType.setTokenized(true);
         contentType.setStoreTermVectors(true);
+
         List<String> entity = p.getEntitiesOnly();
 
         String entityString = String.join(" ",entity);
