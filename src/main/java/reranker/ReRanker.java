@@ -33,7 +33,14 @@ public class ReRanker
 
     public void ReRank()
     {
-        runnerReRank.performDocumentSimilarity();
+
+        for(Map.Entry<String,String> q: query.entrySet())
+        {
+            System.out.println(q.getValue());
+            runnerReRank.getReRank(bm25.getRanking(q.getValue()));
+            break;
+        }
+        //runnerReRank.performDocumentSimilarity();
     }
 
 
