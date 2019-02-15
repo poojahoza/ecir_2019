@@ -73,15 +73,15 @@ public class RegisterCommands
           @Parameter(names = "--rerank",description ="Rerank the initial retrieved cluster using document similarity")
           private boolean isReRank =false;
 
-         @Parameter(names = {"--we","--word-embedding"},description ="Pass the word embedding file GloVe/ Word2Vec")
-         private String word_embedding_file = null;
+          @Parameter(names = {"--we","--word-embedding"},description ="Pass the word embedding file GloVe/ Word2Vec")
+          private String word_embedding_file = null;
 
 
-         @Parameter(names = {"--dim","--word-dimension"},description ="Dimension of the Word embeddings")
-         private Integer dimension=0;
+          @Parameter(names = {"--dim","--word-dimension"},description ="Dimension of the Word embeddings")
+          private Integer dimension=0;
 
 
-         public String getIndexlocation()
+          public String getIndexlocation()
           {
                return indexlocation;
           }
@@ -116,9 +116,47 @@ public class RegisterCommands
           }
      }
 
-    @Parameters(separators = "=",commandDescription = "Command to classify a document as ham or spam")
+    @Parameters(separators = "=",commandDescription = "Command to create ham and spam datasets")
     public static class CommandClassify
     {
+        @Parameter(names = {"-i", "--index-loc"}, description = "Indexed directory to search", required = true)
+        private String indexlocation = null;
+
+        @Parameter(names = {"-q", "--qrel-loc"}, description = "Qrels file to create the ham and spam datasets", required = true)
+        private String qrellocation = null;
+
+        @Parameter(names = {"-d","--dest-location"},description = "Location to save the datasets")
+        private String destpath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+
+        @Parameter(names = "--help", help = true)
+        private boolean help;
+
+        boolean isHelp()
+        {
+            return help;
+        }
+
+        public String getIndexPath()
+        {
+            return indexlocation;
+        }
+
+        public String getQrelPath()
+        {
+            return qrellocation;
+        }
+
+        public String getDestpath()
+        {
+            return destpath;
+        }
+    }
+
+    @Parameters(separators = "=",commandDescription = "Use the ham and spam data sets to detect and filter spam from search results")
+    public static class CommandFilter
+    {
+        @Parameter(names = {"-i","--data-file"},description = "Location of the indexed spam and ham datasets",required=true)
+        private String IndexPath;
 
         @Parameter(names = "--help", help = true)
         private boolean help;
@@ -126,6 +164,12 @@ public class RegisterCommands
         boolean isHelp() {
             return help;
         }
+
+        public String getIndexPath()
+        {
+            return IndexPath;
+        }
+
     }
 
      @Parameters(separators = "=",commandDescription = "Help Information")

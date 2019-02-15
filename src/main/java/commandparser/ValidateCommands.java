@@ -52,6 +52,7 @@ public class ValidateCommands
         }
 
     }
+
     public static class ValidateClassifyCommands
     {
         private final RegisterCommands.CommandClassify classifyParser;
@@ -59,6 +60,22 @@ public class ValidateCommands
         public ValidateClassifyCommands(RegisterCommands.CommandClassify classifyParser)
         {
             this.classifyParser = classifyParser;
+        }
+
+        private void CALLEXIT(int status)
+        {
+            System.exit(status);
+        }
+
+    }
+
+    public static class ValidateFilterCommands
+    {
+        private final RegisterCommands.CommandFilter filterParser;
+
+        public ValidateFilterCommands(RegisterCommands.CommandFilter filterParser)
+        {
+            this.filterParser = filterParser;
         }
 
         private void CALLEXIT(int status)
