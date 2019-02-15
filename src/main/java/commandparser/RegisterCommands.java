@@ -125,8 +125,11 @@ public class RegisterCommands
         @Parameter(names = {"-q", "--qrel-loc"}, description = "Qrels file to create the ham and spam datasets", required = true)
         private String qrellocation = null;
 
-        @Parameter(names = {"-d","--dest-location"},description = "Location to save the datasets")
-        private String destpath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+        @Parameter(names = {"-h","--ham-location"},description = "Location to save the ham corpus")
+        private String hampath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+
+        @Parameter(names = {"-s","--spam-location"},description = "Location to save the spam corpus")
+        private String spampath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
 
         @Parameter(names = "--help", help = true)
         private boolean help;
@@ -146,9 +149,14 @@ public class RegisterCommands
             return qrellocation;
         }
 
-        public String getDestpath()
+        public String getHamPath()
         {
-            return destpath;
+            return hampath;
+        }
+
+        public String getSpamPath()
+        {
+            return spampath;
         }
     }
 

@@ -13,7 +13,10 @@ import java.nio.file.Paths;
 import java.util.*;
 
 
-
+/**
+ * Responsible for creating the ham and spam corpus to train on with the
+ * improved BayesCounter.
+ */
 public class ClassifyRunner implements ProgramRunner {
 
     private RegisterCommands.CommandClassify classifyParser = null;
@@ -34,14 +37,15 @@ public class ClassifyRunner implements ProgramRunner {
         classifyMap = parseQrels(classifyMap);
 
         // Use the ids stored in the maps to get the documents from the Lucene index.
+        HashMap<String, HashMap<String, String>> corpus = new HashMap<>();
         try {
-            HashMap<String, HashMap<String, String>> corpus = getDocIds(classifyMap);
+            corpus = getDocIds(classifyMap);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         // Use these ids to look up the correct documents to feed to the BayesCounter
-        writeMaps();
+        writeMaps(corpus);
     }
 
     private HashMap<String, HashMap<String, String>> initializeMaps() {
@@ -122,7 +126,30 @@ public class ClassifyRunner implements ProgramRunner {
         return corpus;
     }
 
-    private void writeMaps() {
+    private void writeMaps(HashMap<String, HashMap<String, String>> corpus) {
+
+        HashMap<String, String> spamTokens = corpus.get("spam");
+        HashMap<String, String> hamTokens = corpus.get("ham");
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(classifyParser.getSpamPath(), true));
+            for (String key : spamTokens.keySet()) {
+                writer.write(key + ": " + spamTokens.get(key) + '\n');
+            }
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(classifyParser.getHamPath(), true));
+            for (String key : hamTokens.keySet()) {
+                writer.write(key + ": " + hamTokens.get(key) + '\n');
+            }
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }
