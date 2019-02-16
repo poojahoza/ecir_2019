@@ -18,6 +18,19 @@ public class ValidateCommands
 
     }
 
+    public static class ValidatePageIndexCommands{
+
+        RegisterCommands.CommandPageIndex pageIndexParser = null;
+        public ValidatePageIndexCommands(RegisterCommands.CommandPageIndex pageIndexParser){
+            this.pageIndexParser = pageIndexParser;
+        }
+
+        private void CALLEXIT(int status)
+        {
+            System.exit(status);
+        }
+    }
+
 
     public static class ValidateSearchCommands
     {

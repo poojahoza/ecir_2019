@@ -1,5 +1,6 @@
 package main.java.searcher;
 
+import edu.unh.cs.lucene.TrecCarLuceneConfig;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.store.FSDirectory;
@@ -34,7 +35,8 @@ public class BaseSearcher {
     public BaseSearcher(String indexLocation) throws IOException
     {
         searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(Paths.get(indexLocation))));
-        parser = new QueryParser("text", new EnglishAnalyzer());
+        parser = new QueryParser("Text", new EnglishAnalyzer());
+        //parser = new QueryParser("text", new EnglishAnalyzer());
     }
 
     /**
@@ -69,7 +71,8 @@ public class BaseSearcher {
             //Print out the results from the rank document
 
             String docScore = String.valueOf(scoringDoc.score);
-            String paraId = rankedDoc.getField("id").stringValue();
+            String paraId = rankedDoc.getField("Id").stringValue();
+            //String paraId = rankedDoc.getField("id").stringValue();
             String paraRank = String.valueOf(ind+1);
             rankings.add(queryId + " Q0 " + paraId + " " + paraRank + " " + docScore + " "+"team1" + "-" + "BM25");
         }

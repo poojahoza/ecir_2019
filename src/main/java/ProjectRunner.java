@@ -5,6 +5,7 @@ import main.java.runner.IndexRunner;
 import main.java.runner.ProgramRunner;
 import main.java.runner.SearchRunner;
 import main.java.runner.ClassifyRunner;
+import main.java.runner.PageRunner;
 
 
 public class ProjectRunner
@@ -30,7 +31,10 @@ public class ProjectRunner
             } else if (parser.getParser().getParsedCommand().equals("classify")) {
                 runner = new ClassifyRunner(parser);
                 runner.run();
-            } else {
+            } else if (parser.getParser().getParsedCommand().equals("pageindex")) {
+                runner = new PageRunner(parser);
+                runner.run();
+            }else {
                 parser.getParser().usage();
             }
         }
