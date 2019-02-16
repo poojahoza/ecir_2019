@@ -11,8 +11,9 @@ public class CommandParser
 {
     private  JCommander  parse = null;
     private RegisterCommands.CommandIndex index = null;
-    private RegisterCommands.CommandSearch search=null;
-    private RegisterCommands.CommandClassify classify=null;
+    private RegisterCommands.CommandSearch search = null;
+    private RegisterCommands.CommandClassify classify = null;
+    private RegisterCommands.CommandFilter filter = null;
     private RegisterCommands.CommandHelp helpc = null;
     private String[] argslist = null;
 
@@ -21,8 +22,9 @@ public class CommandParser
         index = new RegisterCommands.CommandIndex();
         search =new RegisterCommands.CommandSearch();
         classify = new RegisterCommands.CommandClassify();
+        filter = new RegisterCommands.CommandFilter();
         helpc = new RegisterCommands.CommandHelp();
-        argslist=args;
+        argslist = args;
         parse = createParser();
     }
 
@@ -30,7 +32,7 @@ public class CommandParser
     {
         if(parse == null)
         {
-            parse = JCommander.newBuilder().addCommand("index",index).addCommand("search",search).addCommand("classify", classify).addCommand("--help",helpc).build();
+            parse = JCommander.newBuilder().addCommand("index",index).addCommand("search",search).addCommand("classify", classify).addCommand("filter", filter).addCommand("--help",helpc).build();
             parse.parse(argslist);
         }
         return parse;
@@ -41,15 +43,21 @@ public class CommandParser
         return parse;
     }
 
-    public RegisterCommands.CommandIndex getIndexCommand()
-    {
-        return index;
-
-    }
+    public RegisterCommands.CommandIndex getIndexCommand() { return index; }
 
     public RegisterCommands.CommandSearch getSearchCommand()
     {
         return search;
+    }
+
+    public RegisterCommands.CommandClassify getClassifyCommand()
+    {
+        return classify;
+    }
+
+    public RegisterCommands.CommandFilter getFilterCommand()
+    {
+        return filter;
     }
 
 }
