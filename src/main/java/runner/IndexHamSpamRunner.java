@@ -17,15 +17,15 @@ import java.util.*;
  * Responsible for creating the ham and spam corpus to train on with the
  * improved BayesCounter.
  */
-public class ClassifyRunner implements ProgramRunner {
+public class IndexHamSpamRunner implements ProgramRunner {
 
-    private RegisterCommands.CommandClassify classifyParser = null;
-    private ValidateCommands.ValidateClassifyCommands validate = null;
+    private RegisterCommands.IndexHamSpam indexHamSpamParser = null;
+    private ValidateCommands.ValidateIndexHamSpamCommands validate = null;
 
-    public ClassifyRunner(CommandParser parser)
+    public IndexHamSpamRunner(CommandParser parser)
     {
-        classifyParser = parser.getClassifyCommand();
-        validate = new ValidateCommands.ValidateClassifyCommands(classifyParser);
+        indexHamSpamParser = parser.getClassifyCommand();
+        validate = new ValidateCommands.ValidateIndexHamSpamCommands(indexHamSpamParser);
     }
 
     @Override
@@ -37,15 +37,16 @@ public class ClassifyRunner implements ProgramRunner {
         classifyMap = parseQrels(classifyMap);
 
         // Use the ids stored in the maps to get the documents from the Lucene index.
-        HashMap<String, HashMap<String, String>> corpus = new HashMap<>();
+        ArrayList<Document> corpus = new ArrayList<>();
         try {
             corpus = getDocIds(classifyMap);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // Use these ids to look up the correct documents to feed to the BayesCounter
-        writeMaps(corpus);
+        // This is not enough. I need to make an actual Lucene index. To do this, I need to write the data to a certain
+        // format before invoking the indexbuilder.
+        writeIndex(corpus);
     }
 
     private HashMap<String, HashMap<String, String>> initializeMaps() {
@@ -65,7 +66,7 @@ public class ClassifyRunner implements ProgramRunner {
 
         // Open the qrels file and iterate through each line
         BufferedReader reader = null;
-        File qrelsFile = new File(classifyParser.getQrelPath());
+        File qrelsFile = new File(indexHamSpamParser.getQrelPath());
         String line = null;
 
         try {
@@ -79,11 +80,11 @@ public class ClassifyRunner implements ProgramRunner {
 
                 if (curLine[3].equals("-2")) {
                     curMap = classifyMap.get("spam");
-                    curMap.put(curLine[2], curLine[0]);
+                    curMap.put(curLine[2], line);
                 }
                 else if (curLine[3].equals("2")) {
                     curMap = classifyMap.get("ham");
-                    curMap.put(curLine[2], curLine[0]);
+                    curMap.put(curLine[2], line);
                 }
             }
 
@@ -94,62 +95,40 @@ public class ClassifyRunner implements ProgramRunner {
         return classifyMap;
     }
 
-    private HashMap<String, HashMap<String, String>> getDocIds (HashMap<String, HashMap<String, String>> classifyMap) throws IOException {
+    private ArrayList<Document> getDocIds (HashMap<String, HashMap<String, String>> classifyMap) throws IOException {
 
-        // Use the searcher to traverse the lucene index, and check each page id against those in the maps.
-        // If there is a match, overwrite the page id in the map with the document id.
-        IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(classifyParser.getIndexPath())));
+        IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexHamSpamParser.getIndexPath())));
 
         HashMap<String, String> spamMap = classifyMap.get("spam");
         HashMap<String, String> hamMap = classifyMap.get("ham");
 
-        HashMap<String, String> spamTokens = new HashMap<>();
-        HashMap<String, String> hamTokens = new HashMap<>();
-        HashMap<String, HashMap<String, String>> corpus = new HashMap<>();
+        ArrayList<Document> corpus = new ArrayList<>();
 
         for (int i = 0; i < reader.maxDoc(); i++) {
             Document doc = reader.document(i);
             String docId = doc.get("id");
-            String text = doc.get("text");
 
             if (spamMap.containsKey(docId)) {
-                spamTokens.put(docId, text);
-                // There are no spam ids in the corpus...
+                corpus.add(doc);
             }
             else if (hamMap.containsKey(docId)) {
-                hamTokens.put(docId, text);
+               corpus.add(doc);
             }
         }
 
-        corpus.put("ham", hamMap);
-        corpus.put("spam", spamMap);
         return corpus;
     }
 
-    private void writeMaps(HashMap<String, HashMap<String, String>> corpus) {
-
-        HashMap<String, String> spamTokens = corpus.get("spam");
-        HashMap<String, String> hamTokens = corpus.get("ham");
+    private void writeIndex(ArrayList<Document> corpus) {
 
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(classifyParser.getSpamPath(), true));
-            for (String key : spamTokens.keySet()) {
-                writer.write(key + ": " + spamTokens.get(key) + '\n');
+            BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getPath(), true));
+            for (Document item : corpus) {
+                writer.write(item + "\n");
             }
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(classifyParser.getHamPath(), true));
-            for (String key : hamTokens.keySet()) {
-                writer.write(key + ": " + hamTokens.get(key) + '\n');
-            }
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 }

@@ -1,9 +1,12 @@
 package main.java.runner;
 
-import main.java.BayesCounter;
 import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
+import main.java.predictors.LabelPredictor;
+import main.java.predictors.NaiveBayesPredictor;
+import main.java.utils.SearchUtils;
+import org.apache.lucene.search.IndexSearcher;
 
 
 public class FilterRunner implements ProgramRunner {
@@ -20,9 +23,8 @@ public class FilterRunner implements ProgramRunner {
     @Override
     public void run()
     {
-        BayesCounter bc = new BayesCounter();
-        // Here's where I train the data using the BuildHashMap methods
-        // Potentially create a wrapper function called doTrain
-
+        IndexSearcher searcher = SearchUtils.createIndexSearcher(filterParser.getIndexPath());
+        LabelPredictor predictor = new NaiveBayesPredictor(searcher);
+        // predictor.evaluate();
     }
 }

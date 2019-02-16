@@ -12,7 +12,7 @@ public class CommandParser
     private  JCommander  parse = null;
     private RegisterCommands.CommandIndex index = null;
     private RegisterCommands.CommandSearch search = null;
-    private RegisterCommands.CommandClassify classify = null;
+    private RegisterCommands.IndexHamSpam indexHamSpam = null;
     private RegisterCommands.CommandFilter filter = null;
     private RegisterCommands.CommandHelp helpc = null;
     private String[] argslist = null;
@@ -21,7 +21,7 @@ public class CommandParser
     {
         index = new RegisterCommands.CommandIndex();
         search =new RegisterCommands.CommandSearch();
-        classify = new RegisterCommands.CommandClassify();
+        indexHamSpam = new RegisterCommands.IndexHamSpam();
         filter = new RegisterCommands.CommandFilter();
         helpc = new RegisterCommands.CommandHelp();
         argslist = args;
@@ -32,7 +32,7 @@ public class CommandParser
     {
         if(parse == null)
         {
-            parse = JCommander.newBuilder().addCommand("index",index).addCommand("search",search).addCommand("classify", classify).addCommand("filter", filter).addCommand("--help",helpc).build();
+            parse = JCommander.newBuilder().addCommand("index",index).addCommand("search",search).addCommand("indexHamSpam", indexHamSpam).addCommand("filter", filter).addCommand("--help",helpc).build();
             parse.parse(argslist);
         }
         return parse;
@@ -50,9 +50,9 @@ public class CommandParser
         return search;
     }
 
-    public RegisterCommands.CommandClassify getClassifyCommand()
+    public RegisterCommands.IndexHamSpam getClassifyCommand()
     {
-        return classify;
+        return indexHamSpam;
     }
 
     public RegisterCommands.CommandFilter getFilterCommand()

@@ -53,13 +53,13 @@ public class ValidateCommands
 
     }
 
-    public static class ValidateClassifyCommands
+    public static class ValidateIndexHamSpamCommands
     {
-        private final RegisterCommands.CommandClassify classifyParser;
+        private final RegisterCommands.IndexHamSpam indexHamSpamParser;
 
-        public ValidateClassifyCommands(RegisterCommands.CommandClassify classifyParser)
+        public ValidateIndexHamSpamCommands(RegisterCommands.IndexHamSpam indexHamSpamParser)
         {
-            this.classifyParser = classifyParser;
+            this.indexHamSpamParser = indexHamSpamParser;
         }
 
         private void CALLEXIT(int status)
@@ -75,11 +75,13 @@ public class ValidateCommands
 
         public ValidateFilterCommands(RegisterCommands.CommandFilter filterParser)
         {
+
             this.filterParser = filterParser;
         }
 
         private void CALLEXIT(int status)
         {
+
             System.exit(status);
         }
 

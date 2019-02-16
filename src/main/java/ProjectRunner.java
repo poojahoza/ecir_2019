@@ -4,7 +4,7 @@ import main.java.commandparser.CommandParser;
 import main.java.runner.IndexRunner;
 import main.java.runner.ProgramRunner;
 import main.java.runner.SearchRunner;
-import main.java.runner.ClassifyRunner;
+import main.java.runner.IndexHamSpamRunner;
 import main.java.runner.FilterRunner;
 
 public class ProjectRunner
@@ -28,7 +28,7 @@ public class ProjectRunner
                 runner = new SearchRunner(parser);
                 runner.run();
             } else if (parser.getParser().getParsedCommand().equals("classify")) {
-                runner = new ClassifyRunner(parser);
+                runner = new IndexHamSpamRunner(parser);
                 runner.run();
             } else if (parser.getParser().getParsedCommand().equals("filter")) {
                 runner = new FilterRunner(parser);
