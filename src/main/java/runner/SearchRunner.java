@@ -37,6 +37,11 @@ public class SearchRunner implements ProgramRunner
             re.ReRank();
         }
 
+        if(searchParser.isQEEnabled())
+        {
+
+        }
+
 
     }
 }

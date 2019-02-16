@@ -70,7 +70,7 @@ public class RegisterCommands
           @Parameter(names = {"-k","--candidate-set-val"}, description = "How many candidate set to retrieve using BM25")
           private Integer kVAL=100;
 
-          @Parameter(names = "-rerank",description ="Rerank the initial retrieved document using document similarity")
+          @Parameter(names = "--rerank",description ="Rerank the initial retrieved document using document similarity")
           private boolean isReRank =false;
 
          @Parameter(names = {"-we","--word-embedding"},description ="Pass the word embedding file GloVe/ Word2Vec")
@@ -82,6 +82,9 @@ public class RegisterCommands
 
          @Parameter(names = {"-bm25","--default-bm25"},description ="Rerank the initial retrieved cluster using document similarity")
          private boolean isBM25 =false;
+
+         @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the initial retrieved cluster using document similarity")
+         private boolean isQE =false;
 
 
          public String getIndexlocation()
@@ -113,6 +116,8 @@ public class RegisterCommands
           {
               return dimension;
           }
+
+          public  Boolean isQEEnabled(){ return isQE;}
 
           boolean isHelp() {
                return help;

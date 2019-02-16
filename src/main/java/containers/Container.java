@@ -1,17 +1,17 @@
 package main.java.containers;
 
-public class Container
+import org.jetbrains.annotations.NotNull;
+
+public class Container implements Comparable
 {
     private int  docID;
-    private float scoreVal;
-    private Integer ranking;
+    private Double scoreVal;
     private EntityContainer entity;
 
-    public Container(float scoreVal,Integer ranking,int docID)
+    public Container(Double scoreVal,int docID)
     {
         this.docID=docID;
         this.scoreVal=scoreVal;
-        this.ranking=ranking;
     }
 
     public void addEntityContainer(EntityContainer e)
@@ -20,8 +20,16 @@ public class Container
     }
 
     public int  getDocID() {return docID;}
-    public float getScore(){return scoreVal;}
-    public Integer getRanking() {return ranking;};
-    public String getEntity() { return entity.getEntityVal();
+    public Double getScore(){return scoreVal;}
+
+    public String getEntity() { return entity.getEntityVal();}
+    public void setScoreVal(Double scoreVal)
+    {
+        this.scoreVal=scoreVal;
+    }
+
+    @Override
+    public int compareTo(@NotNull Object o) {
+        return this.scoreVal.compareTo(((Container)o).scoreVal);
     }
 }

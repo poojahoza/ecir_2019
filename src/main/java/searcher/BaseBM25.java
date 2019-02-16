@@ -51,7 +51,6 @@ public class BaseBM25 extends BaseSearcher
 
     private void parseScoreDocs(ScoreDoc[] scoreDocs, String queryId) throws IOException
     {
-        int ranking=1;
         for(ScoreDoc s:scoreDocs)
         {
             Document rankedDoc = searcher.doc(s.doc);
@@ -59,11 +58,11 @@ public class BaseBM25 extends BaseSearcher
             String entity = rankedDoc.getField("entities").stringValue();
 
             //Container that holds all the information
-            Container c = new Container(s.score,ranking,s.doc);
+            Container c = new Container((double) s.score,s.doc);
             c.addEntityContainer(new EntityContainer(entity));
 
             createRankingQueryDocPair(queryId, paraId,c);
-            ranking++;
+
         }
     }
 
@@ -141,7 +140,6 @@ public class BaseBM25 extends BaseSearcher
 
             temp = new LinkedHashMap<>();
 
-            int ranking=1;
             for(ScoreDoc s:scoringDocuments)
             {
                 Document rankedDoc = null;
@@ -154,11 +152,9 @@ public class BaseBM25 extends BaseSearcher
                 String entity = rankedDoc.getField("entities").stringValue();
 
                 //Container that holds all the information
-                Container c = new Container(s.score,ranking,s.doc);
+                Container c = new Container((double) s.score,s.doc);
                 c.addEntityContainer(new EntityContainer(entity));
-
                 temp.put(paraId,c);
-                ranking++;
             }
        return temp;
     }

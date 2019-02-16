@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.util.Map;
 
 /*
-Document Re-ranker based on the document similarity. This is naive approach.
+@author: Amith
+This class performs the Re-Ranking based on the document similarity
 */
-
 public class ReRanker
 {
     private BaseBM25 bm25 = null;
@@ -33,14 +33,16 @@ public class ReRanker
 
     public void ReRank()
     {
-
         for(Map.Entry<String,String> q: query.entrySet())
         {
             System.out.println(q.getValue());
-            runnerReRank.getReRank(bm25.getRanking(q.getValue()));
+            Map<String,Double> v= runnerReRank.getReRank(bm25.getRanking(q.getValue()));
+            if(v!=null)
+            {
+                    System.out.println(v);
+            }
             break;
         }
-        //runnerReRank.performDocumentSimilarity();
     }
 
 
