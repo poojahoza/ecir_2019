@@ -1,6 +1,8 @@
 package main.java.indexer;
 
 /*Lucene imports*/
+import edu.unh.cs.TrecCarParagraph;
+import edu.unh.cs.lucene.TrecCarLuceneConfig;
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexOptions;
@@ -26,7 +28,7 @@ public class IndexBuilder
         indexWriter = IndexUtils.createIndexWriter(indexDir);
     }
 
-    private void writePara(Data.Paragraph p,IndexWriter i)
+    /*private void writePara(Data.Paragraph p,IndexWriter i)
     {
         int incrementFactor=10000;
         System.out.println("Indexing "+ p.getParaId());
@@ -60,6 +62,26 @@ public class IndexBuilder
         }catch(IOException ioe) {
             System.out.println(ioe.getMessage());
         }
+    }*/
+    private void writePara(Data.Paragraph p,
+                           IndexWriter i,
+                           TrecCarLuceneConfig.LuceneIndexConfig cfg,
+                           TrecCarParagraph trecCarParaRepr){
+        final Document doc = trecCarParaRepr.paragraphToLuceneDoc(p);
+        try {
+            int incrementFactor=2000;
+            indexWriter.addDocument(doc);
+            increment++;
+
+            //commit the Data after incrementFactorVariable paragraph
+
+            if(increment % incrementFactor ==0)
+            {
+                indexWriter.commit();
+            }
+        }catch(IOException ioe) {
+            System.out.println(ioe.getMessage());
+        }
     }
 
     /**
@@ -69,6 +91,20 @@ public class IndexBuilder
     public void performIndex(String cborLoc) throws IOException
     {
         Iterable<Data.Paragraph> para = IndexUtils.createParagraphIterator(cborLoc);
+        TrecCarLuceneConfig.LuceneIndexConfig cfg = TrecCarLuceneConfig.paragraphConfig();
+        TrecCarParagraph tcpr = cfg.getTrecCarParaRepr();
+        StreamSupport.stream(para.spliterator(), true)
+                .forEach(paragraph ->
+                {
+                    writePara(paragraph,indexWriter, cfg, tcpr);
+
+                });
+        closeIndexWriter();
+    }
+
+    /*public void performIndex(String cborLoc) throws IOException
+    {
+        Iterable<Data.Paragraph> para = IndexUtils.createParagraphIterator(cborLoc);
         StreamSupport.stream(para.spliterator(), true)
                 .forEach(paragraph ->
                 {
@@ -76,7 +112,7 @@ public class IndexBuilder
 
                 });
         closeIndexWriter();
-    }
+    }*/
 
 
     /**

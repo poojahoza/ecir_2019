@@ -124,9 +124,47 @@ public class RegisterCommands
           }
      }
 
+    @Parameters(separators = "=",commandDescription = "Command to classify a document as ham or spam")
+    public static class CommandClassify
+    {
+
+        @Parameter(names = "--help", help = true)
+        private boolean help;
+
+        boolean isHelp() {
+            return help;
+        }
+    }
+
      @Parameters(separators = "=",commandDescription = "Help Information")
      public static class CommandHelp
      {
+
+     }
+
+    @Parameters(separators = "=",commandDescription = "Command to Index the Page Corpus")
+     public static class CommandPageIndex{
+
+        @Parameter(names = {"-i","--corpus-file"},description = "Page Corpus file to index",required=true)
+        private String PageIndexPath;
+
+        @Parameter(names = {"-p","--page-dest-location"},description = "Location to save the page index file")
+        private String pagedestpath = System.getProperty("user.dir") + System.getProperty("file.separator") + "entity_indexed_file";
+
+        @Parameter(names = "--help", help = true)
+        private boolean help;
+
+        boolean isHelp()
+        {
+            return help;
+        }
+
+        public String PageIndexPath()
+        {
+            return PageIndexPath;
+        }
+
+        public String getPagedestpath(){ return pagedestpath;}
 
      }
 }
