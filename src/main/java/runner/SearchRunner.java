@@ -4,11 +4,12 @@ import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
+import main.java.reranker.ReRankIDFRunner;
 import main.java.reranker.ReRanker;
 import main.java.searcher.BaseBM25;
 import main.java.utils.RunWriter;
 import main.java.utils.SearchUtils;
-import org.nd4j.shade.jackson.databind.ser.Serializers;
+
 
 import java.io.IOException;
 import java.util.Map;
@@ -39,6 +40,13 @@ public class SearchRunner implements ProgramRunner
             validate.ValidateReRank();
             ReRanker re = new ReRanker(searchParser,queryCBOR);
             re.ReRank();
+        }
+
+        if(searchParser.isIDFReRankEnabled())
+        {
+            validate.ValidateReRank();
+            ReRanker re = new ReRanker(searchParser,queryCBOR);
+            re.ReRankIDF();
         }
 
         if(searchParser.isBM25Enabled())

@@ -99,10 +99,16 @@ public class RegisterCommands
          @Parameter(names = {"-V","--verbose"},description ="Print out  some of the results  into stdout")
          private boolean isVerbose =false;
 
+         @Parameter(names = {"--rerank-idf"},description ="Rerank the document based on the IDF")
+         private boolean isIDFReRank =false;
+
          @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the initial retrieved cluster using document similarity")
          private boolean isQE =false;
 
-
+        public boolean isIDFReRankEnabled()
+        {
+            return isIDFReRank;
+        }
          public String getIndexlocation()
           {
                return indexlocation;

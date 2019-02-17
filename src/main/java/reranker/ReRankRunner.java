@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-
 /*
 @author: Amith
 Helper class for ReRanker
@@ -21,10 +20,11 @@ Helper class for ReRanker
 
 class ReRankRunner
 {
-    private BaseBM25 bm25 = null ;
-    private String embeddingFile = null;
-    private Integer Dimension;
-    private WordEmbedding word = null;
+    protected BaseBM25 bm25 = null ;
+    protected String embeddingFile = null;
+    protected Integer Dimension;
+    protected WordEmbedding word = null;
+
 
     ReRankRunner(BaseBM25 bm25, String embeddingFile,Integer Dimension)
     {
@@ -34,8 +34,22 @@ class ReRankRunner
         word = new WordEmbedding(this.Dimension,this.embeddingFile);
     }
 
+    protected ArrayList<String> getTopK(ArrayList<String> sorted)
+    {
+        ArrayList<String> res = new ArrayList<>();
+        int k =sorted.size()/2;
+        int count=0;
+        for(String ss: sorted)
+        {
+            count++;
+            res.add(ss);
+            if(k==count) break;
+        }
+        return res;
+    }
 
-    private INDArray buildVector(ArrayList<String> processed)
+
+    protected INDArray buildVector(ArrayList<String> processed)
     {
         int _number_of_terms=0;
         INDArray res = Nd4j.create(Dimension); //Create the Dimension vector
@@ -52,24 +66,23 @@ class ReRankRunner
     }
 
 
-    private INDArray getVector(Integer docID)
+    protected INDArray getVector(Integer docID)
     {
         ArrayList<String> processed = PreProcessor.processDocument(bm25.getDocument(docID));
         return  buildVector(processed);
     }
 
-    private INDArray getVector(String text)
-    {
-        ArrayList<String> processed = PreProcessor.processDocument(text);
-        return  buildVector(processed);
-    }
-
+//    protected INDArray getVector(String text)
+//    {
+//        ArrayList<String> processed = PreProcessor.processDocument(text);
+//        return  buildVector(processed);
+//    }
 
     /*
     This list takes the unranked list and perform the re ranking based on the document similarity
     This method make assumption that first method is relevant , compute the cosine similarity with other documents.
     */
-    Map<String,Container> getReRank(Map<String, Container> unranked)
+    protected Map<String,Container> getReRank(Map<String, Container> unranked)
     {
         if(unranked.size()<3) return unranked;
 
@@ -95,7 +108,6 @@ class ReRankRunner
             else
             {
                 INDArray _other_doc = getVector(docID);
-
                 double cosineScore = Transforms.cosineSim(_relevant_Vector,_other_doc);
                 double newScore = ((val.getValue().getScore() * cosineScore) + _relevant_Container.getScore());
                 _relevant_doc_score += val.getValue().getScore();

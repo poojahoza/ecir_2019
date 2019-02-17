@@ -21,6 +21,7 @@ public class ReRanker
     private RegisterCommands.CommandSearch SearchCommand= null;
     private Map<String,String> query =null;
     private  ReRankRunner runnerReRank = null;
+    private  ReRankIDFRunner runnerIDFReRank = null;
 
     public ReRanker(RegisterCommands.CommandSearch SearchCommand, Map<String,String> query)
     {
@@ -32,6 +33,7 @@ public class ReRanker
             e.printStackTrace();
         }
         runnerReRank = new ReRankRunner(bm25,SearchCommand.getWordEmbeddingFile(),SearchCommand.getDimension());
+        runnerIDFReRank= new ReRankIDFRunner(bm25,SearchCommand.getWordEmbeddingFile(),SearchCommand.getDimension(),SearchCommand.getIndexlocation());
     }
 
 
@@ -52,7 +54,26 @@ public class ReRanker
         {
             PrintUtils.displayMap(result);
         }
-
     }
 
+
+    public void ReRankIDF()
+    {
+        Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
+        for(Map.Entry<String,String> q: query.entrySet())
+        {
+            String Query = q.getValue();
+            Map<String, Container> BM25Val = bm25.getRanking(Query);
+            Map<String, Container> reOrdered = runnerIDFReRank.getReRank(BM25Val);
+            result.put(q.getKey(),reOrdered);
+        }
+
+        RunWriter.writeRunFile("doc_sim_IDF_reranking",result);
+
+        if(SearchCommand.getisVerbose())
+        {
+            PrintUtils.displayMap(result);
+        }
+
+    }
 }
