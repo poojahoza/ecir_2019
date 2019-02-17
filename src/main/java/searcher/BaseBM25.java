@@ -56,13 +56,12 @@ public class BaseBM25 extends BaseSearcher
             Document rankedDoc = searcher.doc(s.doc);
             String paraId = rankedDoc.getField("Id").stringValue();
             String entity = rankedDoc.getField("EntityLinks").stringValue();
+            String entityId = rankedDoc.getField("OutlinkIds").stringValue();
 
-            /*String paraId = rankedDoc.getField("id").stringValue();
-            String entity = rankedDoc.getField("entities").stringValue();*/
 
             //Container that holds all the information
             Container c = new Container((double) s.score,s.doc);
-            c.addEntityContainer(new EntityContainer(entity));
+            c.addEntityContainer(new EntityContainer(entity, entityId));
 
             createRankingQueryDocPair(queryId, paraId,c);
 
@@ -117,7 +116,6 @@ public class BaseBM25 extends BaseSearcher
         {
             Document rankedDoc = searcher.doc(docID);
             docString = rankedDoc.getField("Text").stringValue();
-            //docString = rankedDoc.getField("text").stringValue();
         }
         catch (IOException io)
         {
@@ -154,14 +152,11 @@ public class BaseBM25 extends BaseSearcher
                 }
                 String paraId = rankedDoc.getField("Id").stringValue();
                 String entity = rankedDoc.getField("EntityLinks").stringValue();
-
-                /*String paraId = rankedDoc.getField("id").stringValue();
-                String entity = rankedDoc.getField("entities").stringValue();*/
-
+                String entityId = rankedDoc.getField("OutlinkIds").stringValue();
 
                 //Container that holds all the information
                 Container c = new Container((double) s.score,s.doc);
-                c.addEntityContainer(new EntityContainer(entity));
+                c.addEntityContainer(new EntityContainer(entity, entityId));
                 temp.put(paraId,c);
             }
        return temp;

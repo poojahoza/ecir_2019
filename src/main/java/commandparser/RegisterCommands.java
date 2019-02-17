@@ -21,7 +21,15 @@ public class RegisterCommands
           private String IndexPath;
 
           @Parameter(names = {"-d","--dest-location"},description = "Location to save the index file")
-          private String destpath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+          private String destpath = System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+
+         @Parameter(names = {"--para-index"}, description = "Perform Paragraph Index")
+         private Boolean isParaIndex = false;
+
+         @Parameter(names = {"--entity-index"}, description = "Perform Entity Index")
+         private Boolean isEntity = false;
+
+
 
           @Parameter(names = "--help", help = true)
           private boolean help;
@@ -40,6 +48,11 @@ public class RegisterCommands
           {
                return destpath;
           }
+
+          public Boolean getIsParaIndex() {return isParaIndex;}
+
+         public Boolean getIsEntity() {return isEntity;}
+
 
      }
 
@@ -142,29 +155,4 @@ public class RegisterCommands
 
      }
 
-    @Parameters(separators = "=",commandDescription = "Command to Index the Page Corpus")
-     public static class CommandPageIndex{
-
-        @Parameter(names = {"-i","--corpus-file"},description = "Page Corpus file to index",required=true)
-        private String PageIndexPath;
-
-        @Parameter(names = {"-p","--page-dest-location"},description = "Location to save the page index file")
-        private String pagedestpath = System.getProperty("user.dir") + System.getProperty("file.separator") + "entity_indexed_file";
-
-        @Parameter(names = "--help", help = true)
-        private boolean help;
-
-        boolean isHelp()
-        {
-            return help;
-        }
-
-        public String PageIndexPath()
-        {
-            return PageIndexPath;
-        }
-
-        public String getPagedestpath(){ return pagedestpath;}
-
-     }
 }

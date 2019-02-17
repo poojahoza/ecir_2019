@@ -11,7 +11,6 @@ public class CommandParser
 {
     private  JCommander  parse = null;
     private RegisterCommands.CommandIndex index = null;
-    private RegisterCommands.CommandPageIndex pageIndex = null;
     private RegisterCommands.CommandSearch search=null;
     private RegisterCommands.CommandClassify classify=null;
     private RegisterCommands.CommandHelp helpc = null;
@@ -21,7 +20,6 @@ public class CommandParser
     {
         index = new RegisterCommands.CommandIndex();
         search =new RegisterCommands.CommandSearch();
-        pageIndex = new RegisterCommands.CommandPageIndex();
         classify = new RegisterCommands.CommandClassify();
         helpc = new RegisterCommands.CommandHelp();
         argslist=args;
@@ -32,7 +30,7 @@ public class CommandParser
     {
         if(parse == null)
         {
-            parse = JCommander.newBuilder().addCommand("index",index).addCommand("search",search).addCommand("classify", classify).addCommand("--help",helpc).addCommand("pageindex",pageIndex).build();
+            parse = JCommander.newBuilder().addCommand("index",index).addCommand("search",search).addCommand("classify", classify).addCommand("--help",helpc).build();
             parse.parse(argslist);
         }
         return parse;
@@ -54,8 +52,6 @@ public class CommandParser
         return search;
     }
 
-    public RegisterCommands.CommandPageIndex getPageIndexCommand(){
-        return pageIndex;
-    }
+
 
 }

@@ -22,7 +22,7 @@ public class Container implements Comparable
     public int  getDocID() {return docID;}
     public Double getScore(){return scoreVal;}
 
-    public String getEntity() { return entity.getEntityVal();}
+    public EntityContainer getEntity() { return entity;}
     public void setScoreVal(Double scoreVal)
     {
         this.scoreVal=scoreVal;

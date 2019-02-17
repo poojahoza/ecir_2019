@@ -3,6 +3,7 @@ package main.java.runner;
 import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
+import main.java.indexer.EntityIndexBuilder;
 import main.java.indexer.IndexBuilder;
 
 import java.io.IOException;
@@ -25,17 +26,41 @@ public class IndexRunner implements ProgramRunner
     @Override
     public void run()
     {
-        IndexBuilder ib = null;
-        try {
-            ib = new IndexBuilder(indexParser.getDestpath());
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        if(indexParser.getIsParaIndex())
+        {
+            String destFinalPath= indexParser.getDestpath()+"_paragraph";
+            IndexBuilder ib = null;
+            try {
+                ib = new IndexBuilder(destFinalPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                ib.performIndex(indexParser.getIndexPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
 
-        try {
-            ib.performIndex(indexParser.getIndexPath());
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(indexParser.getIsEntity())
+        {
+            String destFinalPath= indexParser.getDestpath()+"_entity";
+            EntityIndexBuilder pb = null;
+            try {
+                pb = new EntityIndexBuilder(destFinalPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                pb.performPageIndex(indexParser.getIndexPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }

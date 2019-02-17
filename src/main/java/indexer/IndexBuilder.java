@@ -28,48 +28,14 @@ public class IndexBuilder
         indexWriter = IndexUtils.createIndexWriter(indexDir);
     }
 
-    /*private void writePara(Data.Paragraph p,IndexWriter i)
-    {
-        int incrementFactor=10000;
-        System.out.println("Indexing "+ p.getParaId());
-        Document doc = new Document();
 
-        FieldType contentType = new FieldType();
-        contentType.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS);
-        contentType.setStored(true);
-        contentType.setTokenized(true);
-        contentType.setStoreTermVectors(true);
-
-        List<String> entity = p.getEntitiesOnly();
-
-        String entityString = String.join(" ",entity);
-        //Entity string delimited with a spaces
-        //Then we add the paragraph id and the paragraph body for searching
-        doc.add(new StringField("id", p.getParaId(), Field.Store.YES));
-        doc.add(new Field("text", p.getTextOnly(), contentType));
-        doc.add(new StringField("entities",entityString,Field.Store.YES));
-
-        try {
-            indexWriter.addDocument(doc);
-            increment++;
-
-            //commit the Data after incrementFactorVariable paragraph
-
-            if(increment % incrementFactor ==0)
-            {
-                indexWriter.commit();
-            }
-        }catch(IOException ioe) {
-            System.out.println(ioe.getMessage());
-        }
-    }*/
     private void writePara(Data.Paragraph p,
                            IndexWriter i,
                            TrecCarLuceneConfig.LuceneIndexConfig cfg,
                            TrecCarParagraph trecCarParaRepr){
         final Document doc = trecCarParaRepr.paragraphToLuceneDoc(p);
         try {
-            int incrementFactor=2000;
+            int incrementFactor=10000;
             indexWriter.addDocument(doc);
             increment++;
 
@@ -101,19 +67,6 @@ public class IndexBuilder
                 });
         closeIndexWriter();
     }
-
-    /*public void performIndex(String cborLoc) throws IOException
-    {
-        Iterable<Data.Paragraph> para = IndexUtils.createParagraphIterator(cborLoc);
-        StreamSupport.stream(para.spliterator(), true)
-                .forEach(paragraph ->
-                {
-                    writePara(paragraph,indexWriter);
-
-                });
-        closeIndexWriter();
-    }*/
-
 
     /**
      * Closes the indexwriter so that we can use it in searching.

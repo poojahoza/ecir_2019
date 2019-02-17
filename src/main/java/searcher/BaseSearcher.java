@@ -72,7 +72,6 @@ public class BaseSearcher {
 
             String docScore = String.valueOf(scoringDoc.score);
             String paraId = rankedDoc.getField("Id").stringValue();
-            //String paraId = rankedDoc.getField("id").stringValue();
             String paraRank = String.valueOf(ind+1);
             rankings.add(queryId + " Q0 " + paraId + " " + paraRank + " " + docScore + " "+"team1" + "-" + "BM25");
         }
