@@ -16,6 +16,15 @@ public class ValidateCommands
             System.exit(status);
         }
 
+        public void ValidateIndex()
+        {
+            if(indexParser.getIndexPath()==null)
+            {
+                CALLEXIT(-1);
+            }
+        }
+
+
     }
 
 

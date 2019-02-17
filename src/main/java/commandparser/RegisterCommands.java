@@ -96,6 +96,9 @@ public class RegisterCommands
          @Parameter(names = {"-bm25","--default-bm25"},description ="Rerank the initial retrieved cluster using document similarity")
          private boolean isBM25 =false;
 
+         @Parameter(names = {"-V","--verbose"},description ="Print out  some of the results  into stdout")
+         private boolean isVerbose =false;
+
          @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the initial retrieved cluster using document similarity")
          private boolean isQE =false;
 
@@ -130,7 +133,17 @@ public class RegisterCommands
               return dimension;
           }
 
-          public  Boolean isQEEnabled(){ return isQE;}
+          public Boolean getisVerbose()
+          {
+              return isVerbose;
+          }
+
+          public boolean isBM25Enabled()
+          {
+              return isBM25;
+          }
+
+
 
           boolean isHelp() {
                return help;

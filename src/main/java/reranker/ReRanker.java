@@ -1,9 +1,13 @@
 package main.java.reranker;
 
 import main.java.commandparser.RegisterCommands;
+import main.java.containers.Container;
 import main.java.searcher.BaseBM25;
+import main.java.utils.PrintUtils;
+import main.java.utils.RunWriter;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /*
@@ -33,19 +37,22 @@ public class ReRanker
 
     public void ReRank()
     {
+        Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
         for(Map.Entry<String,String> q: query.entrySet())
         {
-            System.out.println(q.getValue());
-            Map<String,Double> v= runnerReRank.getReRank(bm25.getRanking(q.getValue()));
-            if(v!=null)
-            {
-                    System.out.println(v);
-            }
-            break;
+            String Query = q.getValue();
+            Map<String, Container> BM25Val = bm25.getRanking(Query);
+            Map<String, Container> reOrdered = runnerReRank.getReRank(BM25Val);
+            result.put(q.getKey(),reOrdered);
         }
+
+        RunWriter.writeRunFile("doc_sim_reranking",result);
+
+        if(SearchCommand.getisVerbose())
+        {
+            PrintUtils.displayMap(result);
+        }
+
     }
-
-
-
 
 }

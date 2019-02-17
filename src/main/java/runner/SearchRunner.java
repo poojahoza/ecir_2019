@@ -3,9 +3,14 @@ package main.java.runner;
 import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
+import main.java.containers.Container;
 import main.java.reranker.ReRanker;
+import main.java.searcher.BaseBM25;
+import main.java.utils.RunWriter;
 import main.java.utils.SearchUtils;
+import org.nd4j.shade.jackson.databind.ser.Serializers;
 
+import java.io.IOException;
 import java.util.Map;
 
 /*
@@ -24,8 +29,7 @@ public class SearchRunner implements ProgramRunner
     }
 
     @Override
-    public void run()
-    {
+    public void run()  {
         //Read the outline file in to Map
         Map<String,String> queryCBOR = SearchUtils.readOutline(searchParser.getQueryfile());
 
@@ -37,6 +41,18 @@ public class SearchRunner implements ProgramRunner
             re.ReRank();
         }
 
+        if(searchParser.isBM25Enabled())
+        {
+            BaseBM25 bm = null;
+            try {
+                 bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Map<String,Map<String, Container>> res = bm.getRanking(queryCBOR);
+            RunWriter.writeRunFile("BM_25",res);
+
+        }
 
     }
 }

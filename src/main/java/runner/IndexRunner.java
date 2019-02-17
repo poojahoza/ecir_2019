@@ -29,6 +29,8 @@ public class IndexRunner implements ProgramRunner
 
         if(indexParser.getIsParaIndex())
         {
+            validate.ValidateIndex();
+
             String destFinalPath= indexParser.getDestpath()+"_paragraph";
             IndexBuilder ib = null;
             try {
@@ -47,6 +49,8 @@ public class IndexRunner implements ProgramRunner
 
         if(indexParser.getIsEntity())
         {
+            validate.ValidateIndex();
+
             String destFinalPath= indexParser.getDestpath()+"_entity";
             EntityIndexBuilder pb = null;
             try {
