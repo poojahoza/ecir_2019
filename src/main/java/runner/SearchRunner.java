@@ -45,19 +45,18 @@ public class SearchRunner implements ProgramRunner
         if(searchParser.isEntityDegreeEnabled()){
             try {
                 Map<String,String> querysecCBOR = SearchUtils.readOutlineSectionPath(searchParser.getQueryfile());
+
                 BaseBM25 bm25 = new BaseBM25(100, searchParser.getIndexlocation());
                 Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(querysecCBOR);
+
                 Entities e = new Entities();
                 Map<String, Map<String, String>> query_ent_list = e.getEntitiesPerQuery(bm25_ranking);
-                /*for(Map.Entry<String, Map<String, String>> n: query_ent_list.entrySet())
-                {
-                    for(Map.Entry<String, String> p: n.getValue().entrySet())
-                    {
-                        System.out.println(n.getKey()+" "+p.getKey()+" "+p.getValue());
-                    }
-                }*/
+
                 PageSearcher pgs = new PageSearcher("/home/poojaoza/Documents/projects/test200/entity.lucene");
-                pgs.getRanking(query_ent_list);
+                Map<String, Map<String, Integer>> ranked_entities = pgs.getRanking(query_ent_list);
+
+                ranked_entities = e.rerankParagraphs(bm25_ranking, ranked_entities);
+                System.out.println(ranked_entities);
 
             }catch (IOException ioe){
                 System.out.println(ioe.getMessage());

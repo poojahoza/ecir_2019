@@ -2,8 +2,6 @@ package main.java.graph;
 
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
-//import org.jgrapht.io.*;
-import org.jgrapht.traverse.*;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -46,7 +44,6 @@ public class GraphGenerator {
                     }
                 }
             }
-            //System.out.println(e.getValue());
         }
     }
 }

@@ -46,21 +46,11 @@ public class PageSearcher extends BaseSearcher {
             Document rankedDoc = searcher.doc(s.doc);
             String entityId = rankedDoc.getField("Id").stringValue();
             if(entity_id.equals(entityId)) {
+
                 String outlinkIds = rankedDoc.getField("OutlinkIds").stringValue();
                 String inlinkIds = rankedDoc.getField("InlinkIds").stringValue();
                 String leadText = rankedDoc.getField("LeadText").stringValue();
-             //   System.out.println("------------------------");
-                //System.out.println(entityId + " " + outlinkIds + " " + inlinkIds);
 
-            /*String paraId = rankedDoc.getField("id").stringValue();
-            String entity = rankedDoc.getField("entities").stringValue();*/
-
-
-                //Container that holds all the information
-                //Container c = new Container(s.score,ranking,s.doc);
-                //c.addEntityContainer(new EntityContainer(entity));
-
-                //createRankingQueryDocPair(queryId, paraId,c);
                 this.createEntityOutlinksPair(entityId, outlinkIds);
             }
             ranking++;
@@ -68,8 +58,9 @@ public class PageSearcher extends BaseSearcher {
     }
 
 
-    private void runRanking(Map<String, Map<String, String>> out)
+    private Map<String, Map<String, Integer>> runRanking(Map<String, Map<String, String>> out)
     {
+        Map<String, Map<String, Integer>> query_entity_degree = new LinkedHashMap<>();
         for(Map.Entry<String, Map<String, String>> m:out.entrySet())
         {
             entity_outlinks.clear();
@@ -97,20 +88,14 @@ public class PageSearcher extends BaseSearcher {
             Map<String, Integer> degree_list = graph.getNodeDegree(g);
             degree_list = SortUtils.sortByValue(degree_list);
 
+            query_entity_degree.put(m.getKey(), degree_list);
         }
+        return query_entity_degree;
     }
 
-    public void getRanking(Map<String, Map<String, String>> out)
+    public Map<String, Map<String, Integer>> getRanking(Map<String, Map<String, String>> out)
     {
-        this.runRanking(out);
-        /*if(ranks == null)
-        {
-            this.runRanking(out);
-        }
-        else {
-            ranks.clear();
-            this.runRanking(out);
-        }
-        return ranks;*/
+        Map<String, Map<String, Integer>> ranked_entities = this.runRanking(out);
+        return ranked_entities;
     }
 }
