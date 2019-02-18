@@ -55,7 +55,8 @@ public class SearchRunner implements ProgramRunner
                 PageSearcher pgs = new PageSearcher("/home/poojaoza/Documents/projects/test200/entity.lucene");
                 Map<String, Map<String, Integer>> ranked_entities = pgs.getRanking(query_ent_list);
 
-                ranked_entities = e.rerankParagraphs(bm25_ranking, ranked_entities);
+                ranked_entities = e.getParagraphsScore(bm25_ranking, ranked_entities);
+                ranked_entities = e.getRerankedParas(ranked_entities);
                 System.out.println(ranked_entities);
 
             }catch (IOException ioe){
