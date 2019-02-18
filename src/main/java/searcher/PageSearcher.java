@@ -10,7 +10,6 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 
 import org.jgrapht.Graph;
-import org.jgrapht.graph.*;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -19,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import main.java.graph.GraphGenerator;
+import main.java.utils.SortUtils;
 
 public class PageSearcher extends BaseSearcher {
 
@@ -93,12 +93,10 @@ public class PageSearcher extends BaseSearcher {
                     System.out.println(io.getMessage());
                 }
             }
-            //System.out.println(entity_outlinks.size());
             Graph g = graph.generateGraph(entity_outlinks);
-            HashMap<String, Integer> degree_list = graph.getNodeDegree(g, entity_outlinks);
-            for(Map.Entry<String, Integer> n:degree_list.entrySet()){
-                System.out.println(n.getKey()+" "+n.getValue());
-            }
+            Map<String, Integer> degree_list = graph.getNodeDegree(g);
+            degree_list = SortUtils.sortByValue(degree_list);
+
         }
     }
 

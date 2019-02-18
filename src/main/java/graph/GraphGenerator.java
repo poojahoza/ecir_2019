@@ -16,16 +16,14 @@ public class GraphGenerator {
         entity_graph = new DefaultUndirectedWeightedGraph<>(DefaultEdge.class);
         createVertexList(entity_list);
         createEdgeList(entity_list);
-        //System.out.println(entity_graph.toString());
         return entity_graph;
     }
 
-    public HashMap<String, Integer> getNodeDegree(Graph g,
-                                                  HashMap<String, String> entity_list){
+    public HashMap<String, Integer> getNodeDegree(Graph g){
+
         HashMap<String, Integer> entity_degree = new LinkedHashMap<>();
-        System.out.println(g.vertexSet());
-        for(String v:entity_list.keySet()){
-            entity_degree.put(v,entity_graph.degreeOf(v));
+        for(Object v:g.vertexSet()){
+            entity_degree.put(v.toString(),entity_graph.degreeOf(v.toString()));
         }
         return entity_degree;
     }
