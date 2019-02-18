@@ -99,6 +99,10 @@ public class RegisterCommands
          @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the initial retrieved cluster using document similarity")
          private boolean isQE =false;
 
+         @Parameter(names = "--entity-degree",description ="Rerank the initial retrieved document using entity degree")
+         private boolean isEntityDegree =false;
+
+
 
          public String getIndexlocation()
           {
@@ -131,6 +135,11 @@ public class RegisterCommands
           }
 
           public  Boolean isQEEnabled(){ return isQE;}
+
+         public boolean isEntityDegreeEnabled()
+         {
+             return isEntityDegree;
+         }
 
           boolean isHelp() {
                return help;
