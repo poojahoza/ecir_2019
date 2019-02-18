@@ -51,6 +51,15 @@ public class ValidateCommands
 
         }
 
+        public void ValidateEntityDegree()
+        {
+            if(searchParser.getEntityIndLoc() == null)
+            {
+                System.out.println("Please pass the entity index location path");
+                CALLEXIT(-1);
+            }
+        }
+
     }
     public static class ValidateClassifyCommands
     {

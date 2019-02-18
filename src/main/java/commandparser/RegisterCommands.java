@@ -102,6 +102,9 @@ public class RegisterCommands
          @Parameter(names = "--entity-degree",description ="Rerank the initial retrieved document using entity degree")
          private boolean isEntityDegree =false;
 
+         @Parameter(names = "--entity-index",description ="Pass the index location of entity index")
+         private String entityIndLoc = null;
+
 
 
          public String getIndexlocation()
@@ -136,10 +139,12 @@ public class RegisterCommands
 
           public  Boolean isQEEnabled(){ return isQE;}
 
-         public boolean isEntityDegreeEnabled()
+          public boolean isEntityDegreeEnabled()
          {
              return isEntityDegree;
          }
+
+            public String getEntityIndLoc(){return entityIndLoc; }
 
           boolean isHelp() {
                return help;

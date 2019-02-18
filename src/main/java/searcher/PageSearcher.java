@@ -72,13 +72,15 @@ public class PageSearcher extends BaseSearcher {
                             topDocuments = this.performSearch(n.getValue(), 100);
                         }
                     } catch (org.apache.lucene.queryparser.classic.ParseException e) {
-                        e.printStackTrace();
+                        System.out.println("The query was not parsed");
+                        //e.printStackTrace();
                     }
                     try {
                         ScoreDoc[] scoringDocuments = topDocuments.scoreDocs;
                         this.parseScoreDocs(scoringDocuments, n.getKey());
                     }catch (NullPointerException npe){
-                        npe.printStackTrace();
+                        System.out.println("No matching documents found");
+                        //npe.printStackTrace();
                     }
                 } catch (IOException io) {
                     System.out.println(io.getMessage());
