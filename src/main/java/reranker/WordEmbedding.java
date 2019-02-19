@@ -1,10 +1,13 @@
 package main.java.reranker;
 
+import main.java.utils.PreProcessor;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.ops.transforms.Transforms;
 
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -78,8 +81,33 @@ public class WordEmbedding
             }
             System.out.println(" ");
             if(count == countval ) break;
-
         }
+    }
+
+    private INDArray buildVector(ArrayList<String> processed)
+    {
+        int _number_of_terms=0;
+        INDArray res = Nd4j.create(dimension); //Create the Dimension vector
+        for(String str:processed)
+        {
+            if(getWordEmbeddingVector(str)!= null)
+            {
+                _number_of_terms++;
+                INDArray temp = getWordEmbeddingVector(str);
+                res = res.add(temp);
+            }
+        }
+        return res.div(_number_of_terms); //Taking the mean of the vector
+    }
+
+    /*
+        Given two strings, it gives the Similarity based on the word vectors.
+    */
+    public Double getSimilarity(String para1, String para2)
+    {
+        ArrayList<String> para1List = PreProcessor.processDocument(para1);
+        ArrayList<String> para2List = PreProcessor.processDocument(para2);
+        return Transforms.cosineSim(buildVector(para1List),buildVector(para2List));
     }
 
 

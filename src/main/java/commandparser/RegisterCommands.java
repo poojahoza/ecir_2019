@@ -96,9 +96,26 @@ public class RegisterCommands
          @Parameter(names = {"-bm25","--default-bm25"},description ="Rerank the initial retrieved cluster using document similarity")
          private boolean isBM25 =false;
 
+         @Parameter(names = {"-V","--verbose"},description ="Print out  some of the results  into stdout")
+         private boolean isVerbose =false;
+
+         @Parameter(names = {"--rerank-idf"},description ="Rerank the document based on the IDF")
+         private boolean isIDFReRank =false;
+
+         @Parameter(names = {"--rerank-df"},description ="Rerank the document based on the IDF")
+         private boolean isDFReRank =false;
+
          @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the initial retrieved cluster using document similarity")
          private boolean isQE =false;
 
+        public boolean isIDFReRankEnabled()
+        {
+            return isIDFReRank;
+        }
+         public boolean isDFReRankEnabled()
+         {
+             return isDFReRank;
+         }
          @Parameter(names = "--entity-degree",description ="Rerank the initial retrieved document using entity degree")
          private boolean isEntityDegree =false;
 
@@ -137,7 +154,17 @@ public class RegisterCommands
               return dimension;
           }
 
-          public  Boolean isQEEnabled(){ return isQE;}
+          public Boolean getisVerbose()
+          {
+              return isVerbose;
+          }
+
+          public boolean isBM25Enabled()
+          {
+              return isBM25;
+          }
+
+
 
           public boolean isEntityDegreeEnabled()
          {
