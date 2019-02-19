@@ -62,7 +62,6 @@ public class SearchRunner implements ProgramRunner
 
                 ranked_entities = e.getParagraphsScore(bm25_ranking, ranked_entities);
                 ranked_entities = e.getRerankedParas(ranked_entities);
-                System.out.println(ranked_entities);
 
 
                 write_file.generateEntityRunFile(ranked_entities, "entityDegree");

@@ -17,20 +17,20 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import main.java.graph.GraphGenerator;
+import main.java.graph.GraphDegreeSearcher;
 import main.java.utils.SortUtils;
 
 public class PageSearcher extends BaseSearcher {
 
     HashMap<String, String> entity_outlinks = new LinkedHashMap<>();
-    GraphGenerator graph = null;
+    GraphDegreeSearcher graph = null;
 
     public PageSearcher(String indexLoc) throws IOException {
 
         super(indexLoc);
         searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(Paths.get(indexLoc))));
         parser = new QueryParser("Title", new EnglishAnalyzer());
-        graph = new GraphGenerator();
+        graph = new GraphDegreeSearcher();
     }
 
     private void createEntityOutlinksPair(String entity_id, String entity_val){
@@ -48,8 +48,6 @@ public class PageSearcher extends BaseSearcher {
             if(entity_id.equals(entityId)) {
 
                 String outlinkIds = rankedDoc.getField("OutlinkIds").stringValue();
-                String inlinkIds = rankedDoc.getField("InlinkIds").stringValue();
-                String leadText = rankedDoc.getField("LeadText").stringValue();
 
                 this.createEntityOutlinksPair(entityId, outlinkIds);
             }
@@ -79,7 +77,7 @@ public class PageSearcher extends BaseSearcher {
                         ScoreDoc[] scoringDocuments = topDocuments.scoreDocs;
                         this.parseScoreDocs(scoringDocuments, n.getKey());
                     }catch (NullPointerException npe){
-                        System.out.println("No matching documents found");
+                        System.out.println("No matching documents found "+n.getKey());
                         //npe.printStackTrace();
                     }
                 } catch (IOException io) {

@@ -6,10 +6,11 @@ import org.jgrapht.graph.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-public class GraphGenerator {
+public class GraphDegreeSearcher implements GraphConstructor {
 
     Graph<String, DefaultEdge> entity_graph = null;
 
+    @Override
     public Graph generateGraph(HashMap<String, String> entity_list){
         entity_graph = new DefaultUndirectedWeightedGraph<>(DefaultEdge.class);
         createVertexList(entity_list);
@@ -26,14 +27,16 @@ public class GraphGenerator {
         return entity_degree;
     }
 
-    private void createVertexList(HashMap<String, String> entity_list)
+    @Override
+    public void createVertexList(HashMap<String, String> entity_list)
     {
         for(String v:entity_list.keySet()){
             entity_graph.addVertex(v);
         }
     }
 
-    private void createEdgeList(HashMap<String, String> entity_list)
+    @Override
+    public void createEdgeList(HashMap<String, String> entity_list)
     {
         for (HashMap.Entry<String, String> e: entity_list.entrySet()){
             String [] outlinks_list = e.getValue().split("[\r\n]+");
