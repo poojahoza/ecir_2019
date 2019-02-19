@@ -24,7 +24,7 @@ public class WriteFile {
         }
     }
 
-    public void generateEntityRunFile(Map<String, Map<String, Integer>> results, String methodname)
+    public void generateEntityRunFile(Map<String, Map<String, Double>> results, String methodname)
     {
         String output_file = "output_ranking_"+methodname+".txt";
         List<String> rankings = new ArrayList<String>();
@@ -36,11 +36,11 @@ public class WriteFile {
         {
             System.out.println(ioe.getMessage());
         }
-        for(Map.Entry<String, Map<String, Integer>> m: results.entrySet())
+        for(Map.Entry<String, Map<String, Double>> m: results.entrySet())
         {
             int rank = 0;
             rankings.clear();
-            for(Map.Entry<String, Integer> n: m.getValue().entrySet())
+            for(Map.Entry<String, Double> n: m.getValue().entrySet())
             {
                 rank += 1;
                 rankings.add(m.getKey() + " Q0 " + n.getKey() +" "+String.valueOf(rank)+" "+String.valueOf(n.getValue())+ " team1 "+methodname);

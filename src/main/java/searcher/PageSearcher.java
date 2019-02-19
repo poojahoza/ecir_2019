@@ -1,5 +1,6 @@
 package main.java.searcher;
 
+import main.java.containers.Container;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -22,6 +23,7 @@ import main.java.utils.SortUtils;
 
 public class PageSearcher extends BaseSearcher {
 
+    Map<String, Map<String, String>> query_entity_pair = new LinkedHashMap<>();
     HashMap<String, String> entity_outlinks = new LinkedHashMap<>();
     GraphDegreeSearcher graph = null;
 
@@ -32,6 +34,22 @@ public class PageSearcher extends BaseSearcher {
         parser = new QueryParser("Title", new EnglishAnalyzer());
         graph = new GraphDegreeSearcher();
     }
+
+    private void createRankingQueryDocPair(String outer_key, String inner_key, String rank)
+    {
+        if(query_entity_pair.containsKey(outer_key))
+        {
+            Map<String, String> extract = query_entity_pair.get(outer_key);
+            extract.put(inner_key, rank);
+        }
+        else
+        {
+            Map<String, String> temp = new LinkedHashMap<>();
+            temp.put(inner_key, rank);
+            query_entity_pair.put(outer_key,temp);
+        }
+    }
+
 
     private void createEntityOutlinksPair(String entity_id, String entity_val){
         entity_outlinks.put(entity_id, entity_val);
@@ -58,6 +76,7 @@ public class PageSearcher extends BaseSearcher {
 
     private Map<String, Map<String, Integer>> runRanking(Map<String, Map<String, String>> out)
     {
+
         Map<String, Map<String, Integer>> query_entity_degree = new LinkedHashMap<>();
         for(Map.Entry<String, Map<String, String>> m:out.entrySet())
         {

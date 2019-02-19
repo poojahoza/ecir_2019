@@ -89,11 +89,11 @@ public class SearchRunner implements ProgramRunner
                 PageSearcher pgs = new PageSearcher(searchParser.getEntityIndLoc());
                 Map<String, Map<String, Integer>> ranked_entities = pgs.getRanking(query_ent_list);
 
-                ranked_entities = e.getParagraphsScore(bm25_ranking, ranked_entities);
-                ranked_entities = e.getRerankedParas(ranked_entities);
+                Map<String, Map<String, Double>> ranked_entities_score = e.getParagraphsScore(bm25_ranking, ranked_entities);
+                ranked_entities_score = e.getRerankedParas(ranked_entities_score);
 
 
-                write_file.generateEntityRunFile(ranked_entities, "entityDegree");
+                write_file.generateEntityRunFile(ranked_entities_score, "entityDegree");
 
             }catch (IOException ioe){
                 System.out.println(ioe.getMessage());

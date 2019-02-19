@@ -32,17 +32,17 @@ public class Entities {
         return query_entity_list;
     }
 
-    public Map<String, Map<String, Integer>> getParagraphsScore(Map<String, Map<String, Container>> bm25_ranking,
+    public Map<String, Map<String, Double>> getParagraphsScore(Map<String, Map<String, Container>> bm25_ranking,
                                  Map<String, Map<String, Integer>> ranked_entities)
     {
-        Map<String, Map<String, Integer>> ranked_para = new LinkedHashMap<>();
+        Map<String, Map<String, Double>> ranked_para = new LinkedHashMap<>();
 
         for(Map.Entry<String, Map<String, Container>> m: bm25_ranking.entrySet())
         {
             for(Map.Entry<String, Container> n:m.getValue().entrySet())
             {
                 EntityContainer e = n.getValue().getEntity();
-                int entity_counter = 0;
+                int entity_counter = 1;
                 String [] entity_ids = e.getEntityId().split("[\r\n]+");
                 for(int s = 0; s  < entity_ids.length; s++) {
                     Map<String, Integer> query_entities_list = ranked_entities.get(m.getKey());
@@ -53,13 +53,13 @@ public class Entities {
                     }
                     if(ranked_para.containsKey(m.getKey()))
                     {
-                        Map<String, Integer> query_extract = ranked_para.get(m.getKey());
+                        Map<String, Double> query_extract = ranked_para.get(m.getKey());
                         if(query_extract.containsKey(entity_ids[s]))
                         {
-                            query_extract.put(n.getKey(), query_extract.get(entity_ids[s])+1);
+                            query_extract.put(n.getKey(), (query_extract.get(entity_ids[s])+1)*n.getValue().getScore());
                         }
                         else{
-                            query_extract.put(n.getKey(), entity_counter);
+                            query_extract.put(n.getKey(), entity_counter*n.getValue().getScore());
                         }
 
                     }
@@ -68,8 +68,8 @@ public class Entities {
 
                 if(!ranked_para.containsKey(m.getKey()))
                 {
-                    Map<String, Integer> para_rank = new LinkedHashMap<>();
-                    para_rank.put(n.getKey(), entity_counter);
+                    Map<String, Double> para_rank = new LinkedHashMap<>();
+                    para_rank.put(n.getKey(), entity_counter*n.getValue().getScore());
                     ranked_para.put(m.getKey(), para_rank);
                 }
 
@@ -78,9 +78,9 @@ public class Entities {
         return ranked_para;
     }
 
-    public Map<String, Map<String, Integer>> getRerankedParas(Map<String, Map<String, Integer>> ranked_entities)
+    public Map<String, Map<String, Double>> getRerankedParas(Map<String, Map<String, Double>> ranked_entities)
     {
-        for(Map.Entry<String, Map<String, Integer>> m: ranked_entities.entrySet())
+        for(Map.Entry<String, Map<String, Double>> m: ranked_entities.entrySet())
         {
             ranked_entities.put(m.getKey(), SortUtils.sortByValue(m.getValue()));
         }
