@@ -72,11 +72,7 @@ class ReRankRunner
         return  buildVector(processed);
     }
 
-//    protected INDArray getVector(String text)
-//    {
-//        ArrayList<String> processed = PreProcessor.processDocument(text);
-//        return  buildVector(processed);
-//    }
+
 
     /*
     This list takes the unranked list and perform the re ranking based on the document similarity

@@ -137,7 +137,6 @@ public class CorpusStats
         return queryObj.toString();
     }
 
-
     /*
        perform the porter stem
     */
@@ -203,17 +202,4 @@ public class CorpusStats
         }
         return sortedList;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

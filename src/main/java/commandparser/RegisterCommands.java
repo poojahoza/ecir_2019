@@ -102,6 +102,9 @@ public class RegisterCommands
          @Parameter(names = {"--rerank-idf"},description ="Rerank the document based on the IDF")
          private boolean isIDFReRank =false;
 
+         @Parameter(names = {"--rerank-df"},description ="Rerank the document based on the IDF")
+         private boolean isDFReRank =false;
+
          @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the initial retrieved cluster using document similarity")
          private boolean isQE =false;
 
@@ -109,6 +112,10 @@ public class RegisterCommands
         {
             return isIDFReRank;
         }
+         public boolean isDFReRankEnabled()
+         {
+             return isDFReRank;
+         }
          public String getIndexlocation()
           {
                return indexlocation;

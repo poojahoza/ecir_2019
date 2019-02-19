@@ -49,6 +49,13 @@ public class SearchRunner implements ProgramRunner
             re.ReRankIDF();
         }
 
+        if(searchParser.isDFReRankEnabled())
+        {
+            validate.ValidateReRank();
+            ReRanker re = new ReRanker(searchParser,queryCBOR);
+            re.ReRankDF();
+        }
+
         if(searchParser.isBM25Enabled())
         {
             BaseBM25 bm = null;
