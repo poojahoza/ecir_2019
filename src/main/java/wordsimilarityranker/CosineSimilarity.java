@@ -1,10 +1,12 @@
 package main.java.wordsimilarityranker;
 
 //project imports
+import main.java.containers.Container;
 import main.java.searcher.BaseBM25;
 
 //Dependency imports
 import  info.debatty.java.stringsimilarity.*;
+import main.java.utils.RunWriter;
 
 //Java imports
 import java.util.Map;
@@ -14,6 +16,7 @@ A class implements the abstract class SimilarityBase and returns the CosineSimil
 */
 public class CosineSimilarity extends SimilarityBase
 {
+
     public CosineSimilarity(BaseBM25 bm , Map<String,String> query)
     {
         super(bm,query);
@@ -27,6 +30,10 @@ public class CosineSimilarity extends SimilarityBase
 
     public void doCosine()
     {
-        performReRank();
+        Map<String,Map<String, Container>> result = performReRank();
+        if( result != null)
+        {
+            RunWriter.writeRunFile("cosine_similarity",result);
+        }
     }
 }

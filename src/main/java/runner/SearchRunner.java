@@ -81,7 +81,9 @@ public class SearchRunner implements ProgramRunner
             }
 
             CosineSimilarity cosineSimilarity = new CosineSimilarity(bm,queryCBOR);
+            cosineSimilarity.doCosine();
         }
+
         if(searchParser.isEntityDegreeEnabled()){
             validate.ValidateEntityDegree();
             try {

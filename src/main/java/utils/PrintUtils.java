@@ -19,4 +19,16 @@ public class PrintUtils
 
         }
     }
+
+    public static void  displayMapContainer(Map<String,Container> result)
+    {
+        for(Map.Entry<String,Container> val: result.entrySet())
+        {
+            String paraID = val.getKey();
+            double score = val.getValue().getScore();
+            int docID= val.getValue().getDocID();
+            System.out.println(paraID +" "+ score +" "+docID);
+        }
+
+    }
 }

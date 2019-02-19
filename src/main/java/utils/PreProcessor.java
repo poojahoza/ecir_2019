@@ -1,5 +1,7 @@
 package main.java.utils;
 
+import org.tartarus.snowball.ext.PorterStemmer;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +27,19 @@ public class PreProcessor
             if(!p.STOP_WORDS.contains(s))
             {
                 if(!processedData.contains(s))
+
                     processedData.add(s);
             }
         }
         return processedData;
+    }
+
+    public static String stemTerm(String term)
+    {
+        PorterStemmer stem= new PorterStemmer();
+        stem.setCurrent(term);
+        stem.stem();
+        return stem.getCurrent();
     }
 
 
