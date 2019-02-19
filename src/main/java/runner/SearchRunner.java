@@ -7,8 +7,12 @@ import main.java.containers.Container;
 import main.java.reranker.ReRanker;
 import main.java.searcher.BaseBM25;
 import main.java.utils.RunWriter;
+import main.java.searcher.BaseBM25;
+import main.java.searcher.PageSearcher;
+import main.java.utils.Entities;
 import main.java.utils.SearchUtils;
 import main.java.wordsimilarityranker.CosineSimilarity;
+import main.java.utils.WriteFile;
 
 
 import java.io.IOException;
@@ -77,7 +81,36 @@ public class SearchRunner implements ProgramRunner
             }
 
             CosineSimilarity cosineSimilarity = new CosineSimilarity(bm,queryCBOR);
+        }
+        if(searchParser.isEntityDegreeEnabled()){
+            validate.ValidateEntityDegree();
+            try {
+                Map<String,String> querysecCBOR = SearchUtils.readOutlineSectionPath(searchParser.getQueryfile());
+
+                BaseBM25 bm25 = new BaseBM25(100, searchParser.getIndexlocation());
+                Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(querysecCBOR);
+
+                WriteFile write_file = new WriteFile();
+                write_file.generateBM25RunFile(bm25_ranking, "BM25");
+
+                Entities e = new Entities();
+                Map<String, Map<String, String>> query_ent_list = e.getEntitiesPerQuery(bm25_ranking);
+
+                PageSearcher pgs = new PageSearcher(searchParser.getEntityIndLoc());
+                Map<String, Map<String, Integer>> ranked_entities = pgs.getRanking(query_ent_list);
+
+                ranked_entities = e.getParagraphsScore(bm25_ranking, ranked_entities);
+                ranked_entities = e.getRerankedParas(ranked_entities);
+
+
+                write_file.generateEntityRunFile(ranked_entities, "entityDegree");
+
+            }catch (IOException ioe){
+                System.out.println(ioe.getMessage());
+            }
+        }
+
 
         }
     }
-}
+

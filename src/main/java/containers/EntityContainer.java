@@ -11,11 +11,11 @@ public class EntityContainer
         this.entityId=entityId;
     }
 
-    String getEntityVal()
+    public String getEntityVal()
     {
         return entityVal;
     }
-    String getEntityId()
+    public String getEntityId()
     {
         return entityId;
     }

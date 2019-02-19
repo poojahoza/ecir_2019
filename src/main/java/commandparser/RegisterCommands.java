@@ -120,6 +120,14 @@ public class RegisterCommands
          {
              return isDFReRank;
          }
+         @Parameter(names = "--entity-degree",description ="Rerank the initial retrieved document using entity degree")
+         private boolean isEntityDegree =false;
+
+         @Parameter(names = "--entity-index",description ="Pass the index location of entity index")
+         private String entityIndLoc = null;
+
+
+
          public String getIndexlocation()
           {
                return indexlocation;
@@ -163,6 +171,13 @@ public class RegisterCommands
           public boolean isCosineSimilarityEnabled() {return isCosineSimilarity;}
 
 
+
+          public boolean isEntityDegreeEnabled()
+         {
+             return isEntityDegree;
+         }
+
+            public String getEntityIndLoc(){return entityIndLoc; }
 
           boolean isHelp() {
                return help;
