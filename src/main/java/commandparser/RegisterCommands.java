@@ -102,8 +102,12 @@ public class RegisterCommands
          @Parameter(names = {"--rerank-idf"},description ="Rerank the document based on the IDF")
          private boolean isIDFReRank =false;
 
-         @Parameter(names = {"--rerank-df"},description ="Rerank the document based on the IDF")
+         @Parameter(names = {"--rerank-df"},description ="Rerank the document based on the DF")
          private boolean isDFReRank =false;
+
+         @Parameter(names = {"--cosine-sim"},description ="Rerank the document based on the cosine similarity between two strings")
+         private boolean isCosineSimilarity =false;
+
 
          @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the initial retrieved cluster using document similarity")
          private boolean isQE =false;
@@ -155,6 +159,8 @@ public class RegisterCommands
           {
               return isBM25;
           }
+
+          public boolean isCosineSimilarityEnabled() {return isCosineSimilarity;}
 
 
 
