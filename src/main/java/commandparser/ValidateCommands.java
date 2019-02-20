@@ -69,6 +69,28 @@ public class ValidateCommands
             }
         }
 
+        public void ValidateEntitySim()
+        {
+            if(searchParser.getWordEmbeddingFile()== null)
+            {
+                System.out.println("Please pass the word Embeddings file");
+                CALLEXIT(-1);
+            }
+
+            if(searchParser.getDimension()==0)
+            {
+                System.out.println("Please pass the dimension of the word vectors");
+                CALLEXIT(-1);
+            }
+
+            if(searchParser.getEntityIndLoc() == null)
+            {
+                System.out.println("Please pass the entity index location path");
+                CALLEXIT(-1);
+            }
+
+        }
+
     }
     public static class ValidateClassifyCommands
     {

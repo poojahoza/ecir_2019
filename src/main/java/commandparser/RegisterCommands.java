@@ -122,6 +122,9 @@ public class RegisterCommands
          @Parameter(names = "--entity-index",description ="Pass the index location of entity index")
          private String entityIndLoc = null;
 
+         @Parameter(names = "--entity-sim",description ="Rerank the initial retrieved document using entity abstract similarity")
+         private boolean isEntitySim =false;
+
 
 
          public String getIndexlocation()
@@ -172,6 +175,10 @@ public class RegisterCommands
          }
 
             public String getEntityIndLoc(){return entityIndLoc; }
+         public boolean isEntitySimEnabled()
+         {
+             return isEntitySim;
+         }
 
           boolean isHelp() {
                return help;

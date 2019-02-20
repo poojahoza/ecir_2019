@@ -10,12 +10,17 @@ import main.java.searcher.BaseBM25;
 import main.java.utils.RunWriter;
 import main.java.searcher.BaseBM25;
 import main.java.searcher.PageSearcher;
+import main.java.searcher.LeadtextSearcher;
+import main.java.graph.GraphSimConstructor;
+import main.java.graph.GraphDegreeConstructor;
 import main.java.utils.Entities;
 import main.java.utils.SearchUtils;
 import main.java.utils.WriteFile;
+import org.jgrapht.Graph;
 
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /*
@@ -80,20 +85,50 @@ public class SearchRunner implements ProgramRunner
                 BaseBM25 bm25 = new BaseBM25(100, searchParser.getIndexlocation());
                 Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(querysecCBOR);
 
-                WriteFile write_file = new WriteFile();
-                write_file.generateBM25RunFile(bm25_ranking, "BM25");
-
                 Entities e = new Entities();
                 Map<String, Map<String, String>> query_ent_list = e.getEntitiesPerQuery(bm25_ranking);
 
                 PageSearcher pgs = new PageSearcher(searchParser.getEntityIndLoc());
-                Map<String, Map<String, Integer>> ranked_entities = pgs.getRanking(query_ent_list);
+                Map<String, Map<String, String>> query_entities = pgs.getRanking(query_ent_list);
+
+                GraphDegreeConstructor gdc = new GraphDegreeConstructor();
+                Map<String, Map<String, Integer>> ranked_entities = gdc.getGraphDegree(query_entities);
 
                 Map<String, Map<String, Double>> ranked_entities_score = e.getParagraphsScore(bm25_ranking, ranked_entities);
                 ranked_entities_score = e.getRerankedParas(ranked_entities_score);
 
-
+                WriteFile write_file = new WriteFile();
                 write_file.generateEntityRunFile(ranked_entities_score, "entityDegree");
+
+            }catch (IOException ioe){
+                System.out.println(ioe.getMessage());
+            }
+        }
+        if(searchParser.isEntitySimEnabled()){
+            validate.ValidateEntitySim();
+            try {
+                Map<String,String> querysecCBOR = SearchUtils.readOutlineSectionPath(searchParser.getQueryfile());
+
+                BaseBM25 bm25 = new BaseBM25(100, searchParser.getIndexlocation());
+                Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(querysecCBOR);
+
+                Entities e = new Entities();
+                Map<String, Map<String, String>> query_ent_list = e.getEntitiesPerQuery(bm25_ranking);
+
+                LeadtextSearcher gs = new LeadtextSearcher(searchParser.getEntityIndLoc());
+                Map<String, Map<String, String>> query_entities = gs.getRanking(query_ent_list);
+
+                GraphSimConstructor gdc = new GraphSimConstructor();
+                Map<String, Map<String, Integer>> ranked_entities = gdc.getGraphDegree(query_entities,
+                        searchParser.getDimension(),
+                        searchParser.getWordEmbeddingFile());
+
+
+                Map<String, Map<String, Double>> ranked_entities_score = e.getParagraphsScore(bm25_ranking, ranked_entities);
+                ranked_entities_score = e.getRerankedParas(ranked_entities_score);
+
+                WriteFile write_file = new WriteFile();
+                write_file.generateEntityRunFile(ranked_entities_score, "entitySim");
 
             }catch (IOException ioe){
                 System.out.println(ioe.getMessage());
