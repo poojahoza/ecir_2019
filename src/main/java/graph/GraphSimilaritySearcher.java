@@ -23,17 +23,23 @@ public class GraphSimilaritySearcher extends GraphDegreeSearcher {
     }
 
     void createEdgeList(Map<String, String> entity_list){
+        String[][] edge_array = new String[entity_list.size()][2];
+        int counter = 0;
         for(Map.Entry<String, String> m: entity_list.entrySet())
         {
-            for(Map.Entry<String, String> n: entity_list.entrySet())
+            edge_array[counter][0] = m.getKey();
+            edge_array[counter][1] = m.getValue();
+            counter++;
+        }
+        for(int i = 0; i < edge_array.length; i++)
+        {
+            for(int j = i+1; j < edge_array.length; j++)
             {
-                if(!m.getKey().equals(n.getKey()))
+                Double cos_sim = we.getSimilarity(edge_array[i][1], edge_array[j][1]);
+                if(cos_sim >= 0.5)
                 {
-                    Double cos_sim = we.getSimilarity(m.getValue(), n.getValue());
-                    if(cos_sim >= 0.5)
-                    {
-                        entity_graph.addEdge(m.getKey(), n.getKey());
-                    }
+                    entity_graph.addEdge(edge_array[i][0], edge_array[j][0]);
+                    entity_graph.setEdgeWeight(edge_array[i][0], edge_array[j][0], cos_sim);
                 }
             }
         }
