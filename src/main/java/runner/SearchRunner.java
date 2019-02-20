@@ -135,7 +135,7 @@ public class SearchRunner implements ProgramRunner
             try {
                 Map<String,String> querysecCBOR = SearchUtils.readOutlineSectionPath(searchParser.getQueryfile());
 
-                BaseBM25 bm25 = new BaseBM25(100, searchParser.getIndexlocation());
+                BaseBM25 bm25 = new BaseBM25(searchParser.getkVAL(), searchParser.getIndexlocation());
                 Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(querysecCBOR);
 
                 Entities e = new Entities();
@@ -162,7 +162,7 @@ public class SearchRunner implements ProgramRunner
             try {
                 Map<String,String> querysecCBOR = SearchUtils.readOutlineSectionPath(searchParser.getQueryfile());
 
-                BaseBM25 bm25 = new BaseBM25(100, searchParser.getIndexlocation());
+                BaseBM25 bm25 = new BaseBM25(searchParser.getkVAL(), searchParser.getIndexlocation());
                 Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(querysecCBOR);
 
                 Entities e = new Entities();
@@ -192,7 +192,7 @@ public class SearchRunner implements ProgramRunner
             try {
                 Map<String,String> querysecCBOR = SearchUtils.readOutlineSectionPath(searchParser.getQueryfile());
 
-                BaseBM25 bm25 = new BaseBM25(100, searchParser.getIndexlocation());
+                BaseBM25 bm25 = new BaseBM25(searchParser.getkVAL(), searchParser.getIndexlocation());
                 Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(querysecCBOR);
 
                 Entities e = new Entities();
