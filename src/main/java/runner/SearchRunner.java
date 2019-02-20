@@ -1,10 +1,10 @@
 package main.java.runner;
 
+
 import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
-import main.java.reranker.ReRankIDFRunner;
 import main.java.reranker.ReRanker;
 import main.java.searcher.BaseBM25;
 import main.java.utils.RunWriter;
@@ -15,6 +15,7 @@ import main.java.graph.GraphSimConstructor;
 import main.java.graph.GraphDegreeConstructor;
 import main.java.utils.Entities;
 import main.java.utils.SearchUtils;
+import main.java.wordsimilarityranker.*;
 import main.java.utils.WriteFile;
 import org.jgrapht.Graph;
 
@@ -26,7 +27,7 @@ import java.util.Map;
 /*
 The searchParser object will hold all the information that is passed as the command line argument.
 There are helper methods to get the data.
- */
+*/
 public class SearchRunner implements ProgramRunner
 {
     private RegisterCommands.CommandSearch searchParser = null;
@@ -43,7 +44,18 @@ public class SearchRunner implements ProgramRunner
         //Read the outline file in to Map
         Map<String,String> queryCBOR = SearchUtils.readOutline(searchParser.getQueryfile());
 
-        //parse based on th options
+        if(searchParser.isBM25Enabled())
+        {
+            BaseBM25 bm = null;
+            try {
+                bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Map<String,Map<String, Container>> res = bm.getRanking(queryCBOR);
+            RunWriter.writeRunFile("BM_25",res);
+        }
+
         if(searchParser.isReRankEnabled())
         {
             validate.ValidateReRank();
@@ -65,7 +77,7 @@ public class SearchRunner implements ProgramRunner
             re.ReRankDF();
         }
 
-        if(searchParser.isBM25Enabled())
+        if(searchParser.isCosineSimilarityEnabled())
         {
             BaseBM25 bm = null;
             try {
@@ -73,10 +85,51 @@ public class SearchRunner implements ProgramRunner
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Map<String,Map<String, Container>> res = bm.getRanking(queryCBOR);
-            RunWriter.writeRunFile("BM_25",res);
 
+            CosineSimilarity cosineSimilarity = new CosineSimilarity(bm,queryCBOR);
+            cosineSimilarity.doCosine();
         }
+
+        if(searchParser.isJaccardSimilarityEnabled())
+        {
+            BaseBM25 bm = null;
+            try {
+                bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            JaccardSimilarity jaccardSimilarity = new JaccardSimilarity(bm,queryCBOR);
+            jaccardSimilarity.doJaccard();
+        }
+
+        if(searchParser.isJaroSimilarityEnabled())
+        {
+            BaseBM25 bm = null;
+            try {
+                bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            JaroWinklerSim jaroWinkler = new JaroWinklerSim(bm,queryCBOR);
+            jaroWinkler.doJaroWinkler();
+        }
+
+        if(searchParser.isDiceEnabled())
+        {
+            BaseBM25 bm = null;
+            try {
+                bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            SorensenDiceCoefficient sorensenDiceCoefficient = new SorensenDiceCoefficient(bm,queryCBOR);
+            sorensenDiceCoefficient.doSorsenCoff();
+        }
+
+
         if(searchParser.isEntityDegreeEnabled()){
             validate.ValidateEntityDegree();
             try {
@@ -169,5 +222,6 @@ public class SearchRunner implements ProgramRunner
         }
 
 
+        }
     }
-}
+

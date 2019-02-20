@@ -42,6 +42,8 @@ public class ReRanker
 
     public void ReRank()
     {
+        runnerReRank.setBiasFactor(SearchCommand.getBiasFactor());
+
         Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
         for(Map.Entry<String,String> q: query.entrySet())
         {
@@ -51,7 +53,9 @@ public class ReRanker
             result.put(q.getKey(),reOrdered);
         }
 
-        RunWriter.writeRunFile("doc_sim_reranking",result);
+        String mname = "doc_sim_reranking"+"_k"+SearchCommand.getkVAL()+"_b"+SearchCommand.getBiasFactor()+"_d"+SearchCommand.getDimension();
+
+        RunWriter.writeRunFile(mname,result);
 
         if(SearchCommand.getisVerbose())
         {
@@ -62,6 +66,7 @@ public class ReRanker
 
     public void ReRankIDF()
     {
+        runnerIDFReRank.setBiasFactor(SearchCommand.getBiasFactor());
 
         Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
         for(Map.Entry<String,String> q: query.entrySet())
@@ -72,16 +77,17 @@ public class ReRanker
             result.put(q.getKey(),reOrdered);
         }
 
-        RunWriter.writeRunFile("doc_sim_IDF_reranking",result);
+        String mname = "doc_sim_IDF_reranking"+"_k"+SearchCommand.getkVAL()+"_b"+SearchCommand.getBiasFactor()+"_d"+SearchCommand.getDimension();
+        RunWriter.writeRunFile(mname,result);
         if(SearchCommand.getisVerbose())
         {
             PrintUtils.displayMap(result);
         }
-
     }
 
     public void ReRankDF()
     {
+        runnerDFReRank.setBiasFactor(SearchCommand.getBiasFactor());
         Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
         for(Map.Entry<String,String> q: query.entrySet())
         {
@@ -91,7 +97,8 @@ public class ReRanker
             result.put(q.getKey(),reOrdered);
         }
 
-        RunWriter.writeRunFile("doc_sim_DF_reranking",result);
+        String mname = "doc_sim_DF_reranking"+"_k"+SearchCommand.getkVAL()+"_b"+SearchCommand.getBiasFactor()+"_d"+SearchCommand.getDimension();
+        RunWriter.writeRunFile(mname,result);
 
         if(SearchCommand.getisVerbose())
         {
