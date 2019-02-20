@@ -24,8 +24,7 @@ import static main.java.utils.SearchUtils.createTokenList;
 
 
 /**
- * Responsible for creating the ham and spam corpus to train on with the
- * improved BayesCounter.
+ * Creates training and test data for ham and spam documents from the manual qrels file.
  */
 public class IndexHamSpamRunner implements ProgramRunner {
 
@@ -38,32 +37,30 @@ public class IndexHamSpamRunner implements ProgramRunner {
         validate = new ValidateCommands.ValidateIndexHamSpamCommands(indexHamSpamParser);
     }
 
+
     @Override
     public void run() {
-        // Instantiate the empty hash maps.
         HashMap<String, HashMap<String, String>> classifyMap = initializeMaps();
 
-        // Open the qrels file and save all lines marked with a -2 or 2
         classifyMap = parseQrels(classifyMap);
 
-        // Use the ids stored in the maps to get the documents from the Lucene index.
         HashMap<String, ArrayList<Document>> corpus = new HashMap<>();
         try {
             corpus = getDocIds(classifyMap);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // We need to write out for training, a spam corpus, a ham corpus, and for testing a spam and ham corpus.
         write(corpus);
-
-        //These need to go in another class I think.
-        //train(corpus);
-        //test();
     }
 
+
+    /**
+     * Desc: Initialize the main data structure for this class.
+     *
+     * @return HashMap with ham and spam keys added.
+     */
     private HashMap<String, HashMap<String, String>> initializeMaps() {
 
-        // Initialize the data structure
         HashMap<String, HashMap<String, String>> classifyMap = new HashMap<>();
         HashMap<String, String> spamMap = new HashMap<>();
         HashMap<String, String> hamMap = new HashMap<>();
@@ -75,9 +72,16 @@ public class IndexHamSpamRunner implements ProgramRunner {
     }
 
 
+    /**
+     * Desc: Iterate through the qrels file and map pids to ham/spam labels according to their annotations.
+     * A pid of 2 indicates that a document is ham, whereas a pid of -1, -2, or -0 indicates that a
+     * document is spam.
+     *
+     * @param classifyMap that was initialized in the previous step.
+     * @return classifyMap Fully populated HashMap that maps the ham/spam labels to pids.
+     */
     private HashMap<String, HashMap<String, String>> parseQrels(HashMap<String, HashMap<String, String>> classifyMap) {
 
-        // Open the qrels file and iterate through each line
         BufferedReader reader = null;
         File qrelsFile = new File(indexHamSpamParser.getQrelPath());
         String line = null;
@@ -107,6 +111,13 @@ public class IndexHamSpamRunner implements ProgramRunner {
         return classifyMap;
     }
 
+
+    /**
+     * Desc: Iterate through the Lucene index and store all ids that are also found in the qrels.
+     *
+     * @param classifyMap that was populated in the previous step.
+     * @return corpus A new HashMap only containing Documents that were found in both the qrels and index.
+     */
     private HashMap<String, ArrayList<Document>> getDocIds (HashMap<String, HashMap<String, String>> classifyMap) throws IOException {
 
         IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexHamSpamParser.getIndexPath())));
@@ -135,6 +146,12 @@ public class IndexHamSpamRunner implements ProgramRunner {
         return corpus;
     }
 
+
+    /**
+     * Desc: Create seperate training and test sets.
+     *
+     * @param corpus of ham and spam documents created in the previous step.
+     */
     public void write(HashMap<String, ArrayList<Document>> corpus) {
 
         ArrayList<Document> spamCorpus = corpus.get("spam");
