@@ -111,7 +111,7 @@ public class SearchRunner implements ProgramRunner
             jaroWinkler.doJaroWinkler();
         }
 
-        if(searchParser.isJaroSimilarityEnabled())
+        if(searchParser.isDiceEnabled())
         {
             BaseBM25 bm = null;
             try {

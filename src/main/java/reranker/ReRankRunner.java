@@ -24,6 +24,7 @@ class ReRankRunner
     protected String embeddingFile = null;
     protected Integer Dimension;
     protected WordEmbedding word = null;
+    protected int biasFactor=0;
 
 
     ReRankRunner(BaseBM25 bm25, String embeddingFile,Integer Dimension)
@@ -46,6 +47,11 @@ class ReRankRunner
             if(k==count) break;
         }
         return res;
+    }
+
+    protected void setBiasFactor(Integer biasFactor)
+    {
+        this.biasFactor =biasFactor;
     }
 
 
@@ -78,44 +84,91 @@ class ReRankRunner
     This list takes the unranked list and perform the re ranking based on the document similarity
     This method make assumption that first method is relevant , compute the cosine similarity with other documents.
     */
-    protected Map<String,Container> getReRank(Map<String, Container> unranked)
-    {
-        if(unranked.size()<3) return unranked;
+//    protected Map<String,Container> getReRank(Map<String, Container> unranked)
+//    {
+//        if(unranked.size()<3) return unranked;
+//
+//        boolean _isFirst = false;
+//        String _relevant_para = null;
+//        Container _relevant_Container = null;
+//        INDArray _relevant_Vector = null;
+//        double _relevant_doc_score = 0;
+//
+//        Map<String,Container> unsorted = new LinkedHashMap<String,Container>();
+//
+//        for(Map.Entry<String,Container> val: unranked.entrySet())
+//        {
+//            int docID = val.getValue().getDocID();
+//
+//            if(!_isFirst)
+//            {
+//                _relevant_Container = val.getValue();
+//                _relevant_para = val.getKey();
+//                _relevant_Vector = getVector(docID);
+//                _isFirst = true;
+//            }
+//            else
+//            {
+//                INDArray _other_doc = getVector(docID);
+//                double cosineScore = Transforms.cosineSim(_relevant_Vector,_other_doc);
+//                double newScore = ((val.getValue().getScore() * cosineScore) + _relevant_Container.getScore());
+//                _relevant_doc_score += val.getValue().getScore();
+//
+//                Container temp = new Container(newScore,val.getValue().getDocID());
+//                unsorted.put(val.getKey(),temp);
+//            }
+//        }
+//        //Adding the First para back to the map
+//        _relevant_Container.setScoreVal(_relevant_doc_score);
+//        unsorted.put(_relevant_para,_relevant_Container);
+//        return  SortUtils.sortByValue(unsorted);
+//    }
 
-        boolean _isFirst = false;
-        String _relevant_para = null;
-        Container _relevant_Container = null;
-        INDArray _relevant_Vector = null;
-        double _relevant_doc_score = 0;
+    /*
+    A new implementation based on the bias factor
+    */
+    protected Map<String,Container> getReRank(Map<String, Container> unranked) {
+        if (unranked.size() < 3) return unranked;
 
-        Map<String,Container> unsorted = new LinkedHashMap<String,Container>();
+        INDArray biased_vector = null;
+        INDArray res = Nd4j.create(Dimension);
 
-        for(Map.Entry<String,Container> val: unranked.entrySet())
+        int count = 0;
+
+        //If more biases are used than the candidate set, half the size of the candidate set will be used
+        int actualBias = unranked.size() > biasFactor ? biasFactor : unranked.size() / 2;
+
+        double biasedScore = 0.0;
+        /*
+        Compute the document representation based on the Bias Factors, if the user pass in 10, the first document of the retrieved set will be used as bias
+        */
+        for (Map.Entry<String, Container> val : unranked.entrySet()) {
+            count++;
+            int docID = val.getValue().getDocID();
+            biasedScore += val.getValue().getScore();
+            INDArray temp = getVector(docID);
+            res = res.add(temp);
+            if (count == actualBias) break;
+        }
+
+        //If the Bias factor is 1, we do not need to divide the vector component.
+
+        biased_vector = biasFactor == 1 ? res : res.div(actualBias);
+        biasedScore = biasFactor == 1 ? biasedScore : (biasedScore / actualBias);
+
+
+        Map<String, Container> unsorted = new LinkedHashMap<String, Container>();
+
+        for (Map.Entry<String, Container> val : unranked.entrySet())
         {
             int docID = val.getValue().getDocID();
+            INDArray _other_doc = getVector(docID);
+            double cosineScore = Transforms.cosineSim(biased_vector, _other_doc);
+            double newScore = ((val.getValue().getScore() * cosineScore) + biasedScore);
 
-            if(!_isFirst)
-            {
-                _relevant_Container = val.getValue();
-                _relevant_para = val.getKey();
-                _relevant_Vector = getVector(docID);
-                _isFirst = true;
-            }
-            else
-            {
-                INDArray _other_doc = getVector(docID);
-                double cosineScore = Transforms.cosineSim(_relevant_Vector,_other_doc);
-                double newScore = ((val.getValue().getScore() * cosineScore) + _relevant_Container.getScore());
-                _relevant_doc_score += val.getValue().getScore();
-
-                Container temp = new Container(newScore,val.getValue().getDocID());
-                unsorted.put(val.getKey(),temp);
-            }
+            Container temp = new Container(newScore, val.getValue().getDocID());
+            unsorted.put(val.getKey(), temp);
         }
-        //Adding the First para back to the map
-        _relevant_Container.setScoreVal(_relevant_doc_score);
-        unsorted.put(_relevant_para,_relevant_Container);
-        return  SortUtils.sortByValue(unsorted);
+        return SortUtils.sortByValue(unsorted);
     }
-
 }

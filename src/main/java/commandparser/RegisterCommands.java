@@ -83,8 +83,7 @@ public class RegisterCommands
           @Parameter(names = {"-k","--candidate-set-val"}, description = "How many candidate set to retrieve using BM25")
           private Integer kVAL=100;
 
-          @Parameter(names = "--rerank",description ="Rerank the initial retrieved document using document similarity")
-          private boolean isReRank =false;
+
 
          @Parameter(names = {"-we","--word-embedding"},description ="Pass the word embedding file GloVe/ Word2Vec")
          private String word_embedding_file = null;
@@ -98,6 +97,12 @@ public class RegisterCommands
 
          @Parameter(names = {"-V","--verbose"},description ="Print out  some of the results  into stdout")
          private boolean isVerbose =false;
+
+         @Parameter(names = "--rerank",description ="Rerank the initial retrieved document using document similarity")
+         private boolean isReRank =false;
+
+         @Parameter(names = "--bias-fact",description ="Bias factor to get the document representation")
+         private Integer biasFactor = 1;
 
          @Parameter(names = {"--rerank-idf"},description ="Rerank the document based on the IDF")
          private boolean isIDFReRank =false;
@@ -128,6 +133,8 @@ public class RegisterCommands
          @Parameter(names = "--entity-index",description ="Pass the index location of entity index")
          private String entityIndLoc = null;
 
+
+        public Integer getBiasFactor() {return biasFactor;}
          public boolean isDiceEnabled() { return isDiceEnabled;}
          public boolean isJaroSimilarityEnabled(){return isJaroEnabled;}
          public boolean isJaccardSimilarityEnabled(){return isJaccardSimilarity;}
