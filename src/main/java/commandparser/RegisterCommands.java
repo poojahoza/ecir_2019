@@ -108,25 +108,38 @@ public class RegisterCommands
          @Parameter(names = {"--cosine-sim"},description ="Rerank the document based on the cosine similarity between two strings")
          private boolean isCosineSimilarity =false;
 
+         @Parameter(names = {"--jaccard-sim"},description ="Rerank the document based on the Jaccard similarity between two strings")
+         private boolean isJaccardSimilarity = false;
+
+         @Parameter(names = {"--jaro-sim"},description ="Rerank the document based on the Jaro Winkler similarity between two strings")
+         private boolean isJaroEnabled = false;
+
+         @Parameter(names = {"--dice-sim"},description ="Rerank the document based on the Sorensen Dice coefficient similarity between two strings")
+         private boolean isDiceEnabled = false;
+
 
          @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the initial retrieved cluster using document similarity")
          private boolean isQE =false;
 
-        public boolean isIDFReRankEnabled()
-        {
-            return isIDFReRank;
-        }
-         public boolean isDFReRankEnabled()
-         {
-             return isDFReRank;
-         }
+
          @Parameter(names = "--entity-degree",description ="Rerank the initial retrieved document using entity degree")
          private boolean isEntityDegree =false;
 
          @Parameter(names = "--entity-index",description ="Pass the index location of entity index")
          private String entityIndLoc = null;
 
+         public boolean isDiceEnabled() { return isDiceEnabled;}
+         public boolean isJaroSimilarityEnabled(){return isJaroEnabled;}
+         public boolean isJaccardSimilarityEnabled(){return isJaccardSimilarity;}
 
+         public boolean isIDFReRankEnabled()
+         {
+             return isIDFReRank;
+         }
+         public boolean isDFReRankEnabled()
+         {
+             return isDFReRank;
+         }
 
          public String getIndexlocation()
           {

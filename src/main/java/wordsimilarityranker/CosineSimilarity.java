@@ -16,7 +16,6 @@ A class implements the abstract class SimilarityBase and returns the CosineSimil
 */
 public class CosineSimilarity extends SimilarityBase
 {
-
     public CosineSimilarity(BaseBM25 bm , Map<String,String> query)
     {
         super(bm,query);

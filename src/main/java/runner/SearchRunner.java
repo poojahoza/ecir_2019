@@ -1,5 +1,6 @@
 package main.java.runner;
 
+
 import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
@@ -11,7 +12,7 @@ import main.java.searcher.BaseBM25;
 import main.java.searcher.PageSearcher;
 import main.java.utils.Entities;
 import main.java.utils.SearchUtils;
-import main.java.wordsimilarityranker.CosineSimilarity;
+import main.java.wordsimilarityranker.*;
 import main.java.utils.WriteFile;
 
 
@@ -83,6 +84,46 @@ public class SearchRunner implements ProgramRunner
             CosineSimilarity cosineSimilarity = new CosineSimilarity(bm,queryCBOR);
             cosineSimilarity.doCosine();
         }
+
+        if(searchParser.isJaccardSimilarityEnabled())
+        {
+            BaseBM25 bm = null;
+            try {
+                bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            JaccardSimilarity jaccardSimilarity = new JaccardSimilarity(bm,queryCBOR);
+            jaccardSimilarity.doJaccard();
+        }
+
+        if(searchParser.isJaroSimilarityEnabled())
+        {
+            BaseBM25 bm = null;
+            try {
+                bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            JaroWinklerSim jaroWinkler = new JaroWinklerSim(bm,queryCBOR);
+            jaroWinkler.doJaroWinkler();
+        }
+
+        if(searchParser.isJaroSimilarityEnabled())
+        {
+            BaseBM25 bm = null;
+            try {
+                bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            SorensenDiceCoefficient sorensenDiceCoefficient = new SorensenDiceCoefficient(bm,queryCBOR);
+            sorensenDiceCoefficient.doSorsenCoff();
+        }
+
 
         if(searchParser.isEntityDegreeEnabled()){
             validate.ValidateEntityDegree();
