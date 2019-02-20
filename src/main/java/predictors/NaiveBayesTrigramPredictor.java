@@ -1,17 +1,15 @@
 package main.java.predictors;
 
 import main.java.BayesCounter;
-import main.java.utils.SearchUtils;
 import org.apache.lucene.search.IndexSearcher;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NaiveBayesPredictor extends LabelPredictor {
+public class NaiveBayesTrigramPredictor extends LabelPredictor {
     private BayesCounter bc = new BayesCounter();
 
-    public NaiveBayesPredictor(IndexSearcher s) {
+    public  NaiveBayesTrigramPredictor(IndexSearcher s) {
         super(s);
     }
 
@@ -55,4 +53,6 @@ public class NaiveBayesPredictor extends LabelPredictor {
     public ArrayList<Double> score(List<String> tokens) {
         return bc.getScores(tokens);
     }
+
 }
+

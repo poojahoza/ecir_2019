@@ -3,8 +3,7 @@ package main.java.runner;
 import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
-import main.java.predictors.LabelPredictor;
-import main.java.predictors.NaiveBayesPredictor;
+import main.java.predictors.*;
 import main.java.utils.SearchUtils;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
@@ -17,13 +16,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static main.java.utils.SearchUtils.createTokenList;
 
@@ -45,7 +41,7 @@ public class FilterRunner implements ProgramRunner {
         IndexSearcher searcher = SearchUtils.createIndexSearcher(filterParser.getIndexPath());
         ArrayList<Document> spamTrain = null;
         ArrayList<Document> hamTrain = null;
-        ArrayList<Document> test = null;
+
 
         try {
             spamTrain = readIndex(filterParser.getSpamIndexPath());
@@ -54,20 +50,15 @@ public class FilterRunner implements ProgramRunner {
             e.printStackTrace();
         }
 
-        LabelPredictor predictor = train(searcher, spamTrain, hamTrain);
+        runUnigrams(searcher, spamTrain, hamTrain);
+        runBigrams(searcher, spamTrain, hamTrain);
+        runTrigrams(searcher, spamTrain, hamTrain);
+        runQuadgrams(searcher, spamTrain, hamTrain);
 
-        try {
-            test = readIndex(filterParser.getTestIndexPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        predict(predictor, test);
     }
 
     private ArrayList<Document> readIndex(String path) throws IOException {
 
-        //
         BufferedReader reader = null;
         HashMap<String, String> lines = new HashMap<>();
         File f = new File(path);
@@ -102,7 +93,6 @@ public class FilterRunner implements ProgramRunner {
             String docId = doc.get("id");
 
             if (train.containsKey(docId)) {
-                //System.out.println(docId);
                 corpus.add(doc);
             }
         }
@@ -110,31 +100,121 @@ public class FilterRunner implements ProgramRunner {
     }
 
 
-     private LabelPredictor train(IndexSearcher searcher, ArrayList<Document> spamCorpus, ArrayList<Document> hamCorpus) {
+     private void runUnigrams(IndexSearcher searcher, ArrayList<Document> spamCorpus, ArrayList<Document> hamCorpus) {
 
-        LabelPredictor nbp = new NaiveBayesPredictor(searcher);
+        LabelPredictor unigramsPredictor = new NaiveBayesPredictor(searcher);
+        ArrayList<Document> test = null;
 
         for (Document item : spamCorpus) {
             String text = item.get("text");
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
-            nbp.trainSpamTokens(tokens);
+            unigramsPredictor.trainSpamTokens(tokens);
         }
 
         for (Document item : hamCorpus) {
             String text = item.get("text");
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
-            nbp.trainHamTokens(tokens);
+            unigramsPredictor.trainHamTokens(tokens);
         }
 
-        return nbp;
+         try {
+             test = readIndex(filterParser.getTestIndexPath());
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+
+         System.out.println("------------Unigrams------------");
+         predict(unigramsPredictor, test);
     }
+
+    private void runBigrams(IndexSearcher searcher, ArrayList<Document> spamCorpus, ArrayList<Document> hamCorpus) {
+
+        LabelPredictor bigramsPredictor = new NaiveBayesBigramPredictor(searcher);
+        ArrayList<Document> test = null;
+
+        for (Document item : spamCorpus) {
+            String text = item.get("text");
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            bigramsPredictor.trainSpamTokens(tokens);
+        }
+
+        for (Document item : hamCorpus) {
+            String text = item.get("text");
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            bigramsPredictor.trainHamTokens(tokens);
+        }
+
+        try {
+            test = readIndex(filterParser.getTestIndexPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("------------Bigrams------------");
+        predict(bigramsPredictor, test);
+    }
+
+    private void runTrigrams(IndexSearcher searcher, ArrayList<Document> spamCorpus, ArrayList<Document> hamCorpus) {
+
+        LabelPredictor trigramsPredictor = new NaiveBayesTrigramPredictor(searcher);
+        ArrayList<Document> test = null;
+
+        for (Document item : spamCorpus) {
+            String text = item.get("text");
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            trigramsPredictor.trainSpamTokens(tokens);
+        }
+
+        for (Document item : hamCorpus) {
+            String text = item.get("text");
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            trigramsPredictor.trainHamTokens(tokens);
+        }
+
+        try {
+            test = readIndex(filterParser.getTestIndexPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("------------Trigrams------------");
+        predict(trigramsPredictor, test);
+    }
+
+    private void runQuadgrams(IndexSearcher searcher, ArrayList<Document> spamCorpus, ArrayList<Document> hamCorpus) {
+
+        LabelPredictor quadgramsPredictor = new NaiveBayesQuadgramPredictor(searcher);
+        ArrayList<Document> test = null;
+
+        for (Document item : spamCorpus) {
+            String text = item.get("text");
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            quadgramsPredictor.trainSpamTokens(tokens);
+        }
+
+        for (Document item : hamCorpus) {
+            String text = item.get("text");
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            quadgramsPredictor.trainHamTokens(tokens);
+        }
+
+        try {
+            test = readIndex(filterParser.getTestIndexPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("------------Quadgrams------------");
+        predict(quadgramsPredictor, test);
+    }
+
 
     private void predict(LabelPredictor predictor, ArrayList<Document> test) {
 
         for (Document item : test) {
             String text = item.get("text");
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
-            String result = predictor.predict(tokens);
+            ArrayList<Double> result = predictor.score(tokens);
             System.out.println(result);
         }
     }
