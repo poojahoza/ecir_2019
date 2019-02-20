@@ -8,12 +8,12 @@ import main.java.containers.Container;
 import main.java.reranker.ReRanker;
 import main.java.searcher.BaseBM25;
 import main.java.utils.RunWriter;
-import main.java.searcher.BaseBM25;
 import main.java.searcher.PageSearcher;
 import main.java.utils.Entities;
 import main.java.utils.SearchUtils;
 import main.java.wordsimilarityranker.*;
 import main.java.utils.WriteFile;
+import main.java.queryexpansion.QueryExpansion;
 
 
 import java.io.IOException;
@@ -151,6 +151,12 @@ public class SearchRunner implements ProgramRunner
             }catch (IOException ioe){
                 System.out.println(ioe.getMessage());
             }
+        }
+
+        if(searchParser.isQEEnabled())
+        {
+            QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
+            qe.doQueryExpansion();
         }
 
 

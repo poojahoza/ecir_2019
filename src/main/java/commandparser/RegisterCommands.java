@@ -133,7 +133,7 @@ public class RegisterCommands
          @Parameter(names = "--entity-index",description ="Pass the index location of entity index")
          private String entityIndLoc = null;
 
-
+        public boolean isQEEnabled(){return isQE;}
         public Integer getBiasFactor() {return biasFactor;}
          public boolean isDiceEnabled() { return isDiceEnabled;}
          public boolean isJaroSimilarityEnabled(){return isJaroEnabled;}
