@@ -119,14 +119,21 @@ public class RegisterCommands
     @Parameters(separators = "=",commandDescription = "Command to create ham-spam index")
     public static class IndexHamSpam
     {
-        @Parameter(names = {"-i", "--index-loc"}, description = "Main Lucene indexed directory", required = true)
-        private String indexlocation = null;
+        @Parameter(names = {"-i","--corpus-file"},description = "Index",required=true)
+        private String IndexPath;
 
-        @Parameter(names = {"-q", "--qrel-loc"}, description = "Qrels file to create the ham and spam indexes", required = true)
-        private String qrellocation = null;
+        @Parameter(names = {"-q","--new-qrels-file"},description = "qrels file")
+        private String QrelPath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
 
-        @Parameter(names = {"-p","--path"},description = "Path to save the ham-spam index")
-        private String path=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+        @Parameter(names = {"-s","--dest-spamtrain"},description = "Location to save the spam training data")
+        private String spamDestpath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+
+        @Parameter(names = {"-h","--dest-hamtrain"},description = "Location to save the ham training data")
+        private String hamDestpath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+
+        @Parameter(names = {"-d","--dest-test"},description = "Location to save the test data")
+        private String hamSpamDestpath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+
 
         @Parameter(names = "--help", help = true)
         private boolean help;
@@ -138,17 +145,27 @@ public class RegisterCommands
 
         public String getIndexPath()
         {
-            return indexlocation;
+            return IndexPath;
         }
 
         public String getQrelPath()
         {
-            return qrellocation;
+            return QrelPath;
         }
 
-        public String getPath()
+        public String getSpamDestPath()
         {
-            return path;
+            return spamDestpath;
+        }
+
+        public String getHamDestPath()
+        {
+            return hamDestpath;
+        }
+
+        public String getHamSpamDestPath()
+        {
+            return hamSpamDestpath;
         }
 
     }
@@ -156,9 +173,17 @@ public class RegisterCommands
     @Parameters(separators = "=",commandDescription = "Use the ham and spam data sets to detect and filter spam from search results")
     public static class CommandFilter
     {
+        @Parameter(names = {"-i","--index"},description = "Location of the main index", required=true)
+        private String indexPath;
 
-        @Parameter(names = {"-i","--ham-spam-index-loc"},description = "Location of the ham spam index for training", required=true)
-        private String IndexPath;
+        @Parameter(names = {"-s","--spam-index"},description = "Location of the spam training data", required=true)
+        private String spamIndexPath;
+
+        @Parameter(names = {"-h","--ham-index"},description = "Location of the ham training data", required=true)
+        private String hamIndexPath;
+
+        @Parameter(names = {"-t","--test-index"},description = "Location of the test data", required=true)
+        private String hamSpamIndexPath;
 
         @Parameter(names = "--help", help = true)
         private boolean help;
@@ -167,7 +192,13 @@ public class RegisterCommands
             return help;
         }
 
-        public String getIndexPath(){return IndexPath;}
+        public String getIndexPath(){return indexPath;}
+
+        public String getSpamIndexPath(){return spamIndexPath;}
+
+        public String getHamIndexPath(){return hamIndexPath;}
+
+        public String getTestIndexPath(){return hamSpamIndexPath;}
 
     }
 

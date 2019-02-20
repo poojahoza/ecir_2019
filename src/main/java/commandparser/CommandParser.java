@@ -50,7 +50,7 @@ public class CommandParser
         return search;
     }
 
-    public RegisterCommands.IndexHamSpam getClassifyCommand()
+    public RegisterCommands.IndexHamSpam getIndexHamSpamCommand()
     {
         return indexHamSpam;
     }
