@@ -25,6 +25,9 @@ abstract public class LabelPredictor {
         searcher = s;
     }
 
+    public void trainHamTokens(List<String> tokens) {}
+
+    public void trainSpamTokens(List<String> tokens) {}
     /**
      * Desc: This is used to predict whether an email is a ham or spam.
      *
@@ -128,7 +131,7 @@ abstract public class LabelPredictor {
     }
 
 
-    // Helper function, ignore...
+    // I think the problem is somewhere in here, because there are no ham or spam labels in this corpus.
     private ArrayList<ArrayList<String>> _retrieveEmailTokens(String label) {
         Query q = SearchUtils.createStandardBooleanQuery(label, "label");
         ArrayList<ArrayList<String>> emails = new ArrayList<>();

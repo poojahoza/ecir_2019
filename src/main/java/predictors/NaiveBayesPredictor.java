@@ -13,20 +13,21 @@ public class NaiveBayesPredictor extends LabelPredictor {
     public NaiveBayesPredictor(IndexSearcher s) {
         super(s);
 
-        // Train classifier on ham emails
-        for(List<String> tokens : retrieveHamEmailTokens()) {
-            bc.buildHashMap("ham", tokens);
-        }
-
-        // Train classifier on spam emails
-        for(List<String> tokens : retrieveSpamEmailTokens()) {
-            bc.buildHashMap("spam", tokens);
-        }
     }
+
+    public void trainHamTokens(List<String> tokens) {
+        // Train classifier on ham emails
+        bc.buildHashMap("ham", tokens);
+    }
+
+    public void trainSpamTokens(List<String> tokens) {
+        // Train classifier on spam emails
+        bc.buildHashMap("spam", tokens);
+    }
+
 
     @Override
     public String predict(List<String> tokens) {
         return bc.classify(tokens);
     }
-
 }

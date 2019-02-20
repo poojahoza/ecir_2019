@@ -3,14 +3,24 @@ package main.java.runner;
 import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
+import main.java.indexer.IndexBuilder;
+import main.java.predictors.LabelPredictor;
+import main.java.predictors.NaiveBayesPredictor;
+import main.java.utils.SearchUtils;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.nio.file.Paths;
 import java.util.*;
+
+import static main.java.utils.SearchUtils.createIndexSearcher;
+import static main.java.utils.SearchUtils.createTokenList;
 
 
 /**
@@ -24,7 +34,7 @@ public class IndexHamSpamRunner implements ProgramRunner {
 
     public IndexHamSpamRunner(CommandParser parser)
     {
-        indexHamSpamParser = parser.getClassifyCommand();
+        indexHamSpamParser = parser.getIndexHamSpamCommand();
         validate = new ValidateCommands.ValidateIndexHamSpamCommands(indexHamSpamParser);
     }
 
@@ -37,16 +47,18 @@ public class IndexHamSpamRunner implements ProgramRunner {
         classifyMap = parseQrels(classifyMap);
 
         // Use the ids stored in the maps to get the documents from the Lucene index.
-        ArrayList<Document> corpus = new ArrayList<>();
+        HashMap<String, ArrayList<Document>> corpus = new HashMap<>();
         try {
             corpus = getDocIds(classifyMap);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // We need to write out for training, a spam corpus, a ham corpus, and for testing a spam and ham corpus.
+        write(corpus);
 
-        // This is not enough. I need to make an actual Lucene index. To do this, I need to write the data to a certain
-        // format before invoking the indexbuilder.
-        writeIndex(corpus);
+        //These need to go in another class I think.
+        //train(corpus);
+        //test();
     }
 
     private HashMap<String, HashMap<String, String>> initializeMaps() {
@@ -62,6 +74,7 @@ public class IndexHamSpamRunner implements ProgramRunner {
         return classifyMap;
     }
 
+
     private HashMap<String, HashMap<String, String>> parseQrels(HashMap<String, HashMap<String, String>> classifyMap) {
 
         // Open the qrels file and iterate through each line
@@ -70,7 +83,6 @@ public class IndexHamSpamRunner implements ProgramRunner {
         String line = null;
 
         try {
-
             reader = new BufferedReader(new FileReader(qrelsFile));
 
             while ((line = reader.readLine()) != null) {
@@ -78,7 +90,7 @@ public class IndexHamSpamRunner implements ProgramRunner {
                 String[] curLine = line.split("\\s+");
                 HashMap<String, String> curMap;
 
-                if (curLine[3].equals("-2")) {
+                if (curLine[3].equals("-2") || curLine[3].equals("-1") || curLine[3].equals("-0")) {
                     curMap = classifyMap.get("spam");
                     curMap.put(curLine[2], line);
                 }
@@ -95,36 +107,86 @@ public class IndexHamSpamRunner implements ProgramRunner {
         return classifyMap;
     }
 
-    private ArrayList<Document> getDocIds (HashMap<String, HashMap<String, String>> classifyMap) throws IOException {
+    private HashMap<String, ArrayList<Document>> getDocIds (HashMap<String, HashMap<String, String>> classifyMap) throws IOException {
 
         IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexHamSpamParser.getIndexPath())));
 
         HashMap<String, String> spamMap = classifyMap.get("spam");
         HashMap<String, String> hamMap = classifyMap.get("ham");
 
-        ArrayList<Document> corpus = new ArrayList<>();
+        HashMap<String, ArrayList<Document>> corpus = new HashMap<>();
+        corpus.put("ham", new ArrayList<>());
+        corpus.put("spam", new ArrayList<>());
 
+        ArrayList<Document> curMap;
         for (int i = 0; i < reader.maxDoc(); i++) {
             Document doc = reader.document(i);
             String docId = doc.get("id");
 
             if (spamMap.containsKey(docId)) {
-                corpus.add(doc);
+                curMap = corpus.get("spam");
+                curMap.add(doc);
             }
             else if (hamMap.containsKey(docId)) {
-               corpus.add(doc);
+                curMap = corpus.get("ham");
+                curMap.add(doc);
             }
         }
-
         return corpus;
     }
 
-    private void writeIndex(ArrayList<Document> corpus) {
+    public void write(HashMap<String, ArrayList<Document>> corpus) {
+
+        ArrayList<Document> spamCorpus = corpus.get("spam");
+        ArrayList<Document> hamCorpus = corpus.get("ham");
+
+        // Divide the ham and spam lists in half.
+        int spamSize = spamCorpus.size();
+        int hamSize = hamCorpus.size();
+
+        ArrayList<Document> spamTrain = new ArrayList<>(spamCorpus.subList(0, (spamSize + 1)/2));
+        ArrayList<Document> spamTest =  new ArrayList<>(spamCorpus.subList((spamSize + 1) / 2, spamSize));
+
+        ArrayList<Document> hamTrain = new ArrayList<>(hamCorpus.subList(0, (hamSize + 1)/2));
+        ArrayList<Document> hamTest =  new ArrayList<>(hamCorpus.subList((hamSize + 1) / 2, hamSize));
+
+        // Write out to seperate files the first half of each
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getSpamDestPath(), true));
+            for (Document d: spamTrain) {
+                String s = d.toString();
+                writer.write(s);
+                writer.newLine();
+            }
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getPath(), true));
-            for (Document item : corpus) {
-                writer.write(item + "\n");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getHamDestPath(), true));
+            for (Document d: hamTrain) {
+                String s = d.toString();
+                writer.write(s);
+                writer.newLine();
+            }
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Write out to a third file a combination of the remaining halves for testing.
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getHamSpamDestPath(), true));
+            for (Document d: spamTest) {
+                String s = d.toString();
+                writer.write(s);
+                writer.newLine();
+            }
+            for (Document d: hamTest) {
+                String s = d.toString();
+                writer.write(s);
+                writer.newLine();
             }
             writer.close();
         } catch (Exception e) {
