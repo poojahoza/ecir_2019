@@ -16,9 +16,9 @@ public class GraphSimilaritySearcher extends GraphDegreeSearcher {
                                Integer dim,
                                String embedding_file){
         entity_graph = new DefaultUndirectedWeightedGraph<>(DefaultEdge.class);
+        we = new WordEmbedding(dim, embedding_file);
         createVertexList(entity_list);
         this.createEdgeList(entity_list);
-        we = new WordEmbedding(dim, embedding_file);
         return entity_graph;
     }
 
