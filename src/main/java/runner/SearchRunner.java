@@ -119,12 +119,12 @@ public class SearchRunner implements ProgramRunner
                 Map<String, Map<String, String>> query_entities = gs.getRanking(query_ent_list);
 
                 GraphSimConstructor gdc = new GraphSimConstructor();
-                Map<String, Map<String, Integer>> ranked_entities = gdc.getGraphDegree(query_entities,
+                Map<String, Map<String, Double>> ranked_entities = gdc.getGraphDegree(query_entities,
                         searchParser.getDimension(),
                         searchParser.getWordEmbeddingFile());
 
 
-                Map<String, Map<String, Double>> ranked_entities_score = e.getParagraphsScore(bm25_ranking, ranked_entities);
+                Map<String, Map<String, Double>> ranked_entities_score = e.getParagraphsScoreDouble(bm25_ranking, ranked_entities);
                 ranked_entities_score = e.getRerankedParas(ranked_entities_score);
 
                 WriteFile write_file = new WriteFile();

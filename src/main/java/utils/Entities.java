@@ -78,6 +78,53 @@ public class Entities {
         return ranked_para;
     }
 
+    public Map<String, Map<String, Double>> getParagraphsScoreDouble(Map<String, Map<String, Container>> bm25_ranking,
+                                                               Map<String, Map<String, Double>> ranked_entities)
+    {
+        Map<String, Map<String, Double>> ranked_para = new LinkedHashMap<>();
+
+        for(Map.Entry<String, Map<String, Container>> m: bm25_ranking.entrySet())
+        {
+            for(Map.Entry<String, Container> n:m.getValue().entrySet())
+            {
+                EntityContainer e = n.getValue().getEntity();
+                //int entity_counter = 1;
+                String [] entity_ids = e.getEntityId().split("[\r\n]+");
+                for(int s = 0; s  < entity_ids.length; s++) {
+                    Map<String, Double> query_entities_list = ranked_entities.get(m.getKey());
+
+                    /*if(query_entities_list.containsKey(entity_ids[s]))
+                    {
+                        entity_counter += 1;
+                    }*/
+                    if(ranked_para.containsKey(m.getKey()))
+                    {
+                        Map<String, Double> query_extract = ranked_para.get(m.getKey());
+                        if(query_extract.containsKey(entity_ids[s]))
+                        {
+                            query_extract.put(n.getKey(), (query_extract.get(entity_ids[s]))+n.getValue().getScore());
+                        }
+                        else{
+                            query_extract.put(n.getKey(), n.getValue().getScore());
+                        }
+
+                    }
+
+                }
+
+                if(!ranked_para.containsKey(m.getKey()))
+                {
+                    Map<String, Double> para_rank = new LinkedHashMap<>();
+                    para_rank.put(n.getKey(), n.getValue().getScore());
+                    ranked_para.put(m.getKey(), para_rank);
+                }
+
+            }
+        }
+        return ranked_para;
+    }
+
+
     public Map<String, Map<String, Double>> getRerankedParas(Map<String, Map<String, Double>> ranked_entities)
     {
         for(Map.Entry<String, Map<String, Double>> m: ranked_entities.entrySet())

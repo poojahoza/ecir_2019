@@ -6,6 +6,7 @@ import org.jgrapht.graph.DefaultUndirectedWeightedGraph;
 
 import main.java.reranker.WordEmbedding;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class GraphSimilaritySearcher extends GraphDegreeSearcher {
@@ -14,15 +15,19 @@ public class GraphSimilaritySearcher extends GraphDegreeSearcher {
 
     public Graph generateGraph(Map<String, String> entity_list,
                                Integer dim,
-                               String embedding_file){
+                               String embedding_file,
+                               Map<String, Double> entity_weight){
         entity_graph = new DefaultUndirectedWeightedGraph<>(DefaultEdge.class);
         we = new WordEmbedding(dim, embedding_file);
+        //Map<String, Double> entity_weight = new LinkedHashMap<>();
         createVertexList(entity_list);
-        this.createEdgeList(entity_list);
+        this.createEdgeList(entity_list, entity_weight);
+
         return entity_graph;
     }
 
-    void createEdgeList(Map<String, String> entity_list){
+    void createEdgeList(Map<String, String> entity_list,
+                        Map<String, Double> entity_weight){
         String[][] edge_array = new String[entity_list.size()][2];
         int counter = 0;
         for(Map.Entry<String, String> m: entity_list.entrySet())
@@ -40,6 +45,21 @@ public class GraphSimilaritySearcher extends GraphDegreeSearcher {
                 {
                     entity_graph.addEdge(edge_array[i][0], edge_array[j][0]);
                     entity_graph.setEdgeWeight(edge_array[i][0], edge_array[j][0], cos_sim);
+                    if(entity_weight.containsKey(edge_array[i][0]))
+                    {
+                        Double score = entity_weight.get(edge_array[i][0]);
+                        entity_weight.put(edge_array[i][0], score+cos_sim);
+                    }else{
+                        entity_weight.put(edge_array[i][0], cos_sim);
+                    }
+
+                    if(entity_weight.containsKey(edge_array[j][0]))
+                    {
+                        Double score = entity_weight.get(edge_array[j][0]);
+                        entity_weight.put(edge_array[j][0], score+cos_sim);
+                    }else{
+                        entity_weight.put(edge_array[j][0], cos_sim);
+                    }
                 }
             }
         }
