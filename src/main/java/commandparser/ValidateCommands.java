@@ -92,17 +92,36 @@ public class ValidateCommands
         }
 
     }
-    public static class ValidateClassifyCommands
-    {
-        private final RegisterCommands.CommandClassify classifyParser;
 
-        public ValidateClassifyCommands(RegisterCommands.CommandClassify classifyParser)
+    public static class ValidateIndexHamSpamCommands
+    {
+        private final RegisterCommands.IndexHamSpam indexHamSpamParser;
+
+        public ValidateIndexHamSpamCommands(RegisterCommands.IndexHamSpam indexHamSpamParser)
         {
-            this.classifyParser = classifyParser;
+            this.indexHamSpamParser = indexHamSpamParser;
         }
 
         private void CALLEXIT(int status)
         {
+            System.exit(status);
+        }
+
+    }
+
+    public static class ValidateFilterCommands
+    {
+        private final RegisterCommands.CommandFilter filterParser;
+
+        public ValidateFilterCommands(RegisterCommands.CommandFilter filterParser)
+        {
+
+            this.filterParser = filterParser;
+        }
+
+        private void CALLEXIT(int status)
+        {
+
             System.exit(status);
         }
 

@@ -21,17 +21,40 @@ import java.util.List;
 abstract public class LabelPredictor {
     public IndexSearcher searcher;
 
+
     public LabelPredictor(IndexSearcher s) {
         searcher = s;
     }
 
     /**
-     * Desc: This is used to predict whether an email is a ham or spam.
+     * Desc: Train classifier on ham emails.
      *
-     * @param tokens List of tokens in the email
-     * @return String The label ("spam" or "ham") that is predicted given the email tokens
+     * @param tokens List of tokens in the document
+     */
+    public void trainHamTokens(List<String> tokens) {}
+
+    /**
+     * Desc: Train classifier on ham emails.
+     *
+     * @param tokens List of tokens in the document
+     */
+    public void trainSpamTokens(List<String> tokens) {}
+
+    /**
+     * Desc: Predict whether a document is a ham or spam.
+     *
+     * @param tokens List of tokens in the document
+     * @return String The label ("spam" or "ham") that is predicted given the document  tokens
      */
     abstract public String predict(List<String> tokens);
+
+    /**
+     * Desc: Get the ham and spam scores for the test data.
+     *
+     * @param tokens List of tokens in the document
+     * @return ArrayList The ham and spam scores of the given document tokens
+     */
+    abstract public ArrayList<Double> score(List<String> tokens);
 
 
     /**
@@ -128,7 +151,7 @@ abstract public class LabelPredictor {
     }
 
 
-    // Helper function, ignore...
+    // I think the problem is somewhere in here, because there are no ham or spam labels in this corpus.
     private ArrayList<ArrayList<String>> _retrieveEmailTokens(String label) {
         Query q = SearchUtils.createStandardBooleanQuery(label, "label");
         ArrayList<ArrayList<String>> emails = new ArrayList<>();
