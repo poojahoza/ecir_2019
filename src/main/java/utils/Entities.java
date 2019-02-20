@@ -135,4 +135,22 @@ public class Entities {
         return ranked_entities;
     }
 
+    public Map<String, String> expandQuery(Map<String, String> queryCbor,
+                                           Map<String, Map<String, Double>> ranked_entities)
+    {
+        Map<String, String> expanded_query = new LinkedHashMap<>();
+
+        for(Map.Entry<String, String> m: queryCbor.entrySet())
+        {
+            if(ranked_entities.containsKey(m.getKey()))
+            {
+                expanded_query.put(m.getKey(), new StringBuilder().append(m.getValue()).append(ranked_entities.get(m.getKey()).keySet().iterator().next()).toString());
+            }else{
+                expanded_query.put(m.getKey(), m.getValue());
+            }
+
+        }
+        return expanded_query;
+    }
+
 }

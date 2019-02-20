@@ -134,6 +134,39 @@ public class SearchRunner implements ProgramRunner
                 System.out.println(ioe.getMessage());
             }
         }
+        if(searchParser.isQueryExpand()){
+            validate.ValidateEntityDegree();
+            try {
+                Map<String,String> querysecCBOR = SearchUtils.readOutlineSectionPath(searchParser.getQueryfile());
+
+                BaseBM25 bm25 = new BaseBM25(100, searchParser.getIndexlocation());
+                Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(querysecCBOR);
+
+                Entities e = new Entities();
+                Map<String, Map<String, String>> query_ent_list = e.getEntitiesPerQuery(bm25_ranking);
+
+                PageSearcher pgs = new PageSearcher(searchParser.getEntityIndLoc());
+                Map<String, Map<String, String>> query_entities = pgs.getRanking(query_ent_list);
+
+                GraphDegreeConstructor gdc = new GraphDegreeConstructor();
+                Map<String, Map<String, Integer>> ranked_entities = gdc.getGraphDegree(query_entities);
+
+                Map<String, Map<String, Double>> ranked_entities_score = e.getParagraphsScore(bm25_ranking, ranked_entities);
+                ranked_entities_score = e.getRerankedParas(ranked_entities_score);
+
+                Map<String, String> expanded_query = e.expandQuery(querysecCBOR, ranked_entities_score);
+
+                //BaseBM25 bm25 = new BaseBM25(100, searchParser.getIndexlocation());
+                Map<String, Map<String, Container>> expanded_bm25_ranking = bm25.getRanking(expanded_query);
+
+                WriteFile write_file = new WriteFile();
+                write_file.generateBM25RunFile(expanded_bm25_ranking, "expandedBM25");
+                //write_file.generateEntityRunFile(ranked_entities_score, "entityDegree");
+
+            }catch (IOException ioe){
+                System.out.println(ioe.getMessage());
+            }
+        }
 
 
     }

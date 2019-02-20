@@ -125,6 +125,8 @@ public class RegisterCommands
          @Parameter(names = "--entity-sim",description ="Rerank the initial retrieved document using entity abstract similarity")
          private boolean isEntitySim =false;
 
+         @Parameter(names = "--entity-expand",description ="Rerank the initial retrieved document using expanded query")
+         private boolean isQueryExpand =false;
 
 
          public String getIndexlocation()
@@ -179,6 +181,8 @@ public class RegisterCommands
          {
              return isEntitySim;
          }
+
+         public boolean isQueryExpand(){return isQueryExpand;}
 
           boolean isHelp() {
                return help;
