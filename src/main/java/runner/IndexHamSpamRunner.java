@@ -1,17 +1,23 @@
 package main.java.runner;
 
+import it.unimi.dsi.fastutil.Hash;
 import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.indexer.IndexBuilder;
 import main.java.predictors.LabelPredictor;
 import main.java.predictors.NaiveBayesPredictor;
+import main.java.searcher.BaseSearcher;
 import main.java.utils.SearchUtils;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 
 import java.io.*;
@@ -44,10 +50,12 @@ public class IndexHamSpamRunner implements ProgramRunner {
 
         classifyMap = parseQrels(classifyMap);
 
-        HashMap<String, ArrayList<Document>> corpus = new HashMap<>();
+        HashMap<String, HashMap<String, String>> corpus = new HashMap<>();
         try {
             corpus = getDocIds(classifyMap);
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
             e.printStackTrace();
         }
         write(corpus);
@@ -96,11 +104,11 @@ public class IndexHamSpamRunner implements ProgramRunner {
 
                 if (curLine[3].equals("-2") || curLine[3].equals("-1") || curLine[3].equals("-0")) {
                     curMap = classifyMap.get("spam");
-                    curMap.put(curLine[2], line);
+                    curMap.put(curLine[2], curLine[0]);
                 }
                 else if (curLine[3].equals("2")) {
                     curMap = classifyMap.get("ham");
-                    curMap.put(curLine[2], line);
+                    curMap.put(curLine[2], curLine[0]);
                 }
             }
 
@@ -118,29 +126,30 @@ public class IndexHamSpamRunner implements ProgramRunner {
      * @param classifyMap that was populated in the previous step.
      * @return corpus A new HashMap only containing Documents that were found in both the qrels and index.
      */
-    private HashMap<String, ArrayList<Document>> getDocIds (HashMap<String, HashMap<String, String>> classifyMap) throws IOException {
+    private HashMap<String, HashMap<String, String>> getDocIds (HashMap<String, HashMap<String, String>> classifyMap) throws IOException, ParseException {
 
-        IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(indexHamSpamParser.getIndexPath())));
+        BaseSearcher searcher = new BaseSearcher(indexHamSpamParser.getIndexPath());
 
         HashMap<String, String> spamMap = classifyMap.get("spam");
         HashMap<String, String> hamMap = classifyMap.get("ham");
 
-        HashMap<String, ArrayList<Document>> corpus = new HashMap<>();
-        corpus.put("ham", new ArrayList<>());
-        corpus.put("spam", new ArrayList<>());
+        HashMap<String, HashMap<String, String>> corpus = new HashMap<>();
+        corpus.put("ham", new HashMap<>());
+        corpus.put("spam", new HashMap<>());
 
-        ArrayList<Document> curMap;
-        for (int i = 0; i < reader.maxDoc(); i++) {
-            Document doc = reader.document(i);
-            String docId = doc.get("id");
-
-            if (spamMap.containsKey(docId)) {
-                curMap = corpus.get("spam");
-                curMap.add(doc);
+        HashMap curMap = corpus.get("spam");
+        TopDocs docId = null;
+        for (String key : spamMap.keySet()) {
+            docId = searcher.performSearch(spamMap.get(key), 1);
+            if (docId != null) {
+                curMap.put(key, spamMap.get(key));
             }
-            else if (hamMap.containsKey(docId)) {
-                curMap = corpus.get("ham");
-                curMap.add(doc);
+        }
+        curMap = corpus.get("ham");
+        for (String key : hamMap.keySet()) {
+            docId = searcher.performSearch(spamMap.get(key), 1);
+            if (docId != null) {
+                curMap.put(key, spamMap.get(key));
             }
         }
         return corpus;
@@ -152,17 +161,17 @@ public class IndexHamSpamRunner implements ProgramRunner {
      *
      * @param corpus of ham and spam documents created in the previous step.
      */
-    public void write(HashMap<String, ArrayList<Document>> corpus) {
+    public void write(HashMap<String, HashMap<String, String>> corpus) {
 
-        ArrayList<Document> spamCorpus = corpus.get("spam");
-        ArrayList<Document> hamCorpus = corpus.get("ham");
+        HashMap<String, String> spamCorpus = corpus.get("spam");
+        HashMap<String, String> hamCorpus = corpus.get("ham");
 
         // Divide the ham and spam lists in half.
         int spamSize = spamCorpus.size();
         int hamSize = hamCorpus.size();
 
-        ArrayList<Document> spamTrain = new ArrayList<>(spamCorpus.subList(0, (spamSize + 1)/2));
-        ArrayList<Document> spamTest =  new ArrayList<>(spamCorpus.subList((spamSize + 1) / 2, spamSize));
+        HashMap<String, String> spamTrain = new HashMap(spamCorpus.subList(0, (spamSize + 1)/2));
+        HashMap<String, String> spamTest =  new HashMap(spamCorpus.subList((spamSize + 1) / 2, spamSize));
 
         ArrayList<Document> hamTrain = new ArrayList<>(hamCorpus.subList(0, (hamSize + 1)/2));
         ArrayList<Document> hamTest =  new ArrayList<>(hamCorpus.subList((hamSize + 1) / 2, hamSize));
