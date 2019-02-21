@@ -1,5 +1,6 @@
 package main.java.reranker;
 
+import com.sun.jna.platform.win32.OaIdl;
 import main.java.containers.Container;
 import main.java.searcher.BaseBM25;
 import main.java.utils.PreProcessor;
@@ -57,10 +58,15 @@ class ReRankRunner
 
     protected INDArray buildVector(ArrayList<String> processed)
     {
-        int _number_of_terms=0;
-        INDArray res = Nd4j.create(Dimension); //Create the Dimension vector
+        int _number_of_terms=1;
+        INDArray res = Nd4j.create(Dimension).add(0.000001); //Create the Dimension vector
         for(String str:processed)
         {
+//            if(str==null|| str.equals(""))
+//            {
+//                System.out.println("It is a null");
+//                return res;
+//            }
             if(word.getWordEmbeddingVector(str)!= null)
             {
                 _number_of_terms++;
@@ -74,7 +80,7 @@ class ReRankRunner
 
     protected INDArray getVector(Integer docID)
     {
-        ArrayList<String> processed = PreProcessor.processDocument(bm25.getDocument(docID));
+        ArrayList<String> processed = PreProcessor.processDocumentWithStemming(bm25.getDocument(docID));
         return  buildVector(processed);
     }
 
