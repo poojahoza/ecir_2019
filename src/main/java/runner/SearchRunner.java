@@ -155,6 +155,7 @@ public class SearchRunner implements ProgramRunner
 
         if(searchParser.isQEEnabled())
         {
+            validate.ValidateQE();
             QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
             qe.doQueryExpansion();
         }

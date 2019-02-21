@@ -122,10 +122,11 @@ public class RegisterCommands
          @Parameter(names = {"--dice-sim"},description ="Rerank the document based on the Sorensen Dice coefficient similarity between two strings")
          private boolean isDiceEnabled = false;
 
-
-         @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the initial retrieved cluster using document similarity")
+         @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the document using Query expansion")
          private boolean isQE =false;
 
+         @Parameter(names = {"-top"},description ="specify the top number of selected entity to used in the Query expansion")
+         private int numberOfReturnedEntity = 3;
 
          @Parameter(names = "--entity-degree",description ="Rerank the initial retrieved document using entity degree")
          private boolean isEntityDegree =false;
@@ -133,8 +134,10 @@ public class RegisterCommands
          @Parameter(names = "--entity-index",description ="Pass the index location of entity index")
          private String entityIndLoc = null;
 
-        public boolean isQEEnabled(){return isQE;}
-        public Integer getBiasFactor() {return biasFactor;}
+         public boolean isQEEnabled(){return isQE;}
+         public int getNumberOfReturnedEntity() {return numberOfReturnedEntity;}
+
+         public Integer getBiasFactor() {return biasFactor;}
          public boolean isDiceEnabled() { return isDiceEnabled;}
          public boolean isJaroSimilarityEnabled(){return isJaroEnabled;}
          public boolean isJaccardSimilarityEnabled(){return isJaccardSimilarity;}
@@ -153,15 +156,9 @@ public class RegisterCommands
                return indexlocation;
           }
 
-          public String getQueryfile()
-          {
-               return queryfile;
-          }
+          public String getQueryfile() {return queryfile;}
 
-          public boolean isReRankEnabled()
-          {
-               return isReRank;
-          }
+          public boolean isReRankEnabled(){return isReRank;}
 
           public Integer getkVAL()
           {
@@ -197,7 +194,7 @@ public class RegisterCommands
              return isEntityDegree;
          }
 
-            public String getEntityIndLoc(){return entityIndLoc; }
+          public String getEntityIndLoc(){return entityIndLoc; }
 
           boolean isHelp() {
                return help;
