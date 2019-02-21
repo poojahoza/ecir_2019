@@ -161,7 +161,7 @@ public class QueryExpansion {
             result.put(q.getKey(),sortedMap);
         }
 
-        String mname = "doc-reranking-With-QueryExpansion"+"-k"+this.searchcommand.getkVAL()+"-top"+searchcommand.getNumberOfReturnedEntity();
+        String mname = "doc_reranking_With_QueryExpansion"+"_k"+this.searchcommand.getkVAL()+"_top"+searchcommand.getNumberOfReturnedEntity();
 
         RunWriter.writeRunFile(mname,result);
 
