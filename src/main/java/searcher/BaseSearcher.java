@@ -47,7 +47,7 @@ public class BaseSearcher {
      * @throws IOException
      * @throws ParseException
      */
-    protected TopDocs performSearch(String queryString, int n)
+    public TopDocs performSearch(String queryString, int n)
             throws IOException, ParseException {
 
         queryObj = parser.parse(queryString);

@@ -161,27 +161,44 @@ public class IndexHamSpamRunner implements ProgramRunner {
      *
      * @param corpus of ham and spam documents created in the previous step.
      */
-    public void write(HashMap<String, HashMap<String, String>> corpus) {
+    private void write(HashMap<String, HashMap<String, String>> corpus) {
 
         HashMap<String, String> spamCorpus = corpus.get("spam");
         HashMap<String, String> hamCorpus = corpus.get("ham");
 
-        // Divide the ham and spam lists in half.
-        int spamSize = spamCorpus.size();
-        int hamSize = hamCorpus.size();
+        // Divide the ham and spam maps in half.
+        HashMap<String, String> spamTrain = new HashMap<>();
+        HashMap<String, String> spamTest =  new HashMap<>();
 
-        HashMap<String, String> spamTrain = new HashMap(spamCorpus.subList(0, (spamSize + 1)/2));
-        HashMap<String, String> spamTest =  new HashMap(spamCorpus.subList((spamSize + 1) / 2, spamSize));
+        HashMap<String, String> hamTrain = new HashMap<>();
+        HashMap<String, String> hamTest =  new HashMap<>();
 
-        ArrayList<Document> hamTrain = new ArrayList<>(hamCorpus.subList(0, (hamSize + 1)/2));
-        ArrayList<Document> hamTest =  new ArrayList<>(hamCorpus.subList((hamSize + 1) / 2, hamSize));
+        int i = 0;
+        for (String key : spamCorpus.keySet()) {
+            if (i  > spamCorpus.size() / 2) {
+                spamTest.put(key, spamCorpus.get(key));
+            }
+            else {
+                spamTrain.put(key, spamCorpus.get(key));
+            }
+            i++;
+        }
+        i = 0;
+        for (String key : hamCorpus.keySet()) {
+            if (i  > hamCorpus.size() / 2) {
+                hamTest.put(key, hamCorpus.get(key));
+            }
+            else {
+                hamTrain.put(key, hamCorpus.get(key));
+            }
+            i++;
+        }
 
         // Write out to seperate files the first half of each
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getSpamDestPath(), true));
-            for (Document d: spamTrain) {
-                String s = d.toString();
-                writer.write(s);
+            for (String key: spamTrain.keySet()) {
+                writer.write(key + '\t' + spamTrain.get(key));
                 writer.newLine();
             }
             writer.close();
@@ -191,9 +208,8 @@ public class IndexHamSpamRunner implements ProgramRunner {
 
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getHamDestPath(), true));
-            for (Document d: hamTrain) {
-                String s = d.toString();
-                writer.write(s);
+            for (String key: hamTrain.keySet()) {
+                writer.write(key + '\t' + hamTrain.get(key));
                 writer.newLine();
             }
             writer.close();
@@ -204,14 +220,12 @@ public class IndexHamSpamRunner implements ProgramRunner {
         // Write out to a third file a combination of the remaining halves for testing.
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getHamSpamDestPath(), true));
-            for (Document d: spamTest) {
-                String s = d.toString();
-                writer.write(s);
+            for (String key: spamTest.keySet()) {
+                writer.write(key + '\t' + hamTest.keySet());
                 writer.newLine();
             }
-            for (Document d: hamTest) {
-                String s = d.toString();
-                writer.write(s);
+            for (String key: hamTest.keySet()) {
+                writer.write(key + '\t' + hamTest.keySet());
                 writer.newLine();
             }
             writer.close();
