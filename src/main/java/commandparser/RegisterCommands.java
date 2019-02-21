@@ -122,10 +122,11 @@ public class RegisterCommands
          @Parameter(names = {"--dice-sim"},description ="Rerank the document based on the Sorensen Dice coefficient similarity between two strings")
          private boolean isDiceEnabled = false;
 
-
-         @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the initial retrieved cluster using document similarity")
+         @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the document using Query expansion")
          private boolean isQE =false;
 
+         @Parameter(names = {"-top"},description ="specify the top number of selected entity to used in the Query expansion")
+         private int numberOfReturnedEntity = 3;
 
          @Parameter(names = "--entity-degree",description ="Rerank the initial retrieved document using entity degree")
          private boolean isEntityDegree =false;
@@ -138,6 +139,9 @@ public class RegisterCommands
 
          @Parameter(names = "--entity-expand",description ="Rerank the initial retrieved document using expanded query")
          private boolean isQueryExpand =false;
+
+         public boolean isQEEnabled(){return isQE;}
+         public int getNumberOfReturnedEntity() {return numberOfReturnedEntity;}
 
         public Integer getBiasFactor() {return biasFactor;}
          public boolean isDiceEnabled() { return isDiceEnabled;}

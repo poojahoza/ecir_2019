@@ -60,6 +60,13 @@ public class ValidateCommands
 
         }
 
+        public void ValidateQE() {
+            if (searchParser.getNumberOfReturnedEntity() == 0) {
+                System.out.println("Please pass the number of entity to be returned");
+                CALLEXIT(-1);
+            }
+        }
+
         public void ValidateEntityDegree()
         {
             if(searchParser.getEntityIndLoc() == null)

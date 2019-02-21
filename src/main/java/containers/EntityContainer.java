@@ -4,6 +4,7 @@ public class EntityContainer
 {
     private String entityVal;
     private String entityId;
+    private int existCount = 1;
 
     public EntityContainer(String ent, String entityId)
     {
@@ -19,4 +20,6 @@ public class EntityContainer
     {
         return entityId;
     }
+    public int getCount()   { return existCount; }
+    public void setCount(int value) { existCount = value;}
 }

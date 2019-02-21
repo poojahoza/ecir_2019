@@ -18,6 +18,7 @@ import main.java.utils.SearchUtils;
 import main.java.wordsimilarityranker.*;
 import main.java.utils.WriteFile;
 import org.jgrapht.Graph;
+import main.java.queryexpansion.QueryExpansion;
 
 
 import java.io.IOException;
@@ -219,6 +220,13 @@ public class SearchRunner implements ProgramRunner
             }catch (IOException ioe){
                 System.out.println(ioe.getMessage());
             }
+        }
+
+        if(searchParser.isQEEnabled())
+        {
+            validate.ValidateQE();
+            QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
+            qe.doQueryExpansion();
         }
 
 
