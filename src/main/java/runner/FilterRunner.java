@@ -4,12 +4,18 @@ import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.predictors.*;
+import main.java.searcher.BaseSearcher;
 import main.java.utils.SearchUtils;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 
 import java.io.BufferedReader;
@@ -46,11 +52,10 @@ public class FilterRunner implements ProgramRunner {
         ArrayList<Document> spamTrain = null;
         ArrayList<Document> hamTrain = null;
 
-
         try {
             spamTrain = readIndex(filterParser.getSpamIndexPath());
             hamTrain= readIndex(filterParser.getHamIndexPath());
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 
@@ -68,7 +73,7 @@ public class FilterRunner implements ProgramRunner {
      * @param path to the training set.
      * @return train or test data stored as an ArrayList of Documents.
      */
-    private ArrayList<Document> readIndex(String path) throws IOException {
+    private ArrayList<Document> readIndex(String path) throws IOException, ParseException {
 
         BufferedReader reader = null;
         HashMap<String, String> lines = new HashMap<>();
@@ -79,18 +84,22 @@ public class FilterRunner implements ProgramRunner {
         try {
             reader = new BufferedReader(new FileReader(f));
             while ((line = reader.readLine()) != null) {
-                String[] curLine = line.split("\\s+");
-                String curLineIndexed = curLine[0];
-                String[] curHash = curLineIndexed.split(":");
-                String curHashIndexed = curHash[1];
-                curHashIndexed = curHashIndexed.substring(0, curHashIndexed.length() -1);
-                lines.put(curHashIndexed, "");
+                String[] curLine = line.split("\\t+");
+                String pid = curLine[0];
+                String qid = curLine[1];
+                lines.put(qid, pid);
+
             }
         } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
 
-        ArrayList<Document> train = getCorpus(lines);
+        ArrayList<Document> train = null;
+        try {
+            train = getCorpus(lines);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return train;
     }
 
@@ -101,17 +110,19 @@ public class FilterRunner implements ProgramRunner {
      * @param train or test data in the form of a HashMap.
      * @return Lucene corpus.
      */
-    private ArrayList<Document> getCorpus(HashMap<String, String> train) throws IOException {
+    private ArrayList<Document> getCorpus(HashMap<String, String> train) throws IOException, ParseException {
 
-        IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(filterParser.getIndexPath())));
+        IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(Paths.get(filterParser.getIndexPath()))));
+        QueryParser parser = new QueryParser("Text", new EnglishAnalyzer());
         ArrayList<Document> corpus = new ArrayList<>();
 
-        for (int i = 0; i < reader.maxDoc(); i++) {
-            Document doc = reader.document(i);
-            String docId = doc.get("id");
-
-            if (train.containsKey(docId)) {
-                corpus.add(doc);
+        TopDocs docId = null;
+        for (String key : train.keySet()) {
+            Query q = parser.parse(QueryParser.escape(train.get(key)));
+            TopDocs topDocs = searcher.search(q, 1);
+            for (ScoreDoc sd : topDocs.scoreDocs) {
+                Document d = searcher.doc(sd.doc);
+                corpus.add(d);
             }
         }
         return corpus;
@@ -143,7 +154,7 @@ public class FilterRunner implements ProgramRunner {
 
          try {
              test = readIndex(filterParser.getTestIndexPath());
-         } catch (IOException e) {
+         } catch (IOException | ParseException e) {
              e.printStackTrace();
          }
 
@@ -176,7 +187,7 @@ public class FilterRunner implements ProgramRunner {
 
         try {
             test = readIndex(filterParser.getTestIndexPath());
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 
@@ -210,7 +221,7 @@ public class FilterRunner implements ProgramRunner {
 
         try {
             test = readIndex(filterParser.getTestIndexPath());
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 
@@ -243,7 +254,7 @@ public class FilterRunner implements ProgramRunner {
 
         try {
             test = readIndex(filterParser.getTestIndexPath());
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 
