@@ -55,8 +55,6 @@ public class IndexHamSpamRunner implements ProgramRunner {
             corpus = getDocIds(classifyMap);
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
         write(corpus);
     }
@@ -126,7 +124,7 @@ public class IndexHamSpamRunner implements ProgramRunner {
      * @param classifyMap that was populated in the previous step.
      * @return corpus A new HashMap only containing Documents that were found in both the qrels and index.
      */
-    private HashMap<String, HashMap<String, String>> getDocIds (HashMap<String, HashMap<String, String>> classifyMap) throws IOException, ParseException {
+    private HashMap<String, HashMap<String, String>> getDocIds (HashMap<String, HashMap<String, String>> classifyMap) throws IOException {
 
         BaseSearcher searcher = new BaseSearcher(indexHamSpamParser.getIndexPath());
 
@@ -137,21 +135,26 @@ public class IndexHamSpamRunner implements ProgramRunner {
         corpus.put("ham", new HashMap<>());
         corpus.put("spam", new HashMap<>());
 
-        HashMap curMap = corpus.get("spam");
-        TopDocs docId = null;
-        for (String key : spamMap.keySet()) {
-            docId = searcher.performSearch(spamMap.get(key), 1);
-            if (docId != null) {
-                curMap.put(key, spamMap.get(key));
+        try {
+            HashMap curMap = corpus.get("spam");
+            ArrayList<BaseSearcher.idScore> docId = null;
+            for (String key : spamMap.keySet()) {
+                docId = searcher.doSearch(spamMap.get(key));
+                if (docId != null) {
+                    curMap.put(key, spamMap.get(key));
+                }
             }
-        }
-        curMap = corpus.get("ham");
-        for (String key : hamMap.keySet()) {
-            docId = searcher.performSearch(spamMap.get(key), 1);
-            if (docId != null) {
-                curMap.put(key, spamMap.get(key));
+            curMap = corpus.get("ham");
+            for (String key : hamMap.keySet()) {
+                docId = searcher.doSearch(spamMap.get(key));
+                if (docId != null) {
+                    curMap.put(key, spamMap.get(key));
+                }
             }
+        }catch (NullPointerException e) {
+            System.out.println(e.getStackTrace());
         }
+
         return corpus;
     }
 
