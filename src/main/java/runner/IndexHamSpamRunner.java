@@ -176,25 +176,22 @@ public class IndexHamSpamRunner implements ProgramRunner {
         HashMap<String, String> hamTrain = new HashMap<>();
         HashMap<String, String> hamTest =  new HashMap<>();
 
-        int i = 0;
+        Random random = new Random(50);
         for (String key : spamCorpus.keySet()) {
-            if (i  > spamCorpus.size() / 2) {
+            if (random.nextInt() > 25) {
                 spamTest.put(key, spamCorpus.get(key));
             }
             else {
                 spamTrain.put(key, spamCorpus.get(key));
             }
-            i++;
         }
-        i = 0;
         for (String key : hamCorpus.keySet()) {
-            if (i  > hamCorpus.size() / 2) {
+            if (random.nextInt() > 25) {
                 hamTest.put(key, hamCorpus.get(key));
             }
             else {
                 hamTrain.put(key, hamCorpus.get(key));
             }
-            i++;
         }
 
         // Write out to seperate files
