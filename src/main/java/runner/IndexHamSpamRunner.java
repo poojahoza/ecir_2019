@@ -146,12 +146,12 @@ public class IndexHamSpamRunner implements ProgramRunner {
             }
             curMap = corpus.get("ham");
             for (String key : hamMap.keySet()) {
-                docId = searcher.doSearch(spamMap.get(key));
+                docId = searcher.doSearch(hamMap.get(key));
                 if (docId != null) {
-                    curMap.put(key, spamMap.get(key));
+                    curMap.put(key, hamMap.get(key));
                 }
             }
-        }catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             System.out.println(e.getStackTrace());
         }
 
