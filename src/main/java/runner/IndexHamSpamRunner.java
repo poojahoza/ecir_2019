@@ -197,7 +197,7 @@ public class IndexHamSpamRunner implements ProgramRunner {
             i++;
         }
 
-        // Write out to seperate files the first half of each
+        // Write out to seperate files
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getSpamDestPath(), true));
             for (String key: spamTrain.keySet()) {
@@ -224,11 +224,11 @@ public class IndexHamSpamRunner implements ProgramRunner {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getHamSpamDestPath(), true));
             for (String key: spamTest.keySet()) {
-                writer.write(key + '\t' + hamTest.keySet());
+                writer.write(key + '\t' + spamTest.get(key));
                 writer.newLine();
             }
             for (String key: hamTest.keySet()) {
-                writer.write(key + '\t' + hamTest.keySet());
+                writer.write(key + '\t' + hamTest.get(key));
                 writer.newLine();
             }
             writer.close();
