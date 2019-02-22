@@ -87,7 +87,8 @@ public class FilterRunner implements ProgramRunner {
                 String[] curLine = line.split("\\t+");
                 String pid = curLine[0];
                 String qid = curLine[1];
-                lines.put(qid, pid);
+                //System.out.println(pid + "  " + qid);
+                lines.put(pid, qid);
 
             }
         } catch (IOException | NullPointerException e) {
@@ -116,13 +117,15 @@ public class FilterRunner implements ProgramRunner {
         QueryParser parser = new QueryParser("Text", new EnglishAnalyzer());
         ArrayList<Document> corpus = new ArrayList<>();
 
-        TopDocs docId = null;
         for (String key : train.keySet()) {
             Query q = parser.parse(QueryParser.escape(train.get(key)));
-            TopDocs topDocs = searcher.search(q, 1);
-            for (ScoreDoc sd : topDocs.scoreDocs) {
-                Document d = searcher.doc(sd.doc);
+            try {
+                int docId = searcher.search(q, 100).scoreDocs[0].doc;
+                Document d = searcher.doc(docId);
                 corpus.add(d);
+                //System.out.println(docId);
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println(e.getStackTrace());
             }
         }
         return corpus;
