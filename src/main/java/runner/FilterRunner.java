@@ -120,7 +120,7 @@ public class FilterRunner implements ProgramRunner {
             Query q = parser.parse(QueryParser.escape(data.get(key)));
             try {
                 int docId = searcher.search(q, 1).scoreDocs[0].doc;
-                System.out.println(docId);
+                //System.out.println(docId);
                 Document d = searcher.doc(docId);
                 corpus.add(d);
             } catch (IndexOutOfBoundsException e) {
