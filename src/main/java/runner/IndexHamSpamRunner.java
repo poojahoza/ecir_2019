@@ -121,7 +121,7 @@ public class IndexHamSpamRunner implements ProgramRunner {
     /**
      * Desc: Iterate through the Lucene index and store all ids that are also found in the qrels.
      *
-     * @param classifyMap that was populated in the previous step.
+     * @param classifyMap that was populated from the manual qrels in the previous step.
      * @return corpus A new HashMap only containing Documents that were found in both the qrels and index.
      */
     private HashMap<String, HashMap<String, String>> getDocIds (HashMap<String, HashMap<String, String>> classifyMap) throws IOException {
@@ -160,7 +160,7 @@ public class IndexHamSpamRunner implements ProgramRunner {
 
 
     /**
-     * Desc: Create seperate training and test sets.
+     * Desc: Create separate training and test sets.
      *
      * @param corpus of ham and spam documents created in the previous step.
      */
@@ -194,7 +194,7 @@ public class IndexHamSpamRunner implements ProgramRunner {
             }
         }
 
-        // Write out to seperate files
+        // Write out to separate files
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getSpamDestPath(), true));
             for (String key: spamTrain.keySet()) {
