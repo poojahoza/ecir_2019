@@ -4,12 +4,19 @@ import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.predictors.*;
+import main.java.searcher.BaseSearcher;
 import main.java.utils.SearchUtils;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 
 import java.io.BufferedReader;
@@ -24,7 +31,7 @@ import java.util.List;
 import static main.java.utils.SearchUtils.createTokenList;
 
 /**
- * Uses the training and test sets created by IndexHamSpamRunner to train and clasisfy documents as
+ * Uses the training and test sets created by IndexHamSpamRunner to train and classify documents as
  * either ham or spam.
  */
 public class FilterRunner implements ProgramRunner {
@@ -46,11 +53,10 @@ public class FilterRunner implements ProgramRunner {
         ArrayList<Document> spamTrain = null;
         ArrayList<Document> hamTrain = null;
 
-
         try {
             spamTrain = readIndex(filterParser.getSpamIndexPath());
             hamTrain= readIndex(filterParser.getHamIndexPath());
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 
@@ -65,10 +71,10 @@ public class FilterRunner implements ProgramRunner {
     /**
      * Desc: Read and store the training or test data.
      *
-     * @param path to the training set.
+     * @param path to the training/test set.
      * @return train or test data stored as an ArrayList of Documents.
      */
-    private ArrayList<Document> readIndex(String path) throws IOException {
+    private ArrayList<Document> readIndex(String path) throws IOException, ParseException {
 
         BufferedReader reader = null;
         HashMap<String, String> lines = new HashMap<>();
@@ -79,39 +85,46 @@ public class FilterRunner implements ProgramRunner {
         try {
             reader = new BufferedReader(new FileReader(f));
             while ((line = reader.readLine()) != null) {
-                String[] curLine = line.split("\\s+");
-                String curLineIndexed = curLine[0];
-                String[] curHash = curLineIndexed.split(":");
-                String curHashIndexed = curHash[1];
-                curHashIndexed = curHashIndexed.substring(0, curHashIndexed.length() -1);
-                lines.put(curHashIndexed, "");
+                String[] curLine = line.split("\\t+");
+                String pid = curLine[0].trim();
+                String qid = curLine[1].trim();
+                lines.put(pid, qid);
             }
         } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
 
-        ArrayList<Document> train = getCorpus(lines);
-        return train;
+        ArrayList<Document> data = null;
+        try {
+            data = getCorpus(lines);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 
 
     /**
-     * Desc: Initialize the main data structure for this class.
+     * Desc: Build an ArrayList of Documents for the data set.
      *
-     * @param train or test data in the form of a HashMap.
-     * @return Lucene corpus.
+     * @param  data, train or test in the form of a HashMap.
+     * @return corpus, an ArrayList of documents.
      */
-    private ArrayList<Document> getCorpus(HashMap<String, String> train) throws IOException {
+    private ArrayList<Document> getCorpus(HashMap<String, String> data) throws IOException, ParseException {
 
-        IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(filterParser.getIndexPath())));
+        IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(Paths.get(filterParser.getIndexPath()))));
+        QueryParser parser = new QueryParser("Text", new StandardAnalyzer());
         ArrayList<Document> corpus = new ArrayList<>();
 
-        for (int i = 0; i < reader.maxDoc(); i++) {
-            Document doc = reader.document(i);
-            String docId = doc.get("id");
-
-            if (train.containsKey(docId)) {
-                corpus.add(doc);
+        for (String key : data.keySet()) {
+            Query q = parser.parse(QueryParser.escape(data.get(key)));
+            try {
+                int docId = searcher.search(q, 1).scoreDocs[0].doc;
+                //System.out.println(docId);
+                Document d = searcher.doc(docId);
+                corpus.add(d);
+            } catch (IndexOutOfBoundsException e) {
+                //System.out.println(e.getStackTrace());
             }
         }
         return corpus;
@@ -130,20 +143,20 @@ public class FilterRunner implements ProgramRunner {
         ArrayList<Document> test = null;
 
         for (Document item : spamCorpus) {
-            String text = item.get("text");
+            String text = item.get("Text");
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             unigramsPredictor.trainSpamTokens(tokens);
         }
 
         for (Document item : hamCorpus) {
-            String text = item.get("text");
+            String text = item.get("Text");
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             unigramsPredictor.trainHamTokens(tokens);
         }
 
          try {
              test = readIndex(filterParser.getTestIndexPath());
-         } catch (IOException e) {
+         } catch (IOException | ParseException e) {
              e.printStackTrace();
          }
 
@@ -163,20 +176,20 @@ public class FilterRunner implements ProgramRunner {
         ArrayList<Document> test = null;
 
         for (Document item : spamCorpus) {
-            String text = item.get("text");
+            String text = item.get("Text");
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             bigramsPredictor.trainSpamTokens(tokens);
         }
 
         for (Document item : hamCorpus) {
-            String text = item.get("text");
+            String text = item.get("Text");
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             bigramsPredictor.trainHamTokens(tokens);
         }
 
         try {
             test = readIndex(filterParser.getTestIndexPath());
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 
@@ -197,20 +210,20 @@ public class FilterRunner implements ProgramRunner {
         ArrayList<Document> test = null;
 
         for (Document item : spamCorpus) {
-            String text = item.get("text");
+            String text = item.get("Text");
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             trigramsPredictor.trainSpamTokens(tokens);
         }
 
         for (Document item : hamCorpus) {
-            String text = item.get("text");
+            String text = item.get("Text");
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             trigramsPredictor.trainHamTokens(tokens);
         }
 
         try {
             test = readIndex(filterParser.getTestIndexPath());
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 
@@ -230,20 +243,20 @@ public class FilterRunner implements ProgramRunner {
         ArrayList<Document> test = null;
 
         for (Document item : spamCorpus) {
-            String text = item.get("text");
+            String text = item.get("Text");
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             quadgramsPredictor.trainSpamTokens(tokens);
         }
 
         for (Document item : hamCorpus) {
-            String text = item.get("text");
+            String text = item.get("Text");
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             quadgramsPredictor.trainHamTokens(tokens);
         }
 
         try {
             test = readIndex(filterParser.getTestIndexPath());
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 
@@ -261,7 +274,7 @@ public class FilterRunner implements ProgramRunner {
     private void predict(LabelPredictor predictor, ArrayList<Document> test) {
 
         for (Document item : test) {
-            String text = item.get("text");
+            String text = item.get("Text");
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             ArrayList<Double> result = predictor.score(tokens);
             System.out.println(result);

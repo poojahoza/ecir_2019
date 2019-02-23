@@ -1,6 +1,7 @@
 package main.java.searcher;
 
 import edu.unh.cs.lucene.TrecCarLuceneConfig;
+import main.java.utils.SearchUtils;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.store.FSDirectory;
@@ -47,10 +48,10 @@ public class BaseSearcher {
      * @throws IOException
      * @throws ParseException
      */
-    protected TopDocs performSearch(String queryString, int n)
-            throws IOException, ParseException {
+    public TopDocs performSearch(String queryString, int n)
+            throws IOException, ParseException, NullPointerException {
 
-        queryObj = parser.parse(queryString);
+        queryObj = parser.parse(QueryParser.escape(queryString));
         return searcher.search(queryObj, n);
     }
 
@@ -119,4 +120,91 @@ public class BaseSearcher {
 
         }
     }
+
+    /**
+     * Function: query
+     * Desc: Queries Lucene paragraph corpus using a standard similarity function.
+     *       Note that this uses the StandardAnalyzer.
+     * @param queryString: The query string that will be turned into a boolean query.
+     * @param nResults: How many search results should be returned
+     * @return TopDocs (ranked results matching query)
+     */
+    public TopDocs query(String queryString, Integer nResults) {
+        Query q = SearchUtils.createStandardBooleanQuery(queryString, "text");
+        try {
+            return searcher.search(q, nResults);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Function: queryBigrams
+     * Desc: Queries Lucene paragraph corpus using bigrams and a standard similarity function.
+     *       Note that this uses the EnglishAnalyzer.
+     * @param queryString: The query string that will be turned into a boolean query.
+     * @param nResults: How many search results should be returned
+     * @return TopDocs (ranked results matching query)
+     */
+    public TopDocs queryBigrams(String queryString, Integer nResults) {
+        Query q = SearchUtils.createStandardBooleanQuerywithBigrams(queryString, "bigram");
+        System.out.println("QueryString: " + queryString);
+        System.out.println("q: " + q);
+        try {
+            return searcher.search(q, nResults);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public ArrayList<idScore> doSearch(String query) throws IOException {
+        TopDocs topDocs = query(query, 100);
+        return parseTopDocs(topDocs);
+    }
+
+    public ArrayList<idScore> doBigramsSearch(String query) throws IOException {
+        TopDocs topDocs = queryBigrams(query, 100);
+        return parseTopDocs(topDocs);
+    }
+
+    // Overloaded version that takes a Query instead
+    public ArrayList<idScore> doSearch(Query q) throws IOException {
+        TopDocs topDocs = searcher.search(q, 100);
+        return parseTopDocs(topDocs);
+    }
+
+    public ArrayList<idScore> doBigramsSearch(Query q) throws IOException {
+        TopDocs topDocs = searcher.search(q, 100);
+        return parseTopDocs(topDocs);
+    }
+
+
+    private ArrayList<idScore> parseTopDocs(TopDocs topDocs) throws IOException {
+        ArrayList<idScore> al = new ArrayList<>();
+        // This is an example of iterating of search results
+        for (ScoreDoc sd : topDocs.scoreDocs) {
+            Document doc = searcher.doc(sd.doc);
+            String paraId = doc.get("id");
+            float score = sd.score;
+            idScore cur = new idScore(paraId, score);
+            al.add(cur);
+        }
+        return al;
+    }
+
+
+
+    // Custom class for storing the retrieved data
+    public class idScore {
+        public String i;
+        public float s;
+
+        idScore(String id, float score) {
+            i = id;
+            s = score;
+        }
+    }
+
 }
