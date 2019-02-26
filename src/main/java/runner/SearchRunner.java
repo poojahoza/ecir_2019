@@ -43,7 +43,7 @@ public class SearchRunner implements ProgramRunner
     @Override
     public void run()  {
         //Read the outline file in to Map
-        Map<String,String> queryCBOR = SearchUtils.readOutline(searchParser.getQueryfile());
+        Map<String,String> queryCBOR = SearchUtils.readOutlineSectionPath(searchParser.getQueryfile());
 
         if(searchParser.isBM25Enabled())
         {

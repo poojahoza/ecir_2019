@@ -161,6 +161,4 @@ public class BaseBM25 extends BaseSearcher
             }
        return temp;
     }
-
-
 }
