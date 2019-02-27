@@ -19,6 +19,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -54,8 +55,8 @@ public class FilterRunner implements ProgramRunner {
         ArrayList<Document> hamTrain = null;
 
         try {
-            spamTrain = readIndex(filterParser.getSpamIndexPath());
-            hamTrain= readIndex(filterParser.getHamIndexPath());
+            spamTrain = readIndex(filterParser.getSpamTrainPath());
+            hamTrain= readIndex(filterParser.getHamTrainPath());
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
@@ -64,7 +65,35 @@ public class FilterRunner implements ProgramRunner {
         runBigrams(searcher, spamTrain, hamTrain);
         runTrigrams(searcher, spamTrain, hamTrain);
         runQuadgrams(searcher, spamTrain, hamTrain);
+    }
 
+
+    /**
+     * Desc: Helper function to create hash maps for the ham and spam corpi
+     *
+     * @param path to the training/test set.
+     * @return pids and qids of train or test data stored in a HashMap.
+     */
+    private HashMap<String, String> getIds(String path) throws IOException, ParseException {
+
+        BufferedReader reader = null;
+        HashMap<String, String> lines = new HashMap<>();
+        File f = new File(path);
+
+        String line = null;
+
+        try {
+            reader = new BufferedReader(new FileReader(f));
+            while ((line = reader.readLine()) != null) {
+                String[] curLine = line.split("\\t+");
+                String pid = curLine[0].trim();
+                String qid = curLine[1].trim();
+                lines.put(pid, qid);
+            }
+        } catch (IOException | NullPointerException e) {
+            e.printStackTrace();
+        }
+        return lines;
     }
 
 
@@ -155,13 +184,19 @@ public class FilterRunner implements ProgramRunner {
         }
 
          try {
-             test = readIndex(filterParser.getTestIndexPath());
+             test = readIndex(filterParser.getHamSpamTestPath());
          } catch (IOException | ParseException e) {
              e.printStackTrace();
          }
 
          System.out.println("------------Unigrams------------");
          predict(unigramsPredictor, test);
+
+         try {
+             evaluateClassifier(unigramsPredictor);
+         } catch (IOException | ParseException e) {
+             e.printStackTrace();
+         }
     }
 
     /**
@@ -188,13 +223,19 @@ public class FilterRunner implements ProgramRunner {
         }
 
         try {
-            test = readIndex(filterParser.getTestIndexPath());
+            test = readIndex(filterParser.getHamSpamTestPath());
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 
         System.out.println("------------Bigrams------------");
         predict(bigramsPredictor, test);
+
+        try {
+            evaluateClassifier(bigramsPredictor);
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -222,13 +263,19 @@ public class FilterRunner implements ProgramRunner {
         }
 
         try {
-            test = readIndex(filterParser.getTestIndexPath());
+            test = readIndex(filterParser.getHamSpamTestPath());
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 
         System.out.println("------------Trigrams------------");
         predict(trigramsPredictor, test);
+
+        try {
+            evaluateClassifier(trigramsPredictor);
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -255,13 +302,19 @@ public class FilterRunner implements ProgramRunner {
         }
 
         try {
-            test = readIndex(filterParser.getTestIndexPath());
+            test = readIndex(filterParser.getHamSpamTestPath());
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
 
         System.out.println("------------Quadgrams------------");
         predict(quadgramsPredictor, test);
+
+        try {
+            evaluateClassifier(quadgramsPredictor);
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -279,6 +332,15 @@ public class FilterRunner implements ProgramRunner {
             ArrayList<Double> result = predictor.score(tokens);
             System.out.println(result);
         }
+    }
+
+    private void evaluateClassifier(LabelPredictor predictor) throws IOException, ParseException {
+
+        ArrayList<Document> testDocs = readIndex(filterParser.getHamSpamTestPath());
+        HashMap<String, String> hamTest = getIds(filterParser.getHamTestPath());
+        HashMap<String, String> spamTest = getIds(filterParser.getSpamTestPath());
+        predictor.evaluate(hamTest, spamTest, testDocs);
+
     }
 
 }

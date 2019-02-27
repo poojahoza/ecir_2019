@@ -196,7 +196,7 @@ public class IndexHamSpamRunner implements ProgramRunner {
 
         // Write out to separate files
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getSpamDestPath(), true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getSpamTrainPath(), true));
             for (String key: spamTrain.keySet()) {
                 writer.write(key + '\t' + spamTrain.get(key));
                 writer.newLine();
@@ -207,7 +207,7 @@ public class IndexHamSpamRunner implements ProgramRunner {
         }
 
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getHamDestPath(), true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getHamTrainPath(), true));
             for (String key: hamTrain.keySet()) {
                 writer.write(key + '\t' + hamTrain.get(key));
                 writer.newLine();
@@ -219,11 +219,35 @@ public class IndexHamSpamRunner implements ProgramRunner {
 
         // Write out to a third file a combination of the remaining halves for testing.
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getHamSpamDestPath(), true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getHamSpamTestPath(), true));
             for (String key: spamTest.keySet()) {
                 writer.write(key + '\t' + spamTest.get(key));
                 writer.newLine();
             }
+            for (String key: hamTest.keySet()) {
+                writer.write(key + '\t' + hamTest.get(key));
+                writer.newLine();
+            }
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+        // Write the test data sets into their own files too, so we can evaluate the performance of the classifiers on test data.
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getSpamTestPath(), true));
+            for (String key: spamTest.keySet()) {
+                writer.write(key + '\t' + spamTest.get(key));
+                writer.newLine();
+            }
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(indexHamSpamParser.getHamTestPath(), true));
             for (String key: hamTest.keySet()) {
                 writer.write(key + '\t' + hamTest.get(key));
                 writer.newLine();

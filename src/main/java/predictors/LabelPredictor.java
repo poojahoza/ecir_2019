@@ -2,6 +2,7 @@ package main.java.predictors;
 
 import main.java.utils.SearchUtils;
 //import main.kotlin.evaluation.KotlinEvaluator;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -10,6 +11,7 @@ import org.apache.lucene.search.ScoreDoc;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -56,6 +58,12 @@ abstract public class LabelPredictor {
      */
     abstract public ArrayList<Double> score(List<String> tokens);
 
+
+    /**
+     * Desc: When called, the LabelPredictor will be handed unlabelled documents to classify (using predict method)
+     * The labels will be used to compute the F1 Score of your label prediction method.
+     */
+    abstract public void evaluate(HashMap<String, String> hamTrain, HashMap<String, String> spamTrain, ArrayList<Document> corpus);
 
     /**
      * Desc: Given a token, returns the number of documents in the training corpus that contains this token.

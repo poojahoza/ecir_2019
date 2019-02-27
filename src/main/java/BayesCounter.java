@@ -1,8 +1,17 @@
 package main.java;
 
+import main.java.evaluators.F1Evaluator;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.document.Document;
+
+import javax.print.Doc;
+import java.lang.annotation.Documented;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static main.java.utils.SearchUtils.createTokenList;
 
 public class BayesCounter {
 
@@ -13,6 +22,35 @@ public class BayesCounter {
 
     public BayesCounter() {
         bayesMap = new HashMap<>();
+    }
+
+    public void evaluate(HashMap<String, String> hamTest, HashMap<String, String> spamTest, ArrayList<Document> corpus) {
+
+        HashMap calledLabels = new HashMap<String, String>();
+        HashMap trueLabels = new HashMap<String, String>();
+
+        // for each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (Document item : corpus) {
+            String text = item.get("Text");
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            String label = this.classify(tokens);
+            calledLabels.put(label, item.get("Id"));
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (Document item : corpus) {
+            String curId = item.get("Id");
+            if (hamTest.get(curId) != null) {
+                trueLabels.put(curId, "Ham");
+            }
+            else if (spamTest.get(curId) != null) {
+                trueLabels.put(curId, "Spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
     }
 
     /**
