@@ -22,7 +22,10 @@ public class F1Evaluator {
         /* map must contain id => label */
         for (String id : calledLabels.keySet()) {
             String calledLabel = calledLabels.get(id);
-            String correctLabel = correctLabels.get(id); // Will be "Ham" or "Spam"
+            String correctLabel = null;
+            if (correctLabels.containsKey((id))) {
+                correctLabel = correctLabels.get(id); // Will be "Ham" or "Spam"
+            }
             System.out.println("correct label: " + correctLabel);
             boolean isSpam = false;
 
