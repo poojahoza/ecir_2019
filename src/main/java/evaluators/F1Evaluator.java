@@ -23,6 +23,7 @@ public class F1Evaluator {
         for (String id : calledLabels.keySet()) {
             String calledLabel = calledLabels.get(id);
             String correctLabel = correctLabels.get(id); // Will be "Ham" or "Spam"
+            System.out.println("correct label: " + correctLabel);
             boolean isSpam = false;
 
             if (correctLabel.equals("Spam")) {

@@ -31,7 +31,7 @@ public class BayesCounter {
 
         // for each document, call the predict method. Store the pid with its prediction in the calledLabels map
         for (Document item : corpus) {
-            System.out.println("item:" + item);
+            //System.out.println("item:" + item);
             String text = item.get("Text");
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             String label = this.classify(tokens);
