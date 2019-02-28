@@ -24,27 +24,28 @@ public class F1Evaluator {
             String calledLabel = calledLabels.get(id);
             String correctLabel = null;
             if (correctLabels.containsKey((id))) {
-
+                System.out.println("found correct");
                 correctLabel = correctLabels.get(id); // Will be "Ham" or "Spam"
             }
             //System.out.println("correct label: " + correctLabel);
             boolean isSpam = false;
 
-            if (correctLabel.equals("Spam")) {
-                isSpam = true;
-            }
+            try {
+                if (correctLabel.equals("Spam")) {
+                    isSpam = true;
+                }
 
-            if (isSpam && id.equals("Spam")) {
-                tp++;
-            }
-            else if (isSpam && !calledLabel.equals("Spam")) {
-                fn++;
-            }
-            else if (!isSpam && !calledLabel.equals("Spam")) {
-                tn++;
-            }
-            else {
-                fp++;
+                if (isSpam && id.equals("Spam")) {
+                    tp++;
+                } else if (isSpam && !calledLabel.equals("Spam")) {
+                    fn++;
+                } else if (!isSpam && !calledLabel.equals("Spam")) {
+                    tn++;
+                } else {
+                    fp++;
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
             }
         }
 
