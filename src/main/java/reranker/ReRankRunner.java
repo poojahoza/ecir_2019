@@ -63,11 +63,6 @@ class ReRankRunner
         INDArray res = Nd4j.create(Dimension).add(0.000001); //Create the Dimension vector
         for(String str:processed)
         {
-//            if(str==null|| str.equals(""))
-//            {
-//                System.out.println("It is a null");
-//                return res;
-//            }
             if(word.getWordEmbeddingVector(str)!= null)
             {
                 _number_of_terms++;
@@ -87,59 +82,10 @@ class ReRankRunner
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        try {
-//            PreProcessor.processTermsUsingLucene(bm25.getDocument(docID));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         return  buildVector(processed);
     }
 
 
-
-    /*
-    This list takes the unranked list and perform the re ranking based on the document similarity
-    This method make assumption that first method is relevant , compute the cosine similarity with other documents.
-    */
-//    protected Map<String,Container> getReRank(Map<String, Container> unranked)
-//    {
-//        if(unranked.size()<3) return unranked;
-//
-//        boolean _isFirst = false;
-//        String _relevant_para = null;
-//        Container _relevant_Container = null;
-//        INDArray _relevant_Vector = null;
-//        double _relevant_doc_score = 0;
-//
-//        Map<String,Container> unsorted = new LinkedHashMap<String,Container>();
-//
-//        for(Map.Entry<String,Container> val: unranked.entrySet())
-//        {
-//            int docID = val.getValue().getDocID();
-//
-//            if(!_isFirst)
-//            {
-//                _relevant_Container = val.getValue();
-//                _relevant_para = val.getKey();
-//                _relevant_Vector = getVector(docID);
-//                _isFirst = true;
-//            }
-//            else
-//            {
-//                INDArray _other_doc = getVector(docID);
-//                double cosineScore = Transforms.cosineSim(_relevant_Vector,_other_doc);
-//                double newScore = ((val.getValue().getScore() * cosineScore) + _relevant_Container.getScore());
-//                _relevant_doc_score += val.getValue().getScore();
-//
-//                Container temp = new Container(newScore,val.getValue().getDocID());
-//                unsorted.put(val.getKey(),temp);
-//            }
-//        }
-//        //Adding the First para back to the map
-//        _relevant_Container.setScoreVal(_relevant_doc_score);
-//        unsorted.put(_relevant_para,_relevant_Container);
-//        return  SortUtils.sortByValue(unsorted);
-//    }
 
     /*
     A new implementation based on the bias factor

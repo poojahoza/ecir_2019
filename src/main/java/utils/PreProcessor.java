@@ -1,7 +1,6 @@
 package main.java.utils;
 
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.tartarus.snowball.ext.PorterStemmer;
@@ -16,12 +15,16 @@ public class PreProcessor
 
     private final  List<String> STOP_WORDS = StopWord.getStopWords();
 
+    @Deprecated
     private static String[] processQuery(String query)
     {
         return query.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
     }
 
-    public static ArrayList<String> processTermsUsingLucene(String content) throws IOException {
+    public static ArrayList<String> processTermsUsingLucene(String content) throws IOException
+    {
+        PreProcessor p = new PreProcessor();
+
         StandardAnalyzer analyzer = new StandardAnalyzer();
         ArrayList<String> data = new ArrayList<>();
         TokenStream tokenStream = analyzer.tokenStream("Text", new StringReader(content));
@@ -32,15 +35,18 @@ public class PreProcessor
         }
         while (tokenStream.incrementToken()) {
             final String token = tokenStream.getAttribute(CharTermAttribute.class).toString();
-            data.add(token);
+
+            if(!p.STOP_WORDS.contains(token)) {
+                if (!data.contains(token)) {
+                    data.add(token);
+                }
+            }
         }
         return data;
-
-
     }
 
 
-
+    @Deprecated
     public static ArrayList<String> processDocument(String sb)
     {
         PreProcessor p = new PreProcessor();
@@ -82,7 +88,5 @@ public class PreProcessor
         stem.stem();
         return stem.getCurrent();
     }
-
-
 
 }

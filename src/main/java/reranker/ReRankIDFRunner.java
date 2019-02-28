@@ -26,8 +26,13 @@ public class ReRankIDFRunner extends ReRankRunner
 
     protected INDArray getVector(Integer docID)
     {
+        ArrayList<String> processed = null;
+        try {
+            processed = PreProcessor.processTermsUsingLucene(bm25.getDocument(docID));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        ArrayList<String> processed = PreProcessor.processDocument(bm25.getDocument(docID));
         ArrayList<String> highestIDF = null;
         try {
             highestIDF = cs.getIDF(processed);

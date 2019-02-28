@@ -20,9 +20,13 @@ public class ReRankDFRunner extends ReRankRunner
         cs = new CorpusStats(indexLoc);
     }
 
-    protected INDArray getVector(Integer docID)
-    {
-        ArrayList<String> processed = PreProcessor.processDocument(bm25.getDocument(docID));
+    protected INDArray getVector(Integer docID)  {
+        ArrayList<String> processed = null;
+        try {
+            processed = PreProcessor.processTermsUsingLucene(bm25.getDocument(docID));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         ArrayList<String> highestDF = null;
         try {
             highestDF = cs.getDF(processed);
