@@ -24,9 +24,10 @@ public class F1Evaluator {
             String calledLabel = calledLabels.get(id);
             String correctLabel = null;
             if (correctLabels.containsKey((id))) {
+
                 correctLabel = correctLabels.get(id); // Will be "Ham" or "Spam"
             }
-            System.out.println("correct label: " + correctLabel);
+            //System.out.println("correct label: " + correctLabel);
             boolean isSpam = false;
 
             if (correctLabel.equals("Spam")) {

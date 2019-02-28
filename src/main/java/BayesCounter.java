@@ -26,8 +26,8 @@ public class BayesCounter {
 
     public void evaluate(HashMap<String, String> hamTest, HashMap<String, String> spamTest, ArrayList<Document> corpus) {
 
-        HashMap calledLabels = new HashMap<String, String>();
-        HashMap trueLabels = new HashMap<String, String>();
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
 
         // for each document, call the predict method. Store the pid with its prediction in the calledLabels map
         for (Document item : corpus) {
