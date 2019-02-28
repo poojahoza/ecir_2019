@@ -10,6 +10,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -80,7 +81,17 @@ class ReRankRunner
 
     protected INDArray getVector(Integer docID)
     {
-        ArrayList<String> processed = PreProcessor.processDocumentWithStemming(bm25.getDocument(docID));
+        ArrayList<String> processed = null;
+        try {
+            processed = PreProcessor.processTermsUsingLucene(bm25.getDocument(docID));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        try {
+//            PreProcessor.processTermsUsingLucene(bm25.getDocument(docID));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         return  buildVector(processed);
     }
 

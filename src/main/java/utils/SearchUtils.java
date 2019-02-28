@@ -33,7 +33,24 @@ public class SearchUtils
         return data;
     }
 
-    static public Map<String, String> readOutlineSectionPath(String filename) {
+    static public Map<String, String> readOutlinePara(String filename) {
+        Map<String, String> data = new LinkedHashMap<String, String>();
+
+        FileInputStream qrelStream = null;
+        try {
+            qrelStream = new FileInputStream(new File(filename));
+        } catch (FileNotFoundException fnf) {
+            System.out.println(fnf.getMessage());
+        }
+        for ( Data.Paragraph page : DeserializeData.iterableParagraphs(qrelStream))
+        {
+            data.put(page.getParaId(),page.getTextOnly());
+        }
+        return data;
+    }
+
+    @Deprecated
+    static public Map<String, String> readSectionPathOld(String filename) {
         Map<String, String> data = new LinkedHashMap<String, String>();
 
         FileInputStream qrelStream = null;
@@ -64,6 +81,34 @@ public class SearchUtils
         return data;
     }
 
+    /*
+     Ack -- The below code is taken from the Professor Dietz Trema-UNH examples
+     */
+    public static Map<String,String> readOutlineSectionPath(String fname)
+    {
+        Map<String, String> data = new LinkedHashMap<String, String>();
+
+        FileInputStream qrelStream = null;
+        try {
+            qrelStream = new FileInputStream(new File(fname));
+        } catch (FileNotFoundException fnf) {
+            System.out.println(fnf.getMessage());
+        }
+
+
+        for (Data.Page page : DeserializeData.iterableAnnotations(qrelStream)) {
+            data.put(page.getPageId(),page.getPageName());
+            for (List<Data.Section> sectionPath : page.flatSectionPaths()) {
+                final String queryId = Data.sectionPathId(page.getPageId(), sectionPath);
+                String queryStr = buildSectionQueryStr(page, sectionPath);
+
+                data.put(queryId,queryStr);
+
+            }
+
+        }
+        return data;
+    }
     /**
      * Function: createIndexSearcher
      * Desc: Creates an IndexSearcher (responsible for querying a Lucene index directory).
@@ -117,6 +162,18 @@ public class SearchUtils
         }
 
         return builder.build();
+    }
+
+    /*
+     Ack -- The below code is taken from the Professor Dietz Trema-UNH examples
+     */
+    public static String buildSectionQueryStr(Data.Page page, List<Data.Section> sectionPath) {
+        StringBuilder queryStr = new StringBuilder();
+        queryStr.append(page.getPageName());
+        for (Data.Section section: sectionPath) {
+            queryStr.append(" ").append(section.getHeading());
+        }
+        return queryStr.toString();
     }
 
     /**

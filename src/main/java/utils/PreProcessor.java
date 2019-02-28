@@ -1,7 +1,13 @@
 package main.java.utils;
 
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.tartarus.snowball.ext.PorterStemmer;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +20,25 @@ public class PreProcessor
     {
         return query.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
     }
+
+    public static ArrayList<String> processTermsUsingLucene(String content) throws IOException {
+        StandardAnalyzer analyzer = new StandardAnalyzer();
+        ArrayList<String> data = new ArrayList<>();
+        TokenStream tokenStream = analyzer.tokenStream("Text", new StringReader(content));
+        try {
+            tokenStream.reset();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while (tokenStream.incrementToken()) {
+            final String token = tokenStream.getAttribute(CharTermAttribute.class).toString();
+            data.add(token);
+        }
+        return data;
+
+
+    }
+
 
 
     public static ArrayList<String> processDocument(String sb)

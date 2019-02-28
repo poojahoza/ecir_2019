@@ -31,4 +31,17 @@ public class PrintUtils
         }
 
     }
+
+    public static void  displayQuery(Map<String,String> result)
+    {
+        int count=0;
+        for(Map.Entry<String,String> val: result.entrySet())
+        {
+            count++;
+           System.out.println("QNO: "+count+" QueryID :"+ val.getKey() + " -----"+"QueryString :"+ val.getValue());
+        }
+    }
+
+
+
 }

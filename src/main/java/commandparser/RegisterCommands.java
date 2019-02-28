@@ -8,6 +8,7 @@ import java.util.List;
 /*
 All the necessary commands should be registered here first for your implementation.
 */
+
 public class RegisterCommands
 {
      /*
@@ -140,6 +141,20 @@ public class RegisterCommands
          @Parameter(names = "--entity-expand",description ="Rerank the initial retrieved document using expanded query")
          private boolean isQueryExpand =false;
 
+         @Parameter(names = "article",description ="Article level retrieval")
+         private boolean isArticleEnabled =false;
+
+         @Parameter(names = "section",description ="Section level retrieval")
+         private boolean isSectionEnabled =false;
+
+         public boolean isArticleEnabled()
+         {
+             return isArticleEnabled;
+         }
+         public boolean isSectionEnabled()
+         {
+             return isSectionEnabled;
+         }
          public boolean isQEEnabled(){return isQE;}
          public int getNumberOfReturnedEntity() {return numberOfReturnedEntity;}
 
@@ -198,6 +213,7 @@ public class RegisterCommands
           }
 
           public boolean isCosineSimilarityEnabled() {return isCosineSimilarity;}
+
 
 
 

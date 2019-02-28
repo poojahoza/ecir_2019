@@ -7,16 +7,13 @@ import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
 import main.java.reranker.ReRanker;
 import main.java.searcher.BaseBM25;
-import main.java.utils.RunWriter;
+import main.java.utils.*;
 import main.java.searcher.BaseBM25;
 import main.java.searcher.PageSearcher;
 import main.java.searcher.LeadtextSearcher;
 import main.java.graph.GraphSimConstructor;
 import main.java.graph.GraphDegreeConstructor;
-import main.java.utils.Entities;
-import main.java.utils.SearchUtils;
 import main.java.wordsimilarityranker.*;
-import main.java.utils.WriteFile;
 import org.jgrapht.Graph;
 import main.java.queryexpansion.QueryExpansion;
 
@@ -42,8 +39,17 @@ public class SearchRunner implements ProgramRunner
 
     @Override
     public void run()  {
-        //Read the outline file in to Map
-        Map<String,String> queryCBOR = SearchUtils.readOutlineSectionPath(searchParser.getQueryfile());
+
+        Map<String,String> queryCBOR = null;
+
+        validate.ValidateRetrievalOptions();
+        if(searchParser.isArticleEnabled())
+        {
+            queryCBOR = SearchUtils.readOutline(searchParser.getQueryfile());
+        }else
+        {
+            queryCBOR = SearchUtils.readOutlineSectionPath(searchParser.getQueryfile());
+        }
 
         if(searchParser.isBM25Enabled())
         {
@@ -227,6 +233,11 @@ public class SearchRunner implements ProgramRunner
             validate.ValidateQE();
             QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
             qe.doQueryExpansion();
+        }
+
+        if(searchParser.getisVerbose())
+        {
+            PrintUtils.displayQuery(queryCBOR);
         }
 
 

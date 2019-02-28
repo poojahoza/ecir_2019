@@ -60,6 +60,20 @@ public class ValidateCommands
 
         }
 
+        public void ValidateRetrievalOptions()
+        {
+            if(!searchParser.isArticleEnabled() && !searchParser.isSectionEnabled())
+            {
+                System.out.println("Please use either article or section level option");
+                CALLEXIT(-1);
+            }
+            else if (searchParser.isArticleEnabled() && searchParser.isSectionEnabled())
+            {
+                System.out.println("Please use either section level or article level option, not bot");
+                CALLEXIT(-1);
+            }
+        }
+
         public void ValidateQE() {
             if (searchParser.getNumberOfReturnedEntity() == 0) {
                 System.out.println("Please pass the number of entity to be returned");
