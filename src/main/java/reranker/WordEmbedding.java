@@ -40,7 +40,6 @@ public class WordEmbedding
         try {
             br = new BufferedReader(new FileReader(new File(embeddingFile)));
         } catch (FileNotFoundException e) {
-            System.out.println("What??");
             System.out.println(e.getMessage());
         }
 
@@ -50,13 +49,19 @@ public class WordEmbedding
             while ((line = br.readLine()) != null) {
                 String[] vec = line.split(" ");
 
+                //This avoids reading unnecessary line
+                if(vec.length < (dimension+1))
+                {
+                    continue;
+                }
+
                 //Allocate the memory to convert the read value in to IND array.
                 float[] temp=new float[dimension];
                 for(int i=0;i < dimension ;i++)
                 {
                         temp[i] = Float.parseFloat(vec[i+1]);
                 }
-                word.put(vec[0], Nd4j.create(temp));
+                word.put(vec[0].toLowerCase(), Nd4j.create(temp));
             }
         } catch (NullPointerException | IOException n) {
             System.out.println(n.getMessage());
