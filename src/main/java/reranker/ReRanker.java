@@ -14,6 +14,7 @@ import java.util.Map;
 @author: Amith
 This class performs the Re-Ranking based on the document similarity
 */
+
 public class ReRanker
 {
     private BaseBM25 bm25 = null;
@@ -53,7 +54,17 @@ public class ReRanker
             result.put(q.getKey(),reOrdered);
         }
 
-        String mname = "doc_sim_reranking"+"_k"+SearchCommand.getkVAL()+"_b"+SearchCommand.getBiasFactor()+"_d"+SearchCommand.getDimension();
+        String datafile ="";
+        if(SearchCommand.getQueryfile().toLowerCase().contains("test".toLowerCase()))
+        {
+            datafile = "_test";
+        }
+        else if(SearchCommand.getQueryfile().toLowerCase().contains("train".toLowerCase()))
+        {
+            datafile = "_train";
+        }
+        String level = SearchCommand.isArticleEnabled()? "_article": "_section";
+        String mname = "doc_sim_reranking"+"_k"+SearchCommand.getkVAL()+"_b"+SearchCommand.getBiasFactor()+"_d"+SearchCommand.getDimension()+level+datafile;
 
         RunWriter.writeRunFile(mname,result);
 
@@ -77,7 +88,18 @@ public class ReRanker
             result.put(q.getKey(),reOrdered);
         }
 
-        String mname = "doc_sim_IDF_reranking"+"_k"+SearchCommand.getkVAL()+"_b"+SearchCommand.getBiasFactor()+"_d"+SearchCommand.getDimension();
+        String datafile ="";
+        if(SearchCommand.getQueryfile().toLowerCase().contains("test".toLowerCase()))
+        {
+            datafile = "_test";
+        }
+        else if(SearchCommand.getQueryfile().toLowerCase().contains("train".toLowerCase()))
+        {
+            datafile = "_train";
+        }
+
+        String level = SearchCommand.isArticleEnabled()? "_article": "_section";
+        String mname = "doc_sim_IDF_reranking"+"_k"+SearchCommand.getkVAL()+"_b"+SearchCommand.getBiasFactor()+"_d"+SearchCommand.getDimension()+level+datafile;
         RunWriter.writeRunFile(mname,result);
         if(SearchCommand.getisVerbose())
         {
@@ -96,8 +118,18 @@ public class ReRanker
             Map<String, Container> reOrdered = runnerDFReRank.getReRank(BM25Val);
             result.put(q.getKey(),reOrdered);
         }
+        String datafile ="";
+        if(SearchCommand.getQueryfile().toLowerCase().contains("test".toLowerCase()))
+        {
+            datafile = "_test";
+        }
+        else if(SearchCommand.getQueryfile().toLowerCase().contains("train".toLowerCase()))
+        {
+            datafile = "_train";
+        }
 
-        String mname = "doc_sim_DF_reranking"+"_k"+SearchCommand.getkVAL()+"_b"+SearchCommand.getBiasFactor()+"_d"+SearchCommand.getDimension();
+        String level = SearchCommand.isArticleEnabled()? "_article": "_section";
+        String mname = "doc_sim_DF_reranking"+"_k"+SearchCommand.getkVAL()+"_b"+SearchCommand.getBiasFactor()+"_d"+SearchCommand.getDimension()+level+datafile;
         RunWriter.writeRunFile(mname,result);
 
         if(SearchCommand.getisVerbose())
