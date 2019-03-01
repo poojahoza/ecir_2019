@@ -1,6 +1,9 @@
 package main.java.reranker;
 
 import main.java.utils.PreProcessor;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
@@ -9,6 +12,7 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -26,6 +30,22 @@ public class WordEmbedding
         this.dimension =dimension;
         this.embeddingFile=embeddingFile;
         word = readWordVectors();
+    }
+
+    private  String processedTerm(String content) throws IOException
+    {
+        EnglishAnalyzer analyzer = new EnglishAnalyzer();
+        TokenStream tokenStream = analyzer.tokenStream("Text", new StringReader(content));
+        try {
+            tokenStream.reset();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String token=null;
+        while (tokenStream.incrementToken()) {
+            token = tokenStream.getAttribute(CharTermAttribute.class).toString();
+        }
+        return token;
     }
 
 
@@ -61,7 +81,7 @@ public class WordEmbedding
                 {
                         temp[i] = Float.parseFloat(vec[i+1]);
                 }
-                word.put(vec[0].toLowerCase(), Nd4j.create(temp));
+                word.put(processedTerm(vec[0]), Nd4j.create(temp));
             }
         } catch (NullPointerException | IOException n) {
             System.out.println(n.getMessage());

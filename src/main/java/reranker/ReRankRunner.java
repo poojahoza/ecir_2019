@@ -28,7 +28,6 @@ class ReRankRunner
     protected WordEmbedding word = null;
     protected int biasFactor=0;
 
-
     ReRankRunner(BaseBM25 bm25, String embeddingFile,Integer Dimension)
     {
         this.bm25 = bm25;
@@ -76,6 +75,7 @@ class ReRankRunner
 
     protected INDArray getVector(Integer docID)
     {
+
         ArrayList<String> processed = null;
         try {
             processed = PreProcessor.processTermsUsingLucene(bm25.getDocument(docID));
@@ -84,8 +84,6 @@ class ReRankRunner
         }
         return  buildVector(processed);
     }
-
-
 
     /*
     A new implementation based on the bias factor

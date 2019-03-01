@@ -1,6 +1,7 @@
 package main.java.utils;
 
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.tartarus.snowball.ext.PorterStemmer;
@@ -15,6 +16,11 @@ public class PreProcessor
 
     private final  List<String> STOP_WORDS = StopWord.getStopWords();
 
+    List<String> getSTOP_WORDS()
+    {
+        return STOP_WORDS;
+    }
+
     @Deprecated
     private static String[] processQuery(String query)
     {
@@ -25,7 +31,7 @@ public class PreProcessor
     {
         PreProcessor p = new PreProcessor();
 
-        StandardAnalyzer analyzer = new StandardAnalyzer();
+        EnglishAnalyzer analyzer = new EnglishAnalyzer();
         ArrayList<String> data = new ArrayList<>();
         TokenStream tokenStream = analyzer.tokenStream("Text", new StringReader(content));
         try {
@@ -44,6 +50,8 @@ public class PreProcessor
         }
         return data;
     }
+
+
 
 
     @Deprecated
@@ -65,6 +73,7 @@ public class PreProcessor
         return processedData;
     }
 
+    @Deprecated
     public static ArrayList<String> processDocumentWithStemming(String sb)
     {
         PreProcessor p = new PreProcessor();

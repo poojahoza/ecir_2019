@@ -9,6 +9,9 @@ import main.java.utils.RunWriter;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /*
 @author: Amith
@@ -74,12 +77,12 @@ public class ReRanker
         }
     }
 
-
     public void ReRankIDF()
     {
         runnerIDFReRank.setBiasFactor(SearchCommand.getBiasFactor());
 
-        Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
+        LinkedHashMap<String,Map<String,Container >> result = new LinkedHashMap<>();
+
         for(Map.Entry<String,String> q: query.entrySet())
         {
             String Query = q.getValue();
@@ -87,6 +90,17 @@ public class ReRanker
             Map<String, Container> reOrdered = runnerIDFReRank.getReRank(BM25Val);
             result.put(q.getKey(),reOrdered);
         }
+
+//        StreamSupport.stream(query.entrySet().spliterator(), true)
+//                .parallel()
+//                .forEach(q -> {
+//                    String Query = q.getValue();
+//                    Map<String, Container> BM25Val = bm25.getRanking(Query);
+//                    Map<String, Container> reOrdered = runnerIDFReRank.getReRank(BM25Val);
+//                    result.put(q.getKey(), reOrdered);
+//                });
+
+
 
         String datafile ="";
         if(SearchCommand.getQueryfile().toLowerCase().contains("test".toLowerCase()))

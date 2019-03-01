@@ -107,8 +107,7 @@ public class CorpusStats
     */
     public long getDF(String s) throws  IOException
     {
-        String processedString = stemTerm(s);
-        Term t= new Term("Text",processedString);
+        Term t= new Term("Text",s);
         BasicStats b = getBasicStats(t);
         long d = 0;
 
@@ -151,8 +150,7 @@ public class CorpusStats
     */
     public double getIDF(String s) throws  IOException
     {
-        String processedString = stemTerm(s);
-        Term t= new Term("Text",processedString);
+        Term t= new Term("Text",s);
         BasicStats b = getBasicStats(t);
         double d = 0.0;
         try

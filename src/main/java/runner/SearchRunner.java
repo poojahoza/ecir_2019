@@ -60,7 +60,21 @@ public class SearchRunner implements ProgramRunner
                 e.printStackTrace();
             }
             Map<String,Map<String, Container>> res = bm.getRanking(queryCBOR);
-            RunWriter.writeRunFile("BM_25",res);
+
+            String datafile ="";
+            if(searchParser.getQueryfile().toLowerCase().contains("test".toLowerCase()))
+            {
+                datafile = "_test";
+            }
+            else if(searchParser.getQueryfile().toLowerCase().contains("train".toLowerCase()))
+            {
+                datafile = "_train";
+            }
+
+            String level = searchParser.isArticleEnabled()? "_article": "_section";
+            String mname= "BM_25"+level+datafile;
+
+            RunWriter.writeRunFile(mname,res);
         }
 
         if(searchParser.isReRankEnabled())

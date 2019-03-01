@@ -41,5 +41,4 @@ public class ReRankIDFRunner extends ReRankRunner
         }
         return  buildVector(getTopK(highestIDF));
     }
-
 }
