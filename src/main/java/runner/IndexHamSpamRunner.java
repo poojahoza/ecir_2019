@@ -1,32 +1,15 @@
 package main.java.runner;
 
-import it.unimi.dsi.fastutil.Hash;
 import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
-import main.java.indexer.IndexBuilder;
-import main.java.predictors.LabelPredictor;
-import main.java.predictors.NaiveBayesPredictor;
-import main.java.searcher.BaseSearcher;
-import main.java.utils.SearchUtils;
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.store.FSDirectory;
 
+import edu.unh.cs.treccar_v2.Data;
+import edu.unh.cs.treccar_v2.read_data.DeserializeData;
+
+import java.awt.*;
 import java.io.*;
-import java.lang.reflect.Array;
-import java.nio.file.Paths;
 import java.util.*;
-
-import static main.java.utils.SearchUtils.createIndexSearcher;
-import static main.java.utils.SearchUtils.createTokenList;
 
 
 /**
@@ -36,45 +19,46 @@ public class IndexHamSpamRunner implements ProgramRunner {
 
     private RegisterCommands.IndexHamSpam indexHamSpamParser = null;
     private ValidateCommands.ValidateIndexHamSpamCommands validate = null;
+    public final HashMap<String, HashMap<String, String>> classifyMap;
+    public final HashMap<String, HashMap<String, String>> corpus;
 
     public IndexHamSpamRunner(CommandParser parser)
     {
         indexHamSpamParser = parser.getIndexHamSpamCommand();
         validate = new ValidateCommands.ValidateIndexHamSpamCommands(indexHamSpamParser);
+        classifyMap = new HashMap<>();
+        corpus = new HashMap<>();
     }
 
 
     @Override
     public void run() {
-        HashMap<String, HashMap<String, String>> classifyMap = initializeMaps();
 
-        classifyMap = parseQrels(classifyMap);
-
-        HashMap<String, HashMap<String, String>> corpus = new HashMap<>();
+        parseQrels();
         try {
-            corpus = getDocIds(classifyMap);
+            buildTrainTestSets();
         } catch (IOException e) {
             e.printStackTrace();
         }
         write(corpus);
     }
 
+    private void extractText(Data.Paragraph p) {
 
-    /**
-     * Desc: Initialize the main data structure for this class.
-     *
-     * @return HashMap with ham and spam keys added.
-     */
-    private HashMap<String, HashMap<String, String>> initializeMaps() {
+        HashMap<String, String> spamMap = classifyMap.get("spam");
+        HashMap<String, String> hamMap = classifyMap.get("ham");
 
-        HashMap<String, HashMap<String, String>> classifyMap = new HashMap<>();
-        HashMap<String, String> spamMap = new HashMap<>();
-        HashMap<String, String> hamMap = new HashMap<>();
+        final String content = p.getTextOnly();
+        final String paraId = p.getParaId();
 
-        classifyMap.put("ham", hamMap);
-        classifyMap.put("spam", spamMap);
-
-        return classifyMap;
+        if (spamMap.get(paraId) != null) {
+            HashMap curMap = corpus.get("spam");
+            curMap.put(paraId, content);
+        }
+        else if (hamMap.get(paraId) != null) {
+            HashMap curMap = corpus.get("spam");
+            curMap.put(paraId, content);
+        }
     }
 
 
@@ -83,10 +67,13 @@ public class IndexHamSpamRunner implements ProgramRunner {
      * A pid of 2 indicates that a document is ham, whereas a pid of -1, -2, or -0 indicates that a
      * document is spam.
      *
-     * @param classifyMap that was initialized in the previous step.
-     * @return classifyMap Fully populated HashMap that maps the ham/spam labels to pids.
      */
-    private HashMap<String, HashMap<String, String>> parseQrels(HashMap<String, HashMap<String, String>> classifyMap) {
+    private void parseQrels() {
+
+        HashMap<String, String> spamMap = new HashMap<>();
+        HashMap<String, String> hamMap = new HashMap<>();
+        classifyMap.put("ham", hamMap);
+        classifyMap.put("spam", spamMap);
 
         BufferedReader reader = null;
         File qrelsFile = new File(indexHamSpamParser.getQrelPath());
@@ -114,48 +101,28 @@ public class IndexHamSpamRunner implements ProgramRunner {
             e.printStackTrace();
         }
 
-        return classifyMap;
     }
 
 
     /**
      * Desc: Iterate through the Lucene index and store all ids that are also found in the qrels.
      *
-     * @param classifyMap that was populated from the manual qrels in the previous step.
-     * @return corpus A new HashMap only containing Documents that were found in both the qrels and index.
      */
-    private HashMap<String, HashMap<String, String>> getDocIds (HashMap<String, HashMap<String, String>> classifyMap) throws IOException {
-
-        BaseSearcher searcher = new BaseSearcher(indexHamSpamParser.getIndexPath());
+    private void buildTrainTestSets () throws IOException {
 
         HashMap<String, String> spamMap = classifyMap.get("spam");
         HashMap<String, String> hamMap = classifyMap.get("ham");
 
-        HashMap<String, HashMap<String, String>> corpus = new HashMap<>();
         corpus.put("ham", new HashMap<>());
         corpus.put("spam", new HashMap<>());
 
-        try {
-            HashMap curMap = corpus.get("spam");
-            ArrayList<BaseSearcher.idScore> docId = null;
-            for (String key : spamMap.keySet()) {
-                docId = searcher.doSearch(spamMap.get(key));
-                if (docId != null) {
-                    curMap.put(key, spamMap.get(key));
-                }
-            }
-            curMap = corpus.get("ham");
-            for (String key : hamMap.keySet()) {
-                docId = searcher.doSearch(hamMap.get(key));
-                if (docId != null) {
-                    curMap.put(key, hamMap.get(key));
-                }
-            }
-        } catch (NullPointerException e) {
-            System.out.println(e.getStackTrace());
-        }
+        // Get the doc id and check if it is in the spam/ham map. If it is, then add it to the corpus.
+        final FileInputStream fileInputStream2 = new FileInputStream(new File(indexHamSpamParser.getParagraphPath()));
+        final Iterator<Data.Paragraph> paragraphIterator = DeserializeData.iterParagraphs(fileInputStream2);
 
-        return corpus;
+        for (int i = 1; paragraphIterator.hasNext(); i++) {
+            extractText(paragraphIterator.next());
+        }
     }
 
 

@@ -219,14 +219,15 @@ public class RegisterCommands
           }
      }
 
-    @Parameters(separators = "=",commandDescription = "Command to create ham-spam index")
+    @Parameters(separators = "=",commandDescription = "Command to create training and test data for the spam classifier")
     public static class IndexHamSpam
     {
-        @Parameter(names = {"-i","--corpus-file"},description = "Index",required=true)
-        private String IndexPath;
 
-        @Parameter(names = {"-q","--new-qrels-file"},description = "qrels file")
-        private String QrelPath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+        @Parameter(names = {"-p","--paragraphs-file"},description = "paragraph corpus directory")
+        private String paragraphPath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+
+        @Parameter(names = {"-q","--qrels-file"},description = "qrels file")
+        private String qrelPath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
 
         @Parameter(names = {"-spamTrain"},description = "Location to save the spam training data")
         private String spamTrainPath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
@@ -252,14 +253,14 @@ public class RegisterCommands
             return help;
         }
 
-        public String getIndexPath()
+        public String getParagraphPath()
         {
-            return IndexPath;
+            return paragraphPath;
         }
 
         public String getQrelPath()
         {
-            return QrelPath;
+            return qrelPath;
         }
 
         public String getSpamTrainPath()
@@ -289,11 +290,9 @@ public class RegisterCommands
 
     }
 
-    @Parameters(separators = "=",commandDescription = "Use the ham and spam data sets to detect and filter spam from search results")
+    /*@Parameters(separators = "=",commandDescription = "Use the ham and spam data sets to detect and filter spam from search results")
     public static class CommandFilter
     {
-        @Parameter(names = {"-i","--index"},description = "Location of the main index", required=true)
-        private String indexPath;
 
         @Parameter(names = {"-spamTrain"},description = "Location of the spam training data", required=true)
         private String spamTrainPath;
@@ -317,8 +316,6 @@ public class RegisterCommands
             return help;
         }
 
-        public String getIndexPath(){return indexPath;}
-
         public String getSpamTrainPath(){return spamTrainPath;}
 
         public String getHamTrainPath(){return hamTrainPath;}
@@ -329,7 +326,7 @@ public class RegisterCommands
 
         public String getSpamTestPath(){return spamTestPath;}
 
-    }
+    }*/
 
      @Parameters(separators = "=",commandDescription = "Help Information")
      public static class CommandHelp

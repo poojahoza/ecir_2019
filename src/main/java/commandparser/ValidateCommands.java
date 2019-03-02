@@ -116,7 +116,7 @@ public class ValidateCommands
 
     }
 
-    public static class ValidateFilterCommands
+    /*public static class ValidateFilterCommands
     {
         private final RegisterCommands.CommandFilter filterParser;
 
@@ -132,6 +132,6 @@ public class ValidateCommands
             System.exit(status);
         }
 
-    }
+    }*/
 
 }
