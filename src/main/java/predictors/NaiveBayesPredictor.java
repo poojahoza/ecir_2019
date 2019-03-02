@@ -13,8 +13,8 @@ import java.util.List;
 public class NaiveBayesPredictor extends LabelPredictor {
     private BayesCounter bc = new BayesCounter();
 
-    public NaiveBayesPredictor(IndexSearcher s) {
-        super(s);
+    public NaiveBayesPredictor() {
+        super();
     }
 
     /**
@@ -52,6 +52,7 @@ public class NaiveBayesPredictor extends LabelPredictor {
      *
      * @param tokens List of tokens in the document
      * @return ArrayList The ham and spam scores of the given document tokens
+     *
      */
     @Override
     public ArrayList<Double> score(List<String> tokens) {
@@ -65,8 +66,8 @@ public class NaiveBayesPredictor extends LabelPredictor {
      * @param spamTrain, a hash map of the spam test data by itself.
      * @param corpus of mixed ham and spam documents mapping their pids to their qids.
      */
-    @Override
+    /*@Override
     public void evaluate(HashMap<String, String> hamTrain, HashMap<String, String> spamTrain, ArrayList<Document> corpus) {
          bc.evaluate(hamTrain, spamTrain, corpus);
-    }
+    }*/
 }

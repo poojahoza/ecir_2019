@@ -290,7 +290,7 @@ public class RegisterCommands
 
     }
 
-    /*@Parameters(separators = "=",commandDescription = "Use the ham and spam data sets to detect and filter spam from search results")
+    @Parameters(separators = "=",commandDescription = "Use the ham and spam data sets to detect and filter spam from search results")
     public static class CommandFilter
     {
 
@@ -326,7 +326,7 @@ public class RegisterCommands
 
         public String getSpamTestPath(){return spamTestPath;}
 
-    }*/
+    }
 
      @Parameters(separators = "=",commandDescription = "Help Information")
      public static class CommandHelp
