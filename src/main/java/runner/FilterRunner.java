@@ -43,6 +43,8 @@ import static main.java.utils.SearchUtils.createTokenList;
  *                 call. For instance, if they want to classify with bigrams, they would call "spamClassifier.runBigrams()". This means I will remove filter runner from
  *                 runners, and just make it a class called SpamClassifier inside of the predictors folder.
  *
+ *                 For now, though, I'm keeping this file around for testing purposes.
+ *
  */
 public class FilterRunner implements ProgramRunner {
 
