@@ -290,44 +290,6 @@ public class RegisterCommands
 
     }
 
-    @Parameters(separators = "=",commandDescription = "Use the ham and spam data sets to detect and filter spam from search results")
-    public static class CommandFilter
-    {
-
-        @Parameter(names = {"-spamTrain"},description = "Location of the spam training data", required=true)
-        private String spamTrainPath;
-
-        @Parameter(names = {"-hamTrain"},description = "Location of the ham training data", required=true)
-        private String hamTrainPath;
-
-        @Parameter(names = {"-hamSpamTest"},description = "Location of the combined ham and spam test data", required=true)
-        private String hamSpamTestPath;
-
-        @Parameter(names = {"-hamTest"},description = "Location of the ham test data", required=true)
-        private String hamTestPath;
-
-        @Parameter(names = {"-spamTest"},description = "Location of the spam test data", required=true)
-        private String spamTestPath;
-
-        @Parameter(names = "--help", help = true)
-        private boolean help;
-
-        boolean isHelp() {
-            return help;
-        }
-
-        public String getSpamTrainPath(){return spamTrainPath;}
-
-        public String getHamTrainPath(){return hamTrainPath;}
-
-        public String getHamSpamTestPath(){return hamSpamTestPath;}
-
-        public String getHamTestPath(){return hamTestPath;}
-
-        public String getSpamTestPath(){return spamTestPath;}
-
-    }
-
      @Parameters(separators = "=",commandDescription = "Help Information")
      public static class CommandHelp
      {
