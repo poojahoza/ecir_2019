@@ -31,15 +31,16 @@ public class F1Evaluator {
             boolean isSpam = false;
 
             try {
-                if (correctLabel.equals("Spam")) {
+                assert correctLabel != null;
+                if (correctLabel.equals("spam")) {
                     isSpam = true;
                 }
 
-                if (isSpam && id.equals("Spam")) {
+                if (isSpam && id.equals("spam")) {
                     tp++;
-                } else if (isSpam && !calledLabel.equals("Spam")) {
+                } else if (isSpam && !calledLabel.equals("spam")) {
                     fn++;
-                } else if (!isSpam && !calledLabel.equals("Spam")) {
+                } else if (!isSpam && !calledLabel.equals("spam")) {
                     tn++;
                 } else {
                     fp++;

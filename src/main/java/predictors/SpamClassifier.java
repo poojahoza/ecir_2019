@@ -43,7 +43,7 @@ public class SpamClassifier {
      * @param path to the training/test set.
      * @return train or test data stored as an ArrayList of Documents.
      */
-    private HashMap<String, String> readIndex(String path) throws IOException, ParseException {
+    public HashMap<String, String> readIndex(String path) throws IOException, ParseException {
 
         BufferedReader reader = null;
         HashMap<String, String> lines = new HashMap<>();
@@ -73,7 +73,7 @@ public class SpamClassifier {
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
      */
-    private LabelPredictor classifyWithUnigrams(HashMap<String, String>spamCorpus, HashMap<String, String> hamCorpus) {
+    public LabelPredictor classifyWithUnigrams(HashMap<String, String>spamCorpus, HashMap<String, String> hamCorpus) {
 
         LabelPredictor unigramsPredictor = new NaiveBayesPredictor();
 
@@ -84,7 +84,7 @@ public class SpamClassifier {
         }
 
         for (String key: hamCorpus.keySet()) {
-            String text = spamCorpus.get(key);
+            String text = hamCorpus.get(key);
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             unigramsPredictor.trainHamTokens(tokens);
         }
@@ -99,7 +99,7 @@ public class SpamClassifier {
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
      */
-    private LabelPredictor classifyWithBigrams(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
+    public LabelPredictor classifyWithBigrams(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
 
         LabelPredictor bigramsPredictor = new NaiveBayesBigramPredictor();
 
@@ -110,7 +110,7 @@ public class SpamClassifier {
         }
 
         for (String key: hamCorpus.keySet()) {
-            String text = spamCorpus.get(key);
+            String text = hamCorpus.get(key);
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             bigramsPredictor.trainHamTokens(tokens);
         }
@@ -125,7 +125,7 @@ public class SpamClassifier {
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
      */
-    private LabelPredictor classifyWithTrigrams(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
+    public LabelPredictor classifyWithTrigrams(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
 
         LabelPredictor trigramsPredictor = new NaiveBayesTrigramPredictor();
         HashMap<String, String> test = null;
@@ -137,7 +137,7 @@ public class SpamClassifier {
         }
 
         for (String key: hamCorpus.keySet()) {
-            String text = spamCorpus.get(key);
+            String text = hamCorpus.get(key);
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             trigramsPredictor.trainHamTokens(tokens);
         }
@@ -152,7 +152,7 @@ public class SpamClassifier {
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
      */
-    private LabelPredictor classifyWithQuadgrams(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
+    public LabelPredictor classifyWithQuadgrams(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
 
         LabelPredictor quadgramsPredictor = new NaiveBayesQuadgramPredictor();
         HashMap<String, String> test = null;
@@ -164,7 +164,7 @@ public class SpamClassifier {
         }
 
         for (String key: hamCorpus.keySet()) {
-            String text = spamCorpus.get(key);
+            String text = hamCorpus.get(key);
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             quadgramsPredictor.trainHamTokens(tokens);
         }
@@ -180,7 +180,7 @@ public class SpamClassifier {
      * @param predictor the predictor that was previously trained.
      * @param test the test data that was held out.
      */
-    private HashMap<String, String> predict(LabelPredictor predictor, HashMap<String, String> test) {
+    public HashMap<String, String> predict(LabelPredictor predictor, HashMap<String, String> test) {
 
         for (String key : test.keySet()) {
             String text = test.get(key);
@@ -195,9 +195,9 @@ public class SpamClassifier {
     /*
      * The user can evaluate their predictor if they have ham and spam test data.
      */
-    private void evaluate(LabelPredictor predictor, HashMap<String, String> hamTest, HashMap<String, String> spamTest, HashMap<String, String> testDocs) throws IOException, ParseException {
+    public void evaluate(HashMap<String, String> spamTest, LabelPredictor predictor, HashMap<String, String> hamTest, HashMap<String, String> testDocs) throws IOException, ParseException {
 
-        //predictor.evaluate(hamTest, spamTest, testDocs);
+        predictor.evaluate(spamTest, hamTest, testDocs);
     }
 }
 

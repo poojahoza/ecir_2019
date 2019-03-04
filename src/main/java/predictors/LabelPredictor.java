@@ -60,7 +60,7 @@ abstract public class LabelPredictor {
      * Desc: When called, the LabelPredictor will be handed unlabelled documents to classify (using predict method)
      * The labels will be used to compute the F1 Score of your label prediction method.
      */
-    //abstract public void evaluate(HashMap<String, String> hamTrain, HashMap<String, String> spamTrain, HashMap<String, String> corpus);
+    abstract public void evaluate(HashMap<String, String> spam, HashMap<String, String> ham, HashMap<String, String> docs);
 
 }
 

@@ -5,6 +5,9 @@ import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
 
 import javax.print.Doc;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.annotation.Documented;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -24,23 +27,23 @@ public class BayesCounter {
         bayesMap = new HashMap<>();
     }
 
-    public void evaluate(HashMap<String, String> hamTest, HashMap<String, String> spamTest, ArrayList<Document> corpus) {
+    public void evaluate(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
 
         HashMap <String, String> calledLabels = new HashMap<>();
         HashMap <String, String> trueLabels = new HashMap<>();
 
         // for each document, call the predict method. Store the pid with its prediction in the calledLabels map
-        for (Document item : corpus) {
+        for (String key: docs.keySet()) {
             //System.out.println("item:" + item);
-            String text = item.get("Text");
+            String text = docs.get(key);
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             String label = this.classify(tokens);
-            calledLabels.put(item.get("Id"), label);
+            calledLabels.put(docs.get(key), label);
         }
 
         // For each document, get the real label. Store the pid with its real label in the trueLabels map
-        for (Document item : corpus) {
-            String curId = item.get("Id");
+        for (String key: docs.keySet()) {
+            String curId = docs.get(key);
             if (hamTest.get(curId) != null) {
                 trueLabels.put(curId, "Ham");
             }
@@ -65,7 +68,7 @@ public class BayesCounter {
     public void buildHashMap(String docClass, List<String> tokens) {
 
         if (bayesMap.get(docClass) == null) {
-            HashMap<String, Integer> classMap = new HashMap();
+            HashMap<String, Integer> classMap = new HashMap<>();
             bayesMap.put(docClass, classMap);
         }
 
@@ -93,6 +96,25 @@ public class BayesCounter {
 
         HashMap<String, Integer> spamDist = bayesMap.get("spam");
         HashMap<String, Integer> hamDist = bayesMap.get("ham");
+
+
+        // The following block tells me that I'm hardly getting any ham. Spam tokens take up 99% of the document.
+        /*try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("/home/rachel/grad_courses/data_science/dump/", true));
+            writer.write("++++++++ SPAM COUNTS ++++++++\n\n");
+            for (String key: spamDist.keySet()) {
+                writer.write(key + '\t' + spamDist.get(key) + '\n');
+            }
+            writer.write("++++++++ HAM COUNTS ++++++++\n\n");
+            for (String key: hamDist.keySet()) {
+                writer.write(key + '\t' + hamDist.get(key) + '\n');
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+
+
 
         double hamScore = 0;
         double spamScore = 0;
