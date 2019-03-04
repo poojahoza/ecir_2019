@@ -35,28 +35,45 @@ public class IndexHamSpamRunner implements ProgramRunner {
     public void run() {
 
         parseQrels();
+
+        /*HashMap<String, String> curMap = classifyMap.get("spam");
+        for (String key : curMap.keySet()) {
+            System.out.println(key);
+        }*/
+
         try {
             buildTrainTestSets();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        write(corpus);
+        write();
     }
 
-    private void extractText(Data.Paragraph p) {
+    private void extractText(Data.Paragraph p) throws IOException {
 
         HashMap<String, String> spamMap = classifyMap.get("spam");
         HashMap<String, String> hamMap = classifyMap.get("ham");
+
+         /*for (String key : spamMap.keySet()) {
+            System.out.println(key);
+        }*/
+        //BufferedWriter writer = new BufferedWriter(new FileWriter("/home/rachel/Desktop/test", true));
 
         final String content = p.getTextOnly();
         final String paraId = p.getParaId();
 
         if (spamMap.get(paraId) != null) {
-            HashMap curMap = corpus.get("spam");
+            //System.out.println("spam detected: " + paraId + '\t' + content);
+            //writer.write("spam detected: " + paraId + '\t' + content);
+            //writer.newLine();
+            HashMap <String, String> curMap = corpus.get("spam");
             curMap.put(paraId, content);
+
         }
         else if (hamMap.get(paraId) != null) {
-            HashMap curMap = corpus.get("spam");
+            //writer.write("ham detected: " + paraId + '\t' + content);
+            //writer.newLine();
+            HashMap <String, String> curMap = corpus.get("ham");
             curMap.put(paraId, content);
         }
     }
@@ -87,13 +104,15 @@ public class IndexHamSpamRunner implements ProgramRunner {
                 String[] curLine = line.split("\\s+");
                 HashMap<String, String> curMap;
 
-                if (curLine[3].equals("-2") || curLine[3].equals("-1") || curLine[3].equals("-0")) {
+                if (curLine[3].equals("-2")) {
                     curMap = classifyMap.get("spam");
                     curMap.put(curLine[2], curLine[0]);
+                   // System.out.println("spam found: " + curLine[2] + '\t' + curLine[0]);
                 }
                 else if (curLine[3].equals("2")) {
                     curMap = classifyMap.get("ham");
                     curMap.put(curLine[2], curLine[0]);
+                    //System.out.println("ham found: " + curLine[2] + '\t' + curLine[0]);
                 }
             }
 
@@ -108,10 +127,15 @@ public class IndexHamSpamRunner implements ProgramRunner {
      * Desc: Iterate through the Lucene index and store all ids that are also found in the qrels.
      *
      */
-    private void buildTrainTestSets () throws IOException {
+    private void buildTrainTestSets() throws IOException {
 
         HashMap<String, String> spamMap = classifyMap.get("spam");
         HashMap<String, String> hamMap = classifyMap.get("ham");
+
+
+        /*for (String key : hamMap.keySet()) {
+            System.out.println(key);
+        }*/
 
         corpus.put("ham", new HashMap<>());
         corpus.put("spam", new HashMap<>());
@@ -119,19 +143,18 @@ public class IndexHamSpamRunner implements ProgramRunner {
         // Get the doc id and check if it is in the spam/ham map. If it is, then add it to the corpus.
         final FileInputStream fileInputStream2 = new FileInputStream(new File(indexHamSpamParser.getParagraphPath()));
         final Iterator<Data.Paragraph> paragraphIterator = DeserializeData.iterParagraphs(fileInputStream2);
-
         for (int i = 1; paragraphIterator.hasNext(); i++) {
             extractText(paragraphIterator.next());
         }
+        System.out.println("Finished iterating");
     }
 
 
     /**
      * Desc: Create separate training and test sets.
      *
-     * @param corpus of ham and spam documents created in the previous step.
      */
-    private void write(HashMap<String, HashMap<String, String>> corpus) {
+    private void write() {
 
         HashMap<String, String> spamCorpus = corpus.get("spam");
         HashMap<String, String> hamCorpus = corpus.get("ham");
@@ -146,17 +169,21 @@ public class IndexHamSpamRunner implements ProgramRunner {
         Random random = new Random(50);
         for (String key : spamCorpus.keySet()) {
             if (random.nextInt() > 25) {
+                //System.out.println("spam test: " + key + '\t' + spamCorpus.get(key));
                 spamTest.put(key, spamCorpus.get(key));
             }
             else {
+                //System.out.println("spam train: " + key + '\t' + spamCorpus.get(key));
                 spamTrain.put(key, spamCorpus.get(key));
             }
         }
         for (String key : hamCorpus.keySet()) {
             if (random.nextInt() > 25) {
+                //System.out.println("ham test: " + key + '\t' +  hamCorpus.get(key));
                 hamTest.put(key, hamCorpus.get(key));
             }
             else {
+                //System.out.println("ham train: " + key + '\t' +  hamCorpus.get(key));
                 hamTrain.put(key, hamCorpus.get(key));
             }
         }
