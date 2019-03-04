@@ -21,7 +21,7 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
      * @param tokens List of tokens in the document
      */
     public void trainHamTokens(List<String> tokens) {
-        bc.buildHashMap("ham", tokens);
+        bc.buildQuadgramsHashMap("ham", tokens);
     }
 
     /**
@@ -30,7 +30,7 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
      * @param tokens List of tokens in the document
      */
     public void trainSpamTokens(List<String> tokens) {
-        bc.buildHashMap("spam", tokens);
+        bc.buildQuadgramsHashMap("spam", tokens);
     }
 
 
@@ -42,7 +42,7 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
      */
     @Override
     public String predict(List<String> tokens) {
-        return bc.classify(tokens);
+        return bc.classifyWithQuadgrams(tokens);
     }
 
     /**
@@ -53,7 +53,7 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
      */
     @Override
     public ArrayList<Double> score(List<String> tokens) {
-        return bc.getScores(tokens);
+        return bc.getQuadramScores(tokens);
     }
 
     /**
@@ -65,7 +65,7 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
      */
     @Override
     public void evaluate(HashMap<String, String> spam, HashMap<String, String> ham, HashMap<String, String> docs) {
-        bc.evaluate(spam, ham, docs);
+        bc.evaluateQuadgramPredictor(spam, ham, docs);
     }
 
 }

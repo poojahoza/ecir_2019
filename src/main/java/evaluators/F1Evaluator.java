@@ -14,29 +14,26 @@ public class F1Evaluator {
 
     public double evaluateCalledLabels(HashMap<String, String> calledLabels) {
 
-        int tn = 0;
-        int tp = 0;
-        int fn = 0;
-        int fp = 0;
+        double tn = 0;
+        double tp = 0;
+        double fn = 0;
+        double fp = 0;
 
         /* map must contain id => label */
         for (String id : calledLabels.keySet()) {
             String calledLabel = calledLabels.get(id);
             String correctLabel = null;
             if (correctLabels.containsKey((id))) {
-                System.out.println("found correct");
-                correctLabel = correctLabels.get(id); // Will be "Ham" or "Spam"
+                correctLabel = correctLabels.get(id); // Will be "ham" or "spam"
             }
-            //System.out.println("correct label: " + correctLabel);
             boolean isSpam = false;
-
             try {
                 assert correctLabel != null;
                 if (correctLabel.equals("spam")) {
                     isSpam = true;
                 }
 
-                if (isSpam && id.equals("spam")) {
+                if (isSpam && calledLabel.equals("spam")) {
                     tp++;
                 } else if (isSpam && !calledLabel.equals("spam")) {
                     fn++;
@@ -50,11 +47,16 @@ public class F1Evaluator {
             }
         }
 
-        double precision = (double)tp / (tp + fp);
-        double recall = (double)tp / (tp + fn);
+        System.out.println("true positives: " + tp);
+        System.out.println("false positives: " + fp);
+        System.out.println("true negatives: " + tn);
+        System.out.println("false negatives: " + fn);
+
+        double precision = tp / (tp + fp);
+        double recall = tp / (tp + fn);
         double f1 = 2 * (precision * recall) / (precision + recall);
-        double precision2 = (double)tn / (tn + fn);
-        double recall2 = (double)tn / (tn + fp);
+        double precision2 = tn / (tn + fn);
+        double recall2 = tn / (tn + fp);
         double f2 = 2 * (precision2 * recall2) / (precision2 + recall2);
         return (f1 + f2)/2;
     }

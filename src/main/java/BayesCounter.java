@@ -27,28 +27,110 @@ public class BayesCounter {
         bayesMap = new HashMap<>();
     }
 
-    public void evaluate(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
+    public void evaluateUnigramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
 
         HashMap <String, String> calledLabels = new HashMap<>();
         HashMap <String, String> trueLabels = new HashMap<>();
 
-        // for each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
         for (String key: docs.keySet()) {
-            //System.out.println("item:" + item);
             String text = docs.get(key);
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             String label = this.classify(tokens);
-            calledLabels.put(docs.get(key), label);
+            calledLabels.put(key, label);
         }
 
         // For each document, get the real label. Store the pid with its real label in the trueLabels map
         for (String key: docs.keySet()) {
-            String curId = docs.get(key);
-            if (hamTest.get(curId) != null) {
-                trueLabels.put(curId, "Ham");
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
             }
-            else if (spamTest.get(curId) != null) {
-                trueLabels.put(curId, "Spam");
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
+    }
+
+    public void evaluateBigramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
+
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
+
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (String key: docs.keySet()) {
+            String text = docs.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            String label = this.classifyWithBigrams(tokens);
+            calledLabels.put(key, label);
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (String key: docs.keySet()) {
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
+            }
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
+    }
+
+    public void evaluateTrgramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
+
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
+
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (String key: docs.keySet()) {
+            String text = docs.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            String label = this.classifyWithTrigrams(tokens);
+            calledLabels.put(key, label);
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (String key: docs.keySet()) {
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
+            }
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
+    }
+
+    public void evaluateQuadgramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
+
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
+
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (String key: docs.keySet()) {
+            String text = docs.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            String label = this.classifyWithQuadgrams(tokens);
+            calledLabels.put(key, label);
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (String key: docs.keySet()) {
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
+            }
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
             }
         }
 

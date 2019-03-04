@@ -43,7 +43,7 @@ public class NaiveBayesBigramPredictor extends LabelPredictor {
      */
     @Override
     public String predict(List<String> tokens) {
-        return bc.classify(tokens);
+        return bc.classifyWithBigrams(tokens);
     }
 
     /**
@@ -66,7 +66,7 @@ public class NaiveBayesBigramPredictor extends LabelPredictor {
      */
     @Override
     public void evaluate(HashMap<String, String> spam, HashMap<String, String> ham, HashMap<String, String> docs) {
-        bc.evaluate(spam, ham, docs);
+        bc.evaluateBigramPredictor(spam, ham, docs);
     }
 
 }

@@ -20,11 +20,25 @@ public class SpamClassifierDemo {
         LabelPredictor unigramsPredictor = sc.classifyWithUnigrams(spamTrain, hamTrain);
         HashMap<String, String> labels = sc.predict(unigramsPredictor, test);
 
-       /*for (String key : labels.keySet()) {
+       for (String key : labels.keySet()) {
            System.out.println(key + '\t' + labels.get(key));
-       }*/
+       }
 
+        LabelPredictor bigramsPredictor = sc.classifyWithBigrams(spamTrain, hamTrain);
+        LabelPredictor trigramsPredictor = sc.classifyWithTrigrams(spamTrain, hamTrain);
+        LabelPredictor quadgramsPredictor = sc.classifyWithQuadgrams(spamTrain, hamTrain);
+
+        System.out.println("\n++++++++ UNIGRAMS ++++++++");
         unigramsPredictor.evaluate(spamTest, hamTest, test);
+
+        System.out.println("\n++++++++ BIGRAMS ++++++++");
+        bigramsPredictor.evaluate(spamTest, hamTest, test);
+
+        System.out.println("\n++++++++ TRIGRAMS ++++++++");
+        trigramsPredictor.evaluate(spamTest, hamTest, test);
+
+        System.out.println("\n++++++++ QUADGRAMS ++++++++");
+        quadgramsPredictor.evaluate(spamTest, hamTest, test);
 
     }
 }

@@ -69,6 +69,6 @@ public class NaiveBayesPredictor extends LabelPredictor {
      */
     @Override
     public void evaluate(HashMap<String, String> spam, HashMap<String, String> ham, HashMap<String, String> docs) {
-        bc.evaluate(spam, ham, docs);
+        bc.evaluateUnigramPredictor(spam, ham, docs);
     }
 }
