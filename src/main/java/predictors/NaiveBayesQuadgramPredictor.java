@@ -1,16 +1,18 @@
 package main.java.predictors;
 
 import main.java.BayesCounter;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class NaiveBayesQuadgramPredictor extends LabelPredictor {
     private BayesCounter bc = new BayesCounter();
 
-    public NaiveBayesQuadgramPredictor(IndexSearcher s) {
-        super(s);
+    public NaiveBayesQuadgramPredictor() {
+        super();
     }
 
     /**
@@ -19,7 +21,7 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
      * @param tokens List of tokens in the document
      */
     public void trainHamTokens(List<String> tokens) {
-        bc.buildHashMap("ham", tokens);
+        bc.buildQuadgramsHashMap("ham", tokens);
     }
 
     /**
@@ -28,7 +30,7 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
      * @param tokens List of tokens in the document
      */
     public void trainSpamTokens(List<String> tokens) {
-        bc.buildHashMap("spam", tokens);
+        bc.buildQuadgramsHashMap("spam", tokens);
     }
 
 
@@ -40,7 +42,7 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
      */
     @Override
     public String predict(List<String> tokens) {
-        return bc.classify(tokens);
+        return bc.classifyWithQuadgrams(tokens);
     }
 
     /**
@@ -51,7 +53,19 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
      */
     @Override
     public ArrayList<Double> score(List<String> tokens) {
-        return bc.getScores(tokens);
+        return bc.getQuadramScores(tokens);
+    }
+
+    /**
+     * Desc: Get the F1 score of the Naive Bayes classifiers.
+     *
+     * @param spam, a hash map of the ham test data by itself.
+     * @param ham, a hash map of the spam test data by itself.
+     * @param docs of mixed ham and spam documents mapping their pids to their text.
+     */
+    @Override
+    public void evaluate(HashMap<String, String> spam, HashMap<String, String> ham, HashMap<String, String> docs) {
+        bc.evaluateQuadgramPredictor(spam, ham, docs);
     }
 
 }
