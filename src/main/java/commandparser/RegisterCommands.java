@@ -147,6 +147,16 @@ public class RegisterCommands
          @Parameter(names = "section",description ="Section level retrieval")
          private boolean isSectionEnabled =false;
 
+         @Parameter(names = "--entity-doc-sim",description ="Rerank the initial retrieved document using entity abstract similarity")
+         private boolean isEntityDocSimEnabled = false;
+
+         @Parameter(names = "--spam-filter",description ="Uses the spam filter before performing the re-rank")
+         private boolean isSpamFilterEnabled = false;
+
+         public boolean isSpamFilterEnabled()
+         {
+             return isSpamFilterEnabled;
+         }
          public boolean isArticleEnabled()
          {
              return isArticleEnabled;
@@ -215,7 +225,10 @@ public class RegisterCommands
           public boolean isCosineSimilarityEnabled() {return isCosineSimilarity;}
 
 
-
+            public boolean isEntityDocSimEnabled()
+            {
+                return isEntityDocSimEnabled;
+            }
 
           public boolean isEntityDegreeEnabled()
          {

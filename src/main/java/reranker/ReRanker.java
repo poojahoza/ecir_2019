@@ -47,7 +47,6 @@ public class ReRanker
     public void ReRank()
     {
         runnerReRank.setBiasFactor(SearchCommand.getBiasFactor());
-
         Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
         for(Map.Entry<String,String> q: query.entrySet())
         {

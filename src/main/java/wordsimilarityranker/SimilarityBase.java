@@ -5,6 +5,7 @@ import main.java.searcher.BaseBM25;
 import main.java.utils.PreProcessor;
 import main.java.utils.SortUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,15 +33,18 @@ abstract  public class SimilarityBase
     This will perform the re-rank for each query candidate set.
     */
 
-    private Map<String, Container> performRankerOnCandidate(String Query, Map<String, Container> candidate)
-    {
-        double EPSILON = 0.0000001;
-        //if the map has only one value, return as-is
+    private Map<String, Container> performRankerOnCandidate(String Query, Map<String, Container> candidate) {
 
+        //if the map has only one value, return as-is
         if(candidate.size()<2) return candidate;
 
         //Preprocessed query terms
-        ArrayList<String> querylist = PreProcessor.processDocument(Query);
+        ArrayList<String> querylist = null;
+        try {
+            querylist = PreProcessor.processTermsUsingLucene(Query);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         Map<String,Container> result = new LinkedHashMap<>();
 
@@ -48,23 +52,17 @@ abstract  public class SimilarityBase
         {
             double score = 0.0;
             int docID = candid.getValue().getDocID();
-            ArrayList<String> canidateterms = PreProcessor.processDocument(bm.getDocument(docID));
-            double randomProb = (1.0 / canidateterms.size());
+            ArrayList<String> canidateterms = null;
+            try {
+                canidateterms = PreProcessor.processTermsUsingLucene(bm.getDocument(docID));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             for(String qterm: querylist)
             {
                 for(String cterm: canidateterms)
                 {
-//                    double sc = getScore(qterm,cterm);
-//                    if( sc == 0.0 )
-//                    {
-//                        sc = randomProb;
-//                    } else
-//                    {
-//                        sc = getScore(qterm,cterm);
-//                    }
-//                    score+=sc;
-                    //System.out.println("QTerm: " + qterm +" CTerm "+ cterm +" score: "+ sc);
-
                     score+= getScore(qterm,cterm);
                 }
             }

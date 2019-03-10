@@ -128,7 +128,6 @@ public class BaseBM25 extends BaseSearcher
     {
          Map<String,Container> temp;
 
-
         TopDocs topDocuments = null;
         try {
             topDocuments = this.performSearch(query ,this.k);

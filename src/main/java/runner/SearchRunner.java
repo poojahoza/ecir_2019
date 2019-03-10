@@ -6,6 +6,7 @@ import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
 import main.java.reranker.ReRanker;
+import main.java.reranker.docsimranker.EntitySimilarityReRanker;
 import main.java.searcher.BaseBM25;
 import main.java.utils.*;
 import main.java.searcher.BaseBM25;
@@ -247,6 +248,12 @@ public class SearchRunner implements ProgramRunner
             validate.ValidateQE();
             QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
             qe.doQueryExpansion();
+        }
+
+        if(searchParser.isEntityDocSimEnabled())
+        {
+            EntitySimilarityReRanker ent = new EntitySimilarityReRanker(searchParser,queryCBOR);
+            ent.doEntityReRank();
         }
 
         if(searchParser.getisVerbose())

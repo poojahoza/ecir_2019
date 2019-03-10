@@ -13,7 +13,6 @@ import java.util.List;
 
 public class PreProcessor
 {
-
     private final  List<String> STOP_WORDS = StopWord.getStopWords();
 
     List<String> getSTOP_WORDS()
@@ -52,8 +51,6 @@ public class PreProcessor
     }
 
 
-
-
     @Deprecated
     public static ArrayList<String> processDocument(String sb)
     {
@@ -66,7 +63,6 @@ public class PreProcessor
             if(!p.STOP_WORDS.contains(s))
             {
                 if(!processedData.contains(s))
-
                     processedData.add(s);
             }
         }
