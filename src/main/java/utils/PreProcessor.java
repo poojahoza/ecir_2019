@@ -50,6 +50,30 @@ public class PreProcessor
         return data;
     }
 
+    public static ArrayList<String> processTermsUsingLuceneStandard(String content) throws IOException
+    {
+        PreProcessor p = new PreProcessor();
+
+        StandardAnalyzer analyzer = new StandardAnalyzer();
+        ArrayList<String> data = new ArrayList<>();
+        TokenStream tokenStream = analyzer.tokenStream("Text", new StringReader(content));
+        try {
+            tokenStream.reset();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while (tokenStream.incrementToken()) {
+            final String token = tokenStream.getAttribute(CharTermAttribute.class).toString();
+
+            if(!p.STOP_WORDS.contains(token)) {
+                if (!data.contains(token)) {
+                    data.add(token);
+                }
+            }
+        }
+        return data;
+    }
+
 
     @Deprecated
     public static ArrayList<String> processDocument(String sb)

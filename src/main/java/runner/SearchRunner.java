@@ -6,6 +6,7 @@ import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
 import main.java.reranker.ReRanker;
+import main.java.rerankerv2.docsimranker.DocumentFrequencySimilarity;
 import main.java.rerankerv2.docsimranker.EntitySimilarityRanker;
 import main.java.searcher.BaseBM25;
 import main.java.utils.*;
@@ -91,9 +92,13 @@ public class SearchRunner implements ProgramRunner
 
         if(searchParser.isDFReRankEnabled())
         {
+
             validate.ValidateReRank();
             ReRanker re = new ReRanker(searchParser,queryCBOR);
             re.ReRankDF();
+
+//            DocumentFrequencySimilarity df = new DocumentFrequencySimilarity(searchParser,queryCBOR);
+//            df.doDocumentFrequency();
         }
 
         if(searchParser.isCosineSimilarityEnabled())

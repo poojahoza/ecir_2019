@@ -153,6 +153,7 @@ public class RegisterCommands
          @Parameter(names = "--spam-filter",description ="Uses the spam filter before performing the re-rank")
          private boolean isSpamFilterEnabled = false;
 
+
          public boolean isSpamFilterEnabled()
          {
              return isSpamFilterEnabled;
