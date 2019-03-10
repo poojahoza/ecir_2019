@@ -6,7 +6,7 @@ import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
 import main.java.reranker.ReRanker;
-import main.java.reranker.docsimranker.EntitySimilarityRanker;
+import main.java.rerankerv2.docsimranker.EntitySimilarityRanker;
 import main.java.searcher.BaseBM25;
 import main.java.utils.*;
 import main.java.searcher.PageSearcher;

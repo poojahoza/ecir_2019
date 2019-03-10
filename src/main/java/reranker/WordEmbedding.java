@@ -1,5 +1,6 @@
 package main.java.reranker;
 
+import main.java.rerankerv2.concepts.EmbeddingStrategy;
 import main.java.utils.PreProcessor;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;

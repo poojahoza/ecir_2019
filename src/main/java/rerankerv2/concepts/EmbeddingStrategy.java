@@ -1,4 +1,4 @@
-package main.java.reranker;
+package main.java.rerankerv2.concepts;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 
