@@ -32,6 +32,8 @@ public class Entities {
         return query_entity_list;
     }
 
+
+
     public Map<String, Map<String, Double>> getParagraphsScore(Map<String, Map<String, Container>> bm25_ranking,
                                  Map<String, Map<String, Integer>> ranked_entities)
     {

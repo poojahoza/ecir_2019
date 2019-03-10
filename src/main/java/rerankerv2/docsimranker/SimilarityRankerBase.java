@@ -81,52 +81,52 @@ public abstract class SimilarityRankerBase {
             return res.div(_number_of_terms);
         }
 
-        Map<String,Container> getReRank(Map<String, Container> unranked) {
-        if (unranked.size() < 3) return unranked;
+        protected Map<String,Container> getReRank(Map<String, Container> unranked) {
+            if (unranked.size() < 3) return unranked;
 
-        Integer Dimension = SearchCommand.getDimension();
-        Integer biasFactor = SearchCommand.getBiasFactor();
+            Integer Dimension = SearchCommand.getDimension();
+            Integer biasFactor = SearchCommand.getBiasFactor();
 
-        INDArray biased_vector = null;
-        INDArray res = Nd4j.create(Dimension);
+            INDArray biased_vector = null;
+            INDArray res = Nd4j.create(Dimension);
 
-        int count = 0;
+            int count = 0;
 
-        //If more biases are used than the candidate set, half the size of the candidate set will be used
-        int actualBias = unranked.size() > biasFactor ? biasFactor : unranked.size() / 2;
+            //If more biases are used than the candidate set, half the size of the candidate set will be used
+            int actualBias = unranked.size() > biasFactor ? biasFactor : unranked.size() / 2;
 
-        double biasedScore = 0.0;
-        /*
-        Compute the document representation based on the Bias Factors, if the user pass in 10, the first document of the retrieved set will be used as bias
-        */
-        for (Map.Entry<String, Container> val : unranked.entrySet()) {
-            count++;
-            biasedScore += val.getValue().getScore();
-            INDArray temp = getVector(val.getValue());
-            res = res.add(temp);
-            if (count == actualBias) break;
-        }
+            double biasedScore = 0.0;
+            /*
+            Compute the document representation based on the Bias Factors, if the user pass in 10, the first document of the retrieved set will be used as bias
+            */
+            for (Map.Entry<String, Container> val : unranked.entrySet()) {
+                count++;
+                biasedScore += val.getValue().getScore();
+                INDArray temp = getVector(val.getValue());
+                res = res.add(temp);
+                if (count == actualBias) break;
+            }
 
-        //If the Bias factor is 1, we do not need to divide the vector component.
+            //If the Bias factor is 1, we do not need to divide the vector component.
 
-        biased_vector = biasFactor == 1 ? res : res.div(actualBias);
-        biasedScore = biasFactor == 1 ? biasedScore : (biasedScore / actualBias);
+            biased_vector = biasFactor == 1 ? res : res.div(actualBias);
+            biasedScore = biasFactor == 1 ? biasedScore : (biasedScore / actualBias);
 
 
-        Map<String, Container> unsorted = new LinkedHashMap<String, Container>();
+            Map<String, Container> unsorted = new LinkedHashMap<String, Container>();
 
-        for (Map.Entry<String, Container> val : unranked.entrySet())
-        {
-            int docID = val.getValue().getDocID();
-            INDArray _other_doc = getVector(val.getValue());
-            double cosineScore = Transforms.cosineSim(biased_vector, _other_doc);
-            double newScore = ((val.getValue().getScore() * cosineScore) + biasedScore);
+            for (Map.Entry<String, Container> val : unranked.entrySet())
+            {
+                int docID = val.getValue().getDocID();
+                INDArray _other_doc = getVector(val.getValue());
+                double cosineScore = Transforms.cosineSim(biased_vector, _other_doc);
+                double newScore = ((val.getValue().getScore() * cosineScore) + biasedScore);
 
-            Container temp = new Container(newScore, val.getValue().getDocID());
-            temp.addEntityContainer(val.getValue().getEntity());
-            unsorted.put(val.getKey(), temp);
-        }
-        return SortUtils.sortByValue(unsorted);
+                Container temp = new Container(newScore, val.getValue().getDocID());
+                temp.addEntityContainer(val.getValue().getEntity());
+                unsorted.put(val.getKey(), temp);
+            }
+            return SortUtils.sortByValue(unsorted);
     }
 
 
