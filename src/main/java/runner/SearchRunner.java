@@ -6,21 +6,18 @@ import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
 import main.java.reranker.ReRanker;
-import main.java.reranker.docsimranker.EntitySimilarityReRanker;
+import main.java.reranker.docsimranker.EntitySimilarityRanker;
 import main.java.searcher.BaseBM25;
 import main.java.utils.*;
-import main.java.searcher.BaseBM25;
 import main.java.searcher.PageSearcher;
 import main.java.searcher.LeadtextSearcher;
 import main.java.graph.GraphSimConstructor;
 import main.java.graph.GraphDegreeConstructor;
 import main.java.wordsimilarityranker.*;
-import org.jgrapht.Graph;
 import main.java.queryexpansion.QueryExpansion;
 
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /*
@@ -252,7 +249,7 @@ public class SearchRunner implements ProgramRunner
 
         if(searchParser.isEntityDocSimEnabled())
         {
-            EntitySimilarityReRanker ent = new EntitySimilarityReRanker(searchParser,queryCBOR);
+            EntitySimilarityRanker ent = new EntitySimilarityRanker(searchParser,queryCBOR);
             ent.doEntityReRank();
         }
 

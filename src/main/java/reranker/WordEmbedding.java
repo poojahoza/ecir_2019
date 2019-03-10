@@ -12,14 +12,13 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /*
 Class that Holds the Word Embeddings vectors.
 */
 
-public class WordEmbedding
+public class WordEmbedding extends EmbeddingStrategy
 {
     private Map<String, INDArray> word = null;
     private Integer dimension=0;
@@ -145,4 +144,12 @@ public class WordEmbedding
         return null;
     }
 
+    @Override
+    public INDArray getEmbeddingVector(String token) {
+        if(word.containsKey(token.toLowerCase()))
+        {
+            return word.get(token);
+        }
+        return null;
+    }
 }
