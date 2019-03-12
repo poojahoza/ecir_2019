@@ -18,13 +18,14 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 
 public abstract class SimilarityRankerBase {
 
     private RegisterCommands.CommandSearch SearchCommand=null;
     protected BaseBM25 bm25 = null;
-    private Map<String,String> query = null;
+    protected Map<String,String> query = null;
     private EmbeddingStrategy embedding = null;
     protected CorpusStats cs = null;
 
@@ -133,12 +134,35 @@ public abstract class SimilarityRankerBase {
     protected Map<String,Map<String,Container>> rerank()
     {
         Map<String,Map<String,Container>> res = new LinkedHashMap<String,Map<String,Container>>();
-        for(Map.Entry<String,String> q: query.entrySet())
-        {
-            Map<String, Container> retDoc = bm25.getRanking(q.getValue());
-            Map<String,Container> reranked = getReRank(retDoc);
-            res.put(q.getKey(),reranked);
-        }
+        long start= System.currentTimeMillis();
+//        for(Map.Entry<String,String> q: query.entrySet())
+//        {
+//            try {
+//                BaseBM25 bm = new BaseBM25(SearchCommand.getkVAL(),SearchCommand.getIndexlocation());
+//                Map<String, Container> retDoc = bm.getRanking(q.getValue());
+//                Map<String,Container> reranked = getReRank(retDoc);
+//                res.put(q.getKey(),reranked);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
+
+        StreamSupport.stream(query.entrySet().spliterator(),true)
+                .forEach(q -> {
+                    try {
+                        BaseBM25 bm = new BaseBM25(SearchCommand.getkVAL(),SearchCommand.getIndexlocation());
+                        Map<String, Container> retDoc = bm.getRanking(q.getValue());
+                        Map<String,Container> reranked = getReRank(retDoc);
+                        res.put(q.getKey(),reranked);
+                        System.out.print(".");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+        long end = System.currentTimeMillis();
+        long timeElapsed = end-start;
+        System.out.println("Time took :"+ (double)timeElapsed/1000 +"Minutes : "+ ((double)timeElapsed/1000)/60);
         return res;
     }
 }

@@ -94,11 +94,11 @@ public class SearchRunner implements ProgramRunner
         {
 
             validate.ValidateReRank();
-            ReRanker re = new ReRanker(searchParser,queryCBOR);
-            re.ReRankDF();
+//            ReRanker re = new ReRanker(searchParser,queryCBOR);
+//            re.ReRankDF();
 
-//            DocumentFrequencySimilarity df = new DocumentFrequencySimilarity(searchParser,queryCBOR);
-//            df.doDocumentFrequency();
+            DocumentFrequencySimilarity df = new DocumentFrequencySimilarity(searchParser,queryCBOR);
+            df.doDocumentFrequency();
         }
 
         if(searchParser.isCosineSimilarityEnabled())
