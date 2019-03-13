@@ -10,7 +10,7 @@ import java.util.Map;
 public class RunWriter
 {
 
-     static boolean checkDir(String dirname)
+     public static boolean checkDir(String dirname)
     {
         boolean isSuccess = false;
         File dir = new File(dirname);
@@ -30,7 +30,7 @@ public class RunWriter
     return isSuccess;
     }
 
-     static FileWriter createFile(String dirname,String mname) {
+     public static FileWriter createFile(String dirname,String mname) {
 
         String dest = dirname + System.getProperty("file.separator") + "output_" + mname + "_ranking.txt";
         FileWriter ptr = null;

@@ -153,7 +153,14 @@ public class RegisterCommands
          @Parameter(names = "--spam-filter",description ="Uses the spam filter before performing the re-rank")
          private boolean isSpamFilterEnabled = false;
 
+         @Parameter(names = "--parallel",description ="Uses the parallel stream for the reranker methods")
+         private boolean isParallelEnabled = false;
 
+         @Parameter(names = "--mrf",description ="Uses the parallel stream for the reranker methods")
+         private boolean isMrfEnabled = false;
+
+         public boolean isMrfEnabled() {return  isMrfEnabled;}
+         public boolean isParallelEnabled(){return isParallelEnabled;}
          public boolean isSpamFilterEnabled()
          {
              return isSpamFilterEnabled;

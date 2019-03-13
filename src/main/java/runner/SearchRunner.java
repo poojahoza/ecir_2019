@@ -5,6 +5,7 @@ import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
+import main.java.mrf.MarkovRandomField;
 import main.java.reranker.ReRanker;
 import main.java.rerankerv2.docsimranker.DocumentFrequencySimilarity;
 import main.java.rerankerv2.docsimranker.EntitySimilarityRanker;
@@ -256,6 +257,12 @@ public class SearchRunner implements ProgramRunner
         {
             EntitySimilarityRanker ent = new EntitySimilarityRanker(searchParser,queryCBOR);
             ent.doEntityReRank();
+        }
+
+        if(searchParser.isMrfEnabled())
+        {
+            MarkovRandomField mrf = new MarkovRandomField(searchParser,queryCBOR);
+            mrf.doMarkovRandomField();
         }
 
         if(searchParser.getisVerbose())

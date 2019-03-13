@@ -48,13 +48,26 @@ public class ReRanker
     {
         runnerReRank.setBiasFactor(SearchCommand.getBiasFactor());
         Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
-        for(Map.Entry<String,String> q: query.entrySet())
-        {
-            String Query = q.getValue();
-            Map<String, Container> BM25Val = bm25.getRanking(Query);
-            Map<String, Container> reOrdered = runnerReRank.getReRank(BM25Val);
-            result.put(q.getKey(),reOrdered);
-        }
+//        for(Map.Entry<String,String> q: query.entrySet())
+//        {
+//            String Query = q.getValue();
+//            Map<String, Container> BM25Val = bm25.getRanking(Query);
+//            Map<String, Container> reOrdered = runnerReRank.getReRank(BM25Val);
+//            result.put(q.getKey(),reOrdered);
+//        }
+
+        StreamSupport.stream(query.entrySet().spliterator(),true)
+                .forEach(q -> {
+                    try {
+                        BaseBM25 bm = new BaseBM25(SearchCommand.getkVAL(),SearchCommand.getIndexlocation());
+                        Map<String, Container> BM25Val = bm.getRanking(q.getValue());
+                        Map<String, Container> reOrdered = runnerReRank.getReRank(BM25Val);
+                        result.put(q.getKey(),reOrdered);
+                        System.out.print(".");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
 
         String datafile ="";
         if(SearchCommand.getQueryfile().toLowerCase().contains("test".toLowerCase()))
