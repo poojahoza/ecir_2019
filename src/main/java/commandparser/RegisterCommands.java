@@ -159,6 +159,13 @@ public class RegisterCommands
          @Parameter(names = "--mrf",description ="Uses the parallel stream for the reranker methods")
          private boolean isMrfEnabled = false;
 
+         @Parameter(names = "--qrel-path",description ="Pass the absolute path of the Qrel")
+         private String qrelPath = null;
+
+         public String getQrelPath()
+         {
+             return qrelPath;
+         }
          public boolean isMrfEnabled() {return  isMrfEnabled;}
          public boolean isParallelEnabled(){return isParallelEnabled;}
          public boolean isSpamFilterEnabled()

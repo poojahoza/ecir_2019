@@ -26,8 +26,13 @@ public class MarkovRandomField
         embedding = new WordEmbedding(SearchCommand.getDimension(),SearchCommand.getWordEmbeddingFile());
     }
 
+    /*
+    Collects the different kind of evidences for each document. Each evidence returns the score for a document
+    The scores returned is normalized.
+    */
     private Map<String,Container> collectEvidences(Map<String, Container> unranked,String queryVal)
     {
+        ArrayList<Double> ans=null;
 
         if(queryVal.equals("Aerosol spray History"))
         {
@@ -36,35 +41,41 @@ public class MarkovRandomField
         Map<String,Container> result = new LinkedHashMap<String,Container>();
         result.putAll(unranked);
 
-        ArrayList<Double> ans = Evidences.evidence1(unranked);
-        Evidences.updatescores(result,ans);
+        ans = Evidences.evidence1(unranked);
+        MrfHelper.updatescores(result,ans);
+
 
         ans = Evidences.evidence2(unranked,embedding,SearchCommand.getDimension(),queryVal,SearchCommand.getIndexlocation(),
                     SearchCommand.getkVAL());
-        Evidences.updatescores(result,ans);
+        MrfHelper.updatescores(result,ans);
+
+        ans = Evidences.evidence3(unranked,embedding,SearchCommand.getDimension(),queryVal,SearchCommand.getIndexlocation(),
+                SearchCommand.getkVAL());
+        MrfHelper.updatescores(result,ans);
 
 
-        PrintUtils.displayMapContainerList(result);
-
+        if(SearchCommand.getisVerbose())
+        {
+            PrintUtils.displayMapContainerList(result);
+        }
        return result;
     }
 
+    /*
+        Runs the results in parallel if the --parallel is enabled in the command line and writes the result to file
+    */
     public void doMarkovRandomField()
     {
         Map<String,Map<String,Container>> res = new LinkedHashMap<String,Map<String,Container>>();
-        long start= System.currentTimeMillis();
 
+        long start= System.currentTimeMillis();
         StreamSupport.stream(query.entrySet().spliterator(),SearchCommand.isParallelEnabled())
                 .forEach(q -> {
                     try {
-                        System.out.println("Query "+ q.getValue());
-                        //int count=0;
                         BaseBM25 bm = new BaseBM25(SearchCommand.getkVAL(),SearchCommand.getIndexlocation());
                         Map<String, Container> retDoc = bm.getRanking(q.getValue());
                         Map<String,Container> reranked = collectEvidences(retDoc,q.getValue());
                         res.put(q.getKey(),reranked);
-                        //count++;
-                        //if(count==1) System.exit(-1);
                         System.out.print(".");
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -73,7 +84,7 @@ public class MarkovRandomField
         long end = System.currentTimeMillis();
         long timeElapsed = end-start;
         System.out.println("Time took :"+ (double)timeElapsed/1000 +" sec "+ ((double)timeElapsed/1000)/60 +" min");
-
         MrfHelper.writeRunFile(res,"mrf");
+        MrfHelper.writeFeatureFile(res,"mrfrank",SearchCommand.getQrelPath());
     }
 }

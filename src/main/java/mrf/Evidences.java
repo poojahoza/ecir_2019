@@ -10,6 +10,7 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -17,9 +18,9 @@ import java.util.Map;
 public class Evidences
 {
     /*
-        evidence1 is to return the BM25 score of query-document
+        Evidence is to return the BM25 score of query-document pair
     */
-    public static ArrayList<Double> evidence1(Map<String, Container> list)
+     static ArrayList<Double> evidence1(Map<String, Container> list)
     {
         ArrayList<Double> res = new ArrayList<Double>();
 
@@ -30,7 +31,12 @@ public class Evidences
         return res;
     }
 
-    public static ArrayList<Double> evidence2(Map<String, Container> list, EmbeddingStrategy embedding,Integer Dimension,String Query,String
+    /*
+        Evidence 2 is to return the query-document cosine score.
+        Each document is build using embedding vector of some dimension
+
+    */
+     static ArrayList<Double> evidence2(Map<String, Container> list, EmbeddingStrategy embedding,Integer Dimension,String Query,String
                                               indexLoc,Integer kval)
     {
         ArrayList<Double> res = new ArrayList<Double>();
@@ -53,28 +59,46 @@ public class Evidences
         return res;
     }
 
-    public static void updatescores(Map<String,Container> res,ArrayList<Double> fet)
+    /*
+        Finds the cluster score, for each document, it finds the k nearest documents
+        Computes the centroid of the K nearest document and find the cosine similarity with the query
+    */
+    static ArrayList<Double> evidence3(Map<String, Container> list, EmbeddingStrategy embedding,Integer Dimension,String Query,String indexLoc,Integer kval)
     {
-        int index =0;
-        if(res.size()!= fet.size())
-        {
-            System.out.println("Mismatch in the size, something wrong");
-            System.exit(-1);
-        }
+        ArrayList<Double> res = new ArrayList<>();
 
-        for(Map.Entry<String,Container> val: res.entrySet())
+        for(Map.Entry<String,Container> outer:list.entrySet())
         {
-//            if(val.getValue().getScore() == fet.get(0))
-//            {
-//                val.getValue().addScores(fet.get(index));
-//            }
-//            else
-//            {
-//                System.out.println("Problem with parallelism");
-//                System.exit(-1);
-//            }
-            val.getValue().addScores(fet.get(index));
-            index++;
+            Map<String,Container> unsorted = new LinkedHashMap<String, Container>();
+            BaseBM25 bm25 = null;
+            try {
+                 bm25 = new BaseBM25(kval,indexLoc);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Integer docIDOuter = outer.getValue().getDocID();
+            INDArray docOuter = MrfHelper.getVector(bm25.getDocument(docIDOuter),embedding,Dimension);
+
+
+            for(Map.Entry<String,Container> inner:list.entrySet())
+            {
+                if(!outer.getKey().equals(inner.getKey()))
+                {
+                    Integer docIDInner = inner.getValue().getDocID();
+                    INDArray docInner= MrfHelper.getVector(bm25.getDocument(docIDInner),embedding,Dimension);
+                    Double simscore = Transforms.cosineSim(docOuter,docInner);
+                    Container tempc = new Container(simscore, inner.getValue().getDocID());
+                    unsorted.put(inner.getKey(),tempc);
+
+                }
+            }
+
+            /*
+                call to getClusterScore returns the score between centroid and the query vector
+            */
+            Double d = MrfHelper.getClusterScore(unsorted,embedding,Dimension,Query,indexLoc,kval);
+            res.add(d);
         }
+        return res;
     }
 }
