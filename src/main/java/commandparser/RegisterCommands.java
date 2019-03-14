@@ -159,8 +159,16 @@ public class RegisterCommands
          @Parameter(names = "--mrf",description ="Uses the parallel stream for the reranker methods")
          private boolean isMrfEnabled = false;
 
+         @Parameter(names = "--cluster",description ="Cluster Ranking")
+         private boolean isClusterRankerEnabled = false;
+
          @Parameter(names = "--qrel-path",description ="Pass the absolute path of the Qrel")
          private String qrelPath = null;
+
+         public boolean isClusterRankerEnabled()
+         {
+             return isClusterRankerEnabled;
+         }
 
          public String getQrelPath()
          {

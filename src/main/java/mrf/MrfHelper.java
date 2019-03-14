@@ -8,7 +8,7 @@ import main.java.utils.SortUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
-import org.tensorflow.framework.TensorShapeProto;
+
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,9 +18,9 @@ import java.util.Map;
 import static main.java.utils.RunWriter.checkDir;
 import static main.java.utils.RunWriter.createFile;
 
-class MrfHelper
+public  class MrfHelper
 {
-    static INDArray getVector(String query, EmbeddingStrategy embedding,Integer Dimension)
+    public static INDArray getVector(String query, EmbeddingStrategy embedding,Integer Dimension)
     {
         INDArray res = Nd4j.create(Dimension).add(0.000001);
         int _number_of_terms=1;

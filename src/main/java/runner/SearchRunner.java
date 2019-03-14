@@ -1,6 +1,7 @@
 package main.java.runner;
 
 
+import main.java.clustering.ClusteringRanker;
 import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
@@ -263,6 +264,12 @@ public class SearchRunner implements ProgramRunner
         {
             MarkovRandomField mrf = new MarkovRandomField(searchParser,queryCBOR);
             mrf.doMarkovRandomField();
+        }
+
+        if(searchParser.isClusterRankerEnabled())
+        {
+            ClusteringRanker cr = new ClusteringRanker(searchParser,queryCBOR);
+            cr.doCluster();
         }
 
         if(searchParser.getisVerbose())
