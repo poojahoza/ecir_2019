@@ -4,6 +4,7 @@ import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.indexer.EntityIndexBuilder;
+import main.java.indexer.EntityIndexReader;
 import main.java.indexer.IndexBuilder;
 
 import java.io.IOException;
@@ -65,6 +66,19 @@ public class IndexRunner implements ProgramRunner
                 e.printStackTrace();
             }
 
+        }
+
+        if(indexParser.getIsEntityAbstract()){
+            validate.ValidateIndex();
+
+            EntityIndexReader eir = null;
+            try {
+                eir = new EntityIndexReader(indexParser.getIndexPath());
+                eir.totalIndexDocs();
+
+            }catch (IOException ioe){
+                ioe.printStackTrace();
+            }
         }
     }
 }

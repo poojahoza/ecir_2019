@@ -18,7 +18,7 @@ public class RegisterCommands
      public static class CommandIndex
      {
 
-          @Parameter(names = {"-i","--corpus-file"},description = "Corpus file to index",required=true)
+          @Parameter(names = {"-i","--corpus-file"},description = "Corpus file to index. In case of Entity Abstract, please specify Entity Index location",required=true)
           private String IndexPath;
 
           @Parameter(names = {"-d","--dest-location"},description = "Location to save the index file")
@@ -30,6 +30,8 @@ public class RegisterCommands
          @Parameter(names = {"--entity-index"}, description = "Perform Entity Index")
          private Boolean isEntity = false;
 
+         @Parameter(names = {"--abstract-index"}, description = "Perform Entity Abstract Index")
+         private Boolean isEntityAbstract = false;
 
 
           @Parameter(names = "--help", help = true)
@@ -52,7 +54,9 @@ public class RegisterCommands
 
           public Boolean getIsParaIndex() {return isParaIndex;}
 
-         public Boolean getIsEntity() {return isEntity;}
+          public Boolean getIsEntity() {return isEntity;}
+
+         public Boolean getIsEntityAbstract() {return isEntityAbstract;}
 
 
      }
@@ -141,6 +145,9 @@ public class RegisterCommands
          @Parameter(names = "--entity-expand",description ="Rerank the initial retrieved document using expanded query")
          private boolean isQueryExpand =false;
 
+         @Parameter(names = "--entity-relation",description ="Rerank the initial retrieved document using entity relationship")
+         private boolean isEntityRelationEnabled =false;
+
          @Parameter(names = "article",description ="Article level retrieval")
          private boolean isArticleEnabled =false;
 
@@ -220,6 +227,11 @@ public class RegisterCommands
           public boolean isEntityDegreeEnabled()
          {
              return isEntityDegree;
+         }
+
+         public boolean isEntityRelationEnabled()
+         {
+             return isEntityRelationEnabled;
          }
 
             public String getEntityIndLoc(){return entityIndLoc; }
