@@ -28,7 +28,7 @@ public class Evidences
         {
             res.add(val.getValue().getScore());
         }
-        return res;
+        return Normalize.getZScoreNormalized(res);
     }
 
     /*
@@ -56,7 +56,7 @@ public class Evidences
             INDArray doc = MrfHelper.getVector(bm.getDocument(DocID),embedding,Dimension);
             res.add(Transforms.cosineDistance(queryVector,doc));
         }
-        return res;
+        return Normalize.getZScoreNormalized(res);
     }
 
     /*
@@ -99,6 +99,6 @@ public class Evidences
             Double d = MrfHelper.getClusterScore(unsorted,embedding,Dimension,Query,indexLoc,kval);
             res.add(d);
         }
-        return res;
+        return Normalize.getZScoreNormalized(res);
     }
 }

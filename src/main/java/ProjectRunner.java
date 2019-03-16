@@ -2,11 +2,7 @@ package main.java;
 
 
 import main.java.commandparser.CommandParser;
-import main.java.runner.IndexRunner;
-import main.java.runner.ProgramRunner;
-import main.java.runner.SearchRunner;
-import main.java.runner.IndexHamSpamRunner;
-import main.java.runner.FilterRunner;
+import main.java.runner.*;
 
 
 public class ProjectRunner
@@ -34,6 +30,9 @@ public class ProjectRunner
                 runner.run();
             } else if (parser.getParser().getParsedCommand().equals("filter")) {
                 runner = new FilterRunner(parser);
+                runner.run();
+            } else if (parser.getParser().getParsedCommand().equals("ranker")) {
+                runner = new RankerRunner(parser);
                 runner.run();
             } else {
                 parser.getParser().usage();

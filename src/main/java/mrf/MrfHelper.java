@@ -58,6 +58,17 @@ public  class MrfHelper
         }
     }
 
+    private static void closeStream(BufferedReader br)
+    {
+        if(br!=null) {
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private static Map<String, Map<String, Integer>> readQrel(String filename) {
         Map<String, Map<String, Integer>> mp = new LinkedHashMap<String, Map<String, Integer>>();
 
@@ -148,7 +159,7 @@ public  class MrfHelper
                     sb.append(d);
                     sb.append(" ");
                 }
-                runFileLine = queryID+" Q0 "+pID+" "+ranking+" "+sb.toString()+" "+mname+newLine;
+                runFileLine = queryID+" Q0 "+pID+" "+ranking+" "+sb.toString()+newLine;
                 try {
                     ptr.write(runFileLine);
                 } catch (IOException e1) {
@@ -182,12 +193,15 @@ public  class MrfHelper
         String newLine = System.getProperty("line.separator");
         String runFileLine;
 
+        int qidindex=0;
         for(Map.Entry<String,Map<String, Container>> outer: res.entrySet())
         {
+            qidindex++;
             for(Map.Entry<String,Container> inner:outer.getValue().entrySet())
             {
                 String isRel = String.valueOf(isRelevant(qrel,outer.getKey(),inner.getKey()));
-                String queryid = "qid:"+outer.getKey();
+                String qid = "qid:"+String.valueOf(qidindex);
+                String queryid = outer.getKey()+"_";
 
                 int count=0;
                 StringBuilder sb= new StringBuilder();
@@ -197,9 +211,9 @@ public  class MrfHelper
                     sb.append(count+":"+d);
                     sb.append(" ");
                 }
-                String info = "#"+inner.getKey();
+                String info = "#"+queryid+inner.getKey();
 
-                runFileLine = isRel+" "+queryid+" "+sb.toString()+" "+info+newLine;
+                runFileLine = isRel+" "+qid+" "+sb.toString()+info+newLine;
                 try {
                     ptr.write(runFileLine);
                 } catch (IOException e1) {
@@ -207,6 +221,16 @@ public  class MrfHelper
                 }
             }
         }
+
+        if(ptr!=null)
+        {
+            try {
+                ptr.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     /*
@@ -249,4 +273,147 @@ public  class MrfHelper
         return Transforms.cosineSim(queryVec,clusterCentroid);
     }
 
+    static public void getWeights(String jarPath,String fetFile,String qrelfile)
+    {
+        try {
+            String s = null;
+            String command = "java -jar "+jarPath+" -train "+ fetFile+" -ranker 4 -metric2t MAP -save feature\\model.txt";
+            System.out.println("Executing the command \n");
+            System.out.println(command);
+
+            Process p = Runtime.getRuntime().exec(command);
+
+             int code = p.waitFor();
+
+            System.out.println("Code "+ code);
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            System.out.println("Here is the standard output of the command:\n");
+            while ((s = stdInput.readLine()) != null) {
+                System.out.println(s);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static double getWeightedScore(ArrayList<Double> weights,ArrayList<Double> run)
+    {
+        if(weights.size()!= run.size())
+        {
+            System.out.println("Cannot perform Dot product");
+            System.exit(-1);
+        }
+
+        double score = 0.0;
+        for(int i=0;i<weights.size();i++)
+        {
+            score += weights.get(i)*run.get(i);
+        }
+        return score;
+    }
+
+    private static ArrayList<Double> getWeights(String model)
+    {
+            BufferedReader br = getFileReader(model);
+            ArrayList<Double> modelw = new ArrayList<>();
+            while (true) {
+                try {
+                    String line = br.readLine();
+
+                    if (line == null) {
+                        break;
+                    }
+
+                    if(line.startsWith("#"))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        String[] weights = line.split(" ");
+                        for(String s:weights)
+                        {
+                            String temp[] = s.split(":");
+                            modelw.add(Double.valueOf(temp[1]));
+                        }
+                    }
+                } catch (IOException e) {
+
+                }
+            }
+            return modelw;
+    }
+
+    static private BufferedReader getFileReader(String fname)
+    {
+        File fp = new File(fname);
+        FileReader fr=null;
+        BufferedReader br = null;
+
+        try {
+            fr = new FileReader(fp);
+            br = new BufferedReader(fr);
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        return br;
+    }
+
+    public static void createRunFileFromWeights(String model,String run,String mname) {
+        String dirname = "result";
+        boolean success = checkDir(dirname);
+
+        if (!success) {
+            System.out.println("Unable to create the directory");
+            System.exit(-1);
+        }
+        String newLine = System.getProperty("line.separator");
+        ArrayList<Double> modelw= getWeights(model);
+
+        FileWriter fw = createFile(dirname, mname);
+        BufferedReader br = getFileReader(run);
+        System.out.println("Creating run files from the model file.................");
+        while (true) {
+            try {
+                String line = br.readLine();
+
+                if (line == null) {
+                    break;
+                }
+
+
+                String[] words = line.split(" ");
+                ArrayList<Double> runval =new ArrayList<>();
+                int count=0;
+
+                for(String s: words)
+                {
+                    count++;
+                    if(count <= 4) continue;
+                    runval.add(Double.valueOf(s));
+                }
+                Double score = getWeightedScore(modelw,runval);
+
+                String runline = words[0]+" "+words[1]+" "+words[2]+" "+words[3]+" "+String.valueOf(score)+" "+mname+newLine;
+                fw.write(runline);
+
+            }catch (IOException e)
+            {
+                e.getStackTrace();
+            }
+        }
+        if(fw!=null)
+        {
+            try {
+                fw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("Created file in the directory "+ dirname + " the file has a substring of "+ mname);
+    }
 }

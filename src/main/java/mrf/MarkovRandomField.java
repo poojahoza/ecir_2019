@@ -32,12 +32,8 @@ public class MarkovRandomField
     */
     private Map<String,Container> collectEvidences(Map<String, Container> unranked,String queryVal)
     {
-        ArrayList<Double> ans=null;
+        ArrayList<Double> ans = null;
 
-        if(queryVal.equals("Aerosol spray History"))
-        {
-            System.out.println("Stop");
-        }
         Map<String,Container> result = new LinkedHashMap<String,Container>();
         result.putAll(unranked);
 
@@ -68,6 +64,7 @@ public class MarkovRandomField
     {
         Map<String,Map<String,Container>> res = new LinkedHashMap<String,Map<String,Container>>();
 
+
         long start= System.currentTimeMillis();
         StreamSupport.stream(query.entrySet().spliterator(),SearchCommand.isParallelEnabled())
                 .forEach(q -> {
@@ -77,9 +74,11 @@ public class MarkovRandomField
                         Map<String,Container> reranked = collectEvidences(retDoc,q.getValue());
                         res.put(q.getKey(),reranked);
                         System.out.print(".");
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+
                 });
         long end = System.currentTimeMillis();
         long timeElapsed = end-start;

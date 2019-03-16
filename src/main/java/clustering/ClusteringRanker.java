@@ -79,14 +79,13 @@ public class ClusteringRanker
         System.out.println("Time taken to run clustering on " +pointlist.size()+" Time :" + sw.getTime());
 
         List<Cluster> clsterLst = cs.getClusters();
-
+        System.out.println("Number of cluster = "+ clsterLst.size());
         System.out.println("\nCluster Centers:");
         for(Cluster c: clsterLst) {
             Point center = c.getCenter();
-            System.out.println(center.getId());
+            System.out.println(center.getId() +"Points in each cluster = "+ c.getPoints().size());
         }
     }
-
     public  void doCluster()
     {
         Map<String,Map<String,Container>> res = new LinkedHashMap<String,Map<String,Container>>();

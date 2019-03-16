@@ -165,6 +165,14 @@ public class RegisterCommands
          @Parameter(names = "--qrel-path",description ="Pass the absolute path of the Qrel")
          private String qrelPath = null;
 
+         @Parameter(names = "--rank-lib",description ="Provide path to the Ranklib")
+         private String ranklibpath = null;
+
+         public String getRanklibPath()
+         {
+             return ranklibpath;
+         }
+
          public boolean isClusterRankerEnabled()
          {
              return isClusterRankerEnabled;
@@ -362,5 +370,23 @@ public class RegisterCommands
      {
 
      }
+
+    @Parameters(separators = "=",commandDescription = "Ranker")
+    public static class Ranker
+    {
+        @Parameter(names = {"--model-file"},description = "Location of the model file",required=true)
+        private String modelFile=null;
+
+        @Parameter(names = {"--run-file"},description = "Location of the run file",required=true)
+        private String runfile=null;
+
+        @Parameter(names = {"--mname"},description = "Method name suffix")
+        private String mname="mrfupdated";
+
+        public String getModelFile(){return modelFile;}
+        public String getRunfile() {return  runfile;}
+        public String getMname(){return mname;}
+
+    }
 
 }
