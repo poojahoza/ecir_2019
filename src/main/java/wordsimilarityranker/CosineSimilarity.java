@@ -1,6 +1,7 @@
 package main.java.wordsimilarityranker;
 
 //project imports
+import main.java.commandparser.RegisterCommands;
 import main.java.containers.Container;
 import main.java.searcher.BaseBM25;
 
@@ -16,9 +17,9 @@ A class implements the abstract class SimilarityBase and returns the CosineSimil
 */
 public class CosineSimilarity extends SimilarityBase
 {
-    public CosineSimilarity(BaseBM25 bm , Map<String,String> query)
+    public CosineSimilarity(RegisterCommands.CommandSearch searchCommand, Map<String,String> query)
     {
-        super(bm,query);
+        super(searchCommand,query);
     }
 
     @Override

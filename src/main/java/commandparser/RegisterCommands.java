@@ -127,6 +127,9 @@ public class RegisterCommands
          @Parameter(names = {"--dice-sim"},description ="Rerank the document based on the Sorensen Dice coefficient similarity between two strings")
          private boolean isDiceEnabled = false;
 
+         @Parameter(names = {"--leven-sim"},description ="Rerank the document based on the NormalizedLevenshtein similarity between two strings")
+         private boolean isLevenSim = false;
+
          @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the document using Query expansion")
          private boolean isQE =false;
 
@@ -175,6 +178,8 @@ public class RegisterCommands
          @Parameter(names = "--rank-lib",description ="Provide path to the Ranklib")
          private String ranklibpath = null;
 
+
+
          public String getRanklibPath()
          {
              return ranklibpath;
@@ -184,7 +189,7 @@ public class RegisterCommands
          {
              return isClusterRankerEnabled;
          }
-
+         public boolean isLevenSimEnabled() {return isLevenSim;}
          public String getQrelPath()
          {
              return qrelPath;

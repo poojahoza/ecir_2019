@@ -105,54 +105,32 @@ public class SearchRunner implements ProgramRunner
 
         if(searchParser.isCosineSimilarityEnabled())
         {
-            BaseBM25 bm = null;
-            try {
-                 bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            CosineSimilarity cosineSimilarity = new CosineSimilarity(bm,queryCBOR);
+            CosineSimilarity cosineSimilarity = new CosineSimilarity(searchParser,queryCBOR);
             cosineSimilarity.doCosine();
         }
 
         if(searchParser.isJaccardSimilarityEnabled())
         {
-            BaseBM25 bm = null;
-            try {
-                bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            JaccardSimilarity jaccardSimilarity = new JaccardSimilarity(bm,queryCBOR);
+            JaccardSimilarity jaccardSimilarity = new JaccardSimilarity(searchParser,queryCBOR);
             jaccardSimilarity.doJaccard();
         }
 
         if(searchParser.isJaroSimilarityEnabled())
         {
-            BaseBM25 bm = null;
-            try {
-                bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            JaroWinklerSim jaroWinkler = new JaroWinklerSim(bm,queryCBOR);
+            JaroWinklerSim jaroWinkler = new JaroWinklerSim(searchParser,queryCBOR);
             jaroWinkler.doJaroWinkler();
         }
 
         if(searchParser.isDiceEnabled())
         {
-            BaseBM25 bm = null;
-            try {
-                bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            SorensenDiceCoefficient sorensenDiceCoefficient = new SorensenDiceCoefficient(bm,queryCBOR);
+            SorensenDiceCoefficient sorensenDiceCoefficient = new SorensenDiceCoefficient(searchParser,queryCBOR);
             sorensenDiceCoefficient.doSorsenCoff();
+        }
+
+        if(searchParser.isLevenSimEnabled())
+        {
+            NormalizedLevenshteinSimilarity normalizedLevenshteinSimilarity = new NormalizedLevenshteinSimilarity(searchParser,queryCBOR);
+            normalizedLevenshteinSimilarity.doNormalizedLevenshtein();
         }
 
 

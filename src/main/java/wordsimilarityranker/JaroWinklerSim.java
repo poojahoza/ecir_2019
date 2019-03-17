@@ -2,6 +2,7 @@ package main.java.wordsimilarityranker;
 
 
 import info.debatty.java.stringsimilarity.JaroWinkler;
+import main.java.commandparser.RegisterCommands;
 import main.java.containers.Container;
 import main.java.searcher.BaseBM25;
 import main.java.utils.RunWriter;
@@ -10,9 +11,9 @@ import java.util.Map;
 
 public class JaroWinklerSim extends SimilarityBase
 {
-    public JaroWinklerSim(BaseBM25 bm , Map<String,String> query)
+    public JaroWinklerSim(RegisterCommands.CommandSearch searchCommand, Map<String,String> query)
     {
-        super(bm,query);
+        super(searchCommand,query);
     }
 
     @Override

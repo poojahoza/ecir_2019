@@ -1,5 +1,6 @@
 package main.java.wordsimilarityranker;
 
+import main.java.commandparser.RegisterCommands;
 import main.java.containers.Container;
 import main.java.searcher.BaseBM25;
 import main.java.utils.PreProcessor;
@@ -9,18 +10,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 
 /*
 A Base class which implements all functionality.
 */
 abstract  public class SimilarityBase
 {
-    private  BaseBM25 bm = null;
+    private  RegisterCommands.CommandSearch Searchcommand = null;
     private Map<String,String> query = null;
 
-    SimilarityBase(BaseBM25 bm, Map<String,String> query)
+    SimilarityBase(RegisterCommands.CommandSearch Searchcommand, Map<String,String> query)
     {
-        this.bm = bm;
+        this.Searchcommand = Searchcommand;
         this.query = query;
     }
 
@@ -33,7 +35,7 @@ abstract  public class SimilarityBase
     This will perform the re-rank for each query candidate set.
     */
 
-    private Map<String, Container> performRankerOnCandidate(String Query, Map<String, Container> candidate) {
+    private Map<String, Container> performRankerOnCandidate(String Query, Map<String, Container> candidate,BaseBM25 bm) {
 
         //if the map has only one value, return as-is
         if(candidate.size()<2) return candidate;
@@ -77,20 +79,43 @@ abstract  public class SimilarityBase
         For each query, it retrieves the initial BM25 candidate sets and calls performRankerOnCandidate to rerank
         based on the String similarity.
     */
+//    protected Map<String,Map<String,Container>>  performReRank()
+//    {
+//        Map<String,Container> candidate = null;
+//        Map<String,Container> candidateRanked = null;
+//
+//        Map<String,Map<String,Container>> result = new LinkedHashMap<>();
+//
+//        for(Map.Entry<String,String> Q: query.entrySet())
+//        {
+//            String query = Q.getValue();
+//            candidate = bm.getRanking(query);
+//            candidateRanked = performRankerOnCandidate(query,candidate);
+//            result.put(Q.getKey(),candidateRanked);
+//        }
+//        return result;
+//    }
+
     protected Map<String,Map<String,Container>>  performReRank()
     {
-        Map<String,Container> candidate = null;
-        Map<String,Container> candidateRanked = null;
 
         Map<String,Map<String,Container>> result = new LinkedHashMap<>();
 
-        for(Map.Entry<String,String> Q: query.entrySet())
-        {
-            String query = Q.getValue();
-            candidate = bm.getRanking(query);
-            candidateRanked = performRankerOnCandidate(query,candidate);
-            result.put(Q.getKey(),candidateRanked);
-        }
+        StreamSupport.stream(query.entrySet().spliterator(),Searchcommand.isParallelEnabled())
+                .forEach(q -> {
+                    try {
+                        BaseBM25 bm = new BaseBM25(Searchcommand.getkVAL(),Searchcommand.getIndexlocation());
+                        Map<String,Container> candidateRanked = performRankerOnCandidate(q.getValue(),bm.getRanking(q.getValue()),bm);
+                        result.put(q.getKey(),candidateRanked);
+                        System.out.print(".");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+
         return result;
     }
+
+
+
 }
