@@ -161,7 +161,16 @@ public class RegisterCommands
          private boolean isEntityDocSimEnabled = false;
 
          @Parameter(names = "--spam-filter",description ="Uses the spam filter before performing the re-rank")
-         private boolean isSpamFilterEnabled = false;
+         private static boolean isSpamFilterEnabled = false;
+
+
+         @Parameter(names = {"--spam-loc"}, description = "Directory to spam train file")
+         private static String spamLocation = null;
+
+
+         @Parameter(names = {"--ham-loc"}, description = "Directory to ham train file")
+         private static String hamLocation = null;
+
 
          @Parameter(names = "--parallel",description ="Uses the parallel stream for the reranker methods")
          private boolean isParallelEnabled = false;
@@ -196,9 +205,17 @@ public class RegisterCommands
          }
          public boolean isMrfEnabled() {return  isMrfEnabled;}
          public boolean isParallelEnabled(){return isParallelEnabled;}
-         public boolean isSpamFilterEnabled()
+         public static boolean isSpamFilterEnabled()
          {
              return isSpamFilterEnabled;
+         }
+         public static String SpamLocation()
+         {
+             return spamLocation;
+         }
+         public static String hamLocation()
+         {
+             return hamLocation;
          }
          public boolean isArticleEnabled()
          {

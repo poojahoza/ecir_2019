@@ -32,7 +32,7 @@ public class SpamClassifier {
     /* This constructor should be invoked if the user doesn't have seperate ham/spam test data and just wants to
      * classify their documents as ham or spam.
      */
-    SpamClassifier() {
+    public SpamClassifier() {
         labels = new HashMap<>();
     }
 
@@ -192,6 +192,26 @@ public class SpamClassifier {
         return labels;
     }
 
+    public boolean isSpam(LabelPredictor predictor,  String text ) {
+        List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+        String prediction = predictor.predict(tokens);
+        switch (prediction.toLowerCase()){
+            case "ham":
+            {
+                return false;
+            }
+            case "spam":
+            {
+                return true;
+
+            }
+            default :
+            {
+                // if we did not clarify if it is spam or ham then it is ham
+                return true;
+            }
+        }
+    }
     /*
      * The user can evaluate their predictor if they have ham and spam test data.
      */
