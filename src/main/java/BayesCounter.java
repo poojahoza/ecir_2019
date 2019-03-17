@@ -1,8 +1,20 @@
 package main.java;
 
+import main.java.evaluators.F1Evaluator;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.document.Document;
+
+import javax.print.Doc;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.annotation.Documented;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static main.java.utils.SearchUtils.createTokenList;
 
 public class BayesCounter {
 
@@ -13,6 +25,118 @@ public class BayesCounter {
 
     public BayesCounter() {
         bayesMap = new HashMap<>();
+    }
+
+    public void evaluateUnigramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
+
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
+
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (String key: docs.keySet()) {
+            String text = docs.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            String label = this.classify(tokens);
+            calledLabels.put(key, label);
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (String key: docs.keySet()) {
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
+            }
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
+    }
+
+    public void evaluateBigramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
+
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
+
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (String key: docs.keySet()) {
+            String text = docs.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            String label = this.classifyWithBigrams(tokens);
+            calledLabels.put(key, label);
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (String key: docs.keySet()) {
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
+            }
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
+    }
+
+    public void evaluateTrgramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
+
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
+
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (String key: docs.keySet()) {
+            String text = docs.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            String label = this.classifyWithTrigrams(tokens);
+            calledLabels.put(key, label);
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (String key: docs.keySet()) {
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
+            }
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
+    }
+
+    public void evaluateQuadgramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
+
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
+
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (String key: docs.keySet()) {
+            String text = docs.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            String label = this.classifyWithQuadgrams(tokens);
+            calledLabels.put(key, label);
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (String key: docs.keySet()) {
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
+            }
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
     }
 
     /**
@@ -26,7 +150,7 @@ public class BayesCounter {
     public void buildHashMap(String docClass, List<String> tokens) {
 
         if (bayesMap.get(docClass) == null) {
-            HashMap<String, Integer> classMap = new HashMap();
+            HashMap<String, Integer> classMap = new HashMap<>();
             bayesMap.put(docClass, classMap);
         }
 
@@ -54,6 +178,25 @@ public class BayesCounter {
 
         HashMap<String, Integer> spamDist = bayesMap.get("spam");
         HashMap<String, Integer> hamDist = bayesMap.get("ham");
+
+
+        // The following block tells me that I'm hardly getting any ham. Spam tokens take up 99% of the document.
+        /*try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("/home/rachel/grad_courses/data_science/dump/", true));
+            writer.write("++++++++ SPAM COUNTS ++++++++\n\n");
+            for (String key: spamDist.keySet()) {
+                writer.write(key + '\t' + spamDist.get(key) + '\n');
+            }
+            writer.write("++++++++ HAM COUNTS ++++++++\n\n");
+            for (String key: hamDist.keySet()) {
+                writer.write(key + '\t' + hamDist.get(key) + '\n');
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+
+
 
         double hamScore = 0;
         double spamScore = 0;
