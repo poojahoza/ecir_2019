@@ -27,6 +27,7 @@ public class SpamClassifierDemo {
         LabelPredictor bigramsPredictor = sc.classifyWithBigrams(spamTrain, hamTrain);
         LabelPredictor trigramsPredictor = sc.classifyWithTrigrams(spamTrain, hamTrain);
         LabelPredictor quadgramsPredictor = sc.classifyWithQuadgrams(spamTrain, hamTrain);
+        LabelPredictor stopCoverPredictor = sc.classifyWithStopCover(spamTrain, hamTrain);
 
         System.out.println("\n++++++++ UNIGRAMS ++++++++");
         unigramsPredictor.evaluate(spamTest, hamTest, test);
@@ -39,6 +40,9 @@ public class SpamClassifierDemo {
 
         System.out.println("\n++++++++ QUADGRAMS ++++++++");
         quadgramsPredictor.evaluate(spamTest, hamTest, test);
+
+        System.out.println("\n++++++++ STOP COVERAGE ++++++++");
+        stopCoverPredictor.evaluate(spamTest, hamTest, test);
 
     }
 }

@@ -25,7 +25,8 @@ import static main.java.utils.SearchUtils.createTokenList;
  *      HashMap<String, String> labels = sc.predict(lp, test);
  *
  */
-public class SpamClassifier {
+public class
+SpamClassifier {
 
     private HashMap<String, String> labels;
 
@@ -170,6 +171,33 @@ public class SpamClassifier {
         }
 
         return quadgramsPredictor;
+
+    }
+
+    /**
+     * Desc: Train a NaiveBayesQuadgramPredictor.
+     *
+     * @param spamCorpus the training set of spam documents.
+     * @param hamCorpus the training set of ham documents.
+     */
+    public LabelPredictor classifyWithStopCover(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
+
+        LabelPredictor stopCoverPredictor = new StopCoveragePredictor();
+        HashMap<String, String> test = null;
+
+        for (String key : spamCorpus.keySet()) {
+            String text = spamCorpus.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            stopCoverPredictor.trainSpamTokens(tokens);
+        }
+
+        for (String key: hamCorpus.keySet()) {
+            String text = hamCorpus.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            stopCoverPredictor.trainHamTokens(tokens);
+        }
+
+        return stopCoverPredictor;
 
     }
 

@@ -2,19 +2,14 @@ package main.java;
 
 import main.java.evaluators.F1Evaluator;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
-import org.apache.lucene.document.Document;
+import weka.core.stopwords.StopwordsHandler;
 
-import javax.print.Doc;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.annotation.Documented;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import static main.java.utils.SearchUtils.createTokenList;
+import static weka.core.Stopwords.isStopword;
 
 public class BayesCounter {
 
@@ -22,9 +17,39 @@ public class BayesCounter {
      * Makes a new BayesCounter with empty hash map.
      */
     public final HashMap<String, HashMap<String, Integer>> bayesMap;
+    public final HashMap<String, ArrayList<Double>> stopWordMap;
 
     public BayesCounter() {
         bayesMap = new HashMap<>();
+        stopWordMap = new HashMap<>();
+    }
+
+    public void evaluateStopCoverPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
+
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
+
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (String key: docs.keySet()) {
+            String text = docs.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            String label = this.classifyWithStopCover(tokens);
+            calledLabels.put(key, label);
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (String key: docs.keySet()) {
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
+            }
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
     }
 
     public void evaluateUnigramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
@@ -178,25 +203,6 @@ public class BayesCounter {
 
         HashMap<String, Integer> spamDist = bayesMap.get("spam");
         HashMap<String, Integer> hamDist = bayesMap.get("ham");
-
-
-        // The following block tells me that I'm hardly getting any ham. Spam tokens take up 99% of the document.
-        /*try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("/home/rachel/grad_courses/data_science/dump/", true));
-            writer.write("++++++++ SPAM COUNTS ++++++++\n\n");
-            for (String key: spamDist.keySet()) {
-                writer.write(key + '\t' + spamDist.get(key) + '\n');
-            }
-            writer.write("++++++++ HAM COUNTS ++++++++\n\n");
-            for (String key: hamDist.keySet()) {
-                writer.write(key + '\t' + hamDist.get(key) + '\n');
-            }
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-
 
         double hamScore = 0;
         double spamScore = 0;
@@ -493,6 +499,95 @@ public class BayesCounter {
             String quadgram = tokens.get(i) + tokens.get(i + 1) + tokens.get(i + 2) + tokens.get(i + 3);
             spamScore += Math.log(spamDist.getOrDefault(quadgram, 1));
             hamScore += Math.log(hamDist.getOrDefault(quadgram, 1));
+        }
+
+        scores.add(hamScore);
+        scores.add(spamScore);
+        return scores;
+    }
+
+
+    public void buildStopWordHashMap(String docClass, List<String> tokens) {
+
+        if (stopWordMap.get(docClass) == null) {
+            ArrayList<Double> classList = new ArrayList<>();
+            stopWordMap.put(docClass, classList);
+        }
+
+        ArrayList<Double> curList = stopWordMap.get(docClass);
+        // Get the stop coverage for each document in the ham and spam sets.
+        double stop = 0;
+        double total = 0;
+
+        for (String token : tokens) {
+            if (isStopword(token)) {
+                stop++;
+            }
+            total++;
+        }
+
+        double result = (stop / total) * 100;
+        curList.add(result);
+    }
+
+    /**
+     * Desc: Parse the tokens of the document passed as a parameter and get the number of stopwords and non stopwords.
+     *       This function is for evaluation and should therefore be called on the evaluation set of emails.
+     *
+     * @param tokens List of tokens in the document.
+     * @return The document class with the larger count.
+     */
+    public String classifyWithStopCover(List<String> tokens) {
+
+        ArrayList<Double> spamDist = stopWordMap.get("spam");
+        ArrayList<Double> hamDist = stopWordMap.get("ham");
+
+        // Get the average number of stopwords for spam and ham training
+        double sum = 0;
+        for (int i = 0; i < spamDist.size(); i++) {
+            sum += spamDist.get(i);
+        }
+        double spamAverage = sum/spamDist.size();
+
+        sum = 0;
+        for (int i = 0; i < hamDist.size(); i++) {
+            sum += hamDist.get(i);
+        }
+        double hamAverage = sum/hamDist.size();
+
+        double stop = 0;
+        double total = 0;
+
+        for (String token : tokens) {
+            if (isStopword(token)) {
+                stop++;
+            }
+            total++;
+        }
+
+        double result = (stop / total) * 100;
+
+        if (Math.abs(spamAverage - result) < Math.abs(hamAverage - result)) {
+            return "ham";
+        }
+        else {
+            return "spam";
+        }
+    }
+
+    public ArrayList<Double> getStopCoverScores(List<String> tokens) {
+
+        HashMap<String, Integer> spamDist = bayesMap.get("spam");
+        HashMap<String, Integer> hamDist = bayesMap.get("ham");
+        ArrayList<Double> scores = new ArrayList<>();
+
+        double hamScore = 0;
+        double spamScore = 0;
+
+        for (String token : tokens) {
+            //String quadgram = tokens.get(i) + tokens.get(i + 1) + tokens.get(i + 2) + tokens.get(i + 3);
+            spamScore += Math.log(spamDist.getOrDefault(token, 1));
+            hamScore += Math.log(hamDist.getOrDefault(token, 1));
         }
 
         scores.add(hamScore);
