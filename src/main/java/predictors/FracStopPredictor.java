@@ -2,15 +2,16 @@ package main.java.predictors;
 
 import main.java.BayesCounter;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class StopCoveragePredictor extends LabelPredictor{
+public class FracStopPredictor extends LabelPredictor{
 
     private BayesCounter bc = new BayesCounter();
 
-    public StopCoveragePredictor() {
+    public FracStopPredictor() {
         super();
     }
 
@@ -20,7 +21,11 @@ public class StopCoveragePredictor extends LabelPredictor{
      * @param tokens List of tokens in the document
      */
     public void trainHamTokens(List<String> tokens) {
-        bc.buildStopWordHashMap("ham", tokens);
+        try {
+            bc.buildFracStopHashMap("ham", tokens);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -29,7 +34,11 @@ public class StopCoveragePredictor extends LabelPredictor{
      * @param tokens List of tokens in the document
      */
     public void trainSpamTokens(List<String> tokens) {
-        bc.buildStopWordHashMap("spam", tokens);
+        try {
+            bc.buildFracStopHashMap("spam", tokens);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -40,7 +49,13 @@ public class StopCoveragePredictor extends LabelPredictor{
      * @return String The label ("spam" or "ham") that is predicted given the document  tokens
      */
     public String predict(List<String> tokens) {
-        return bc.classifyWithStopCover(tokens);
+        String label = null;
+        try {
+            label =  bc.classifyWithFracStops(tokens);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return label;
     }
 
     /**
@@ -49,7 +64,7 @@ public class StopCoveragePredictor extends LabelPredictor{
      * @param tokens List of tokens in the document
      * @return ArrayList The ham and spam scores of the given document tokens
      */
-     public ArrayList<Double> score(List<String> tokens) {
+    public ArrayList<Double> score(List<String> tokens) {
         return null;
     }
 
@@ -61,7 +76,10 @@ public class StopCoveragePredictor extends LabelPredictor{
      * @param docs of mixed ham and spam documents mapping their pids to their text.
      */
     public void evaluate(HashMap<String, String> spam, HashMap<String, String> ham, HashMap<String, String> docs) {
-        bc.evaluateStopCoverPredictor(spam, ham, docs);
+        try {
+            bc.evaluateFracStopPredictor(spam, ham, docs);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
-

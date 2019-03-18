@@ -201,6 +201,33 @@ SpamClassifier {
 
     }
 
+    /**
+     * Desc: Train a NaiveBayesQuadgramPredictor.
+     *
+     * @param spamCorpus the training set of spam documents.
+     * @param hamCorpus the training set of ham documents.
+     */
+    public LabelPredictor classifyWithFracStops(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
+
+        LabelPredictor fracStopPredictor = new FracStopPredictor();
+        HashMap<String, String> test = null;
+
+        for (String key : spamCorpus.keySet()) {
+            String text = spamCorpus.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            fracStopPredictor.trainSpamTokens(tokens);
+        }
+
+        for (String key: hamCorpus.keySet()) {
+            String text = hamCorpus.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            fracStopPredictor.trainHamTokens(tokens);
+        }
+
+        return fracStopPredictor;
+
+    }
+
 
     /**
      * Desc: Test the trained predictor.

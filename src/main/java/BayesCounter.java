@@ -4,9 +4,12 @@ import main.java.evaluators.F1Evaluator;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import weka.core.stopwords.StopwordsHandler;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 
 import static main.java.utils.SearchUtils.createTokenList;
 import static weka.core.Stopwords.isStopword;
@@ -34,6 +37,34 @@ public class BayesCounter {
             String text = docs.get(key);
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
             String label = this.classifyWithStopCover(tokens);
+            calledLabels.put(key, label);
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (String key: docs.keySet()) {
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
+            }
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
+    }
+
+    public void evaluateFracStopPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) throws FileNotFoundException {
+
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
+
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (String key: docs.keySet()) {
+            String text = docs.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            String label = this.classifyWithFracStops(tokens);
             calledLabels.put(key, label);
         }
 
@@ -575,7 +606,7 @@ public class BayesCounter {
         }
     }
 
-    public ArrayList<Double> getStopCoverScores(List<String> tokens) {
+    public ArrayList<Double> getFracStopScores(List<String> tokens) {
 
         HashMap<String, Integer> spamDist = bayesMap.get("spam");
         HashMap<String, Integer> hamDist = bayesMap.get("ham");
@@ -593,5 +624,82 @@ public class BayesCounter {
         scores.add(hamScore);
         scores.add(spamScore);
         return scores;
+    }
+
+    public void buildFracStopHashMap(String docClass, List<String> tokens) throws FileNotFoundException {
+
+        // Get list of the most common stopwords
+        ArrayList<String> stopwords = new ArrayList<>();
+        Scanner s = new Scanner(new File("/home/rachel/grad_courses/data_science/cs953-team1/stopwords"));
+        while (s.hasNext()) {
+            stopwords.add(s.next());
+        }
+        s.close();
+
+        if (stopWordMap.get(docClass) == null) {
+            ArrayList<Double> classList = new ArrayList<>();
+            stopWordMap.put(docClass, classList);
+        }
+
+        ArrayList<Double> curList = stopWordMap.get(docClass);
+        // Get the stop coverage for each document in the ham and spam sets.
+        double stop = 0;
+        double total = 0;
+
+        for (String token : tokens) {
+            if (stopwords.contains(token)) {
+                stop++;
+            }
+            total++;
+        }
+
+        double result = (stop / total) * 100;
+        curList.add(result);
+    }
+
+    public String classifyWithFracStops(List<String> tokens) throws FileNotFoundException {
+
+        // Get list of the most common stopwords
+        ArrayList<String> stopwords = new ArrayList<>();
+        Scanner s = new Scanner(new File("stopwords"));
+        while (s.hasNext()) {
+            stopwords.add(s.next());
+        }
+        s.close();
+
+        ArrayList<Double> spamDist = stopWordMap.get("spam");
+        ArrayList<Double> hamDist = stopWordMap.get("ham");
+
+        // Get the average number of stopwords for spam and ham training
+        double sum = 0;
+        for (int i = 0; i < spamDist.size(); i++) {
+            sum += spamDist.get(i);
+        }
+        double spamAverage = sum/spamDist.size();
+
+        sum = 0;
+        for (int i = 0; i < hamDist.size(); i++) {
+            sum += hamDist.get(i);
+        }
+        double hamAverage = sum/hamDist.size();
+
+        double stop = 0;
+        double total = 0;
+
+        for (String token : tokens) {
+            if (stopwords.contains(token)) {
+                stop++;
+            }
+            total++;
+        }
+
+        double result = (stop / total) * 100;
+
+        if (Math.abs(spamAverage - result) < Math.abs(hamAverage - result)) {
+            return "ham";
+        }
+        else {
+            return "spam";
+        }
     }
 }
