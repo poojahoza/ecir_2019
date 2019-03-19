@@ -16,6 +16,7 @@ import main.java.graph.GraphDegreeConstructor;
 import main.java.wordsimilarityranker.*;
 import org.jgrapht.Graph;
 import main.java.queryexpansion.QueryExpansion;
+import main.java.entityrelation.FeatureGenerator;
 
 
 import java.io.IOException;
@@ -239,6 +240,29 @@ public class SearchRunner implements ProgramRunner
 
             }catch (IOException ioe){
                 System.out.println(ioe.getMessage());
+            }
+        }
+
+        if(searchParser.isEntityRelationEnabled()){
+            validate.ValidateEntityDegree();
+
+            try {
+                Map<String,String> querysecCBOR = SearchUtils.readOutlineSectionPath(searchParser.getQueryfile());
+
+                BaseBM25 bm25 = new BaseBM25(searchParser.getkVAL(), searchParser.getIndexlocation());
+                Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(querysecCBOR);
+
+                Entities e = new Entities();
+                Map<String, Map<String, String>> query_ent_list = e.getSortedEntitiesPerQuery(bm25_ranking);
+
+                FeatureGenerator featuregenerator = new FeatureGenerator();
+                Map<String, Map<String, Double[]>> featureVectors = featuregenerator.getNormalizedFeatureVectors(query_ent_list, bm25_ranking);
+
+                WriteFile write_file = new WriteFile();
+                write_file.generateFeatureVectorRunFile(featureVectors, "feature_vectors");
+
+            }catch (IOException ioe){
+                ioe.printStackTrace();
             }
         }
 
