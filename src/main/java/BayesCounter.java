@@ -1,6 +1,7 @@
 package main.java;
 
 import main.java.evaluators.F1Evaluator;
+import main.java.evaluators.MAPEvaluator;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import weka.core.stopwords.StopwordsHandler;
 
@@ -53,6 +54,10 @@ public class BayesCounter {
         F1Evaluator f1 = new F1Evaluator(trueLabels);
         double f1Score = f1.evaluateCalledLabels(calledLabels);
         System.out.println("F1 score: " + f1Score);
+
+        MAPEvaluator map = new MAPEvaluator(trueLabels);
+        double MAPScore = map.evaluateCalledLabels(calledLabels);
+        System.out.println("MAP: " + MAPScore);
     }
 
     public void evaluateFracStopPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) throws FileNotFoundException {
@@ -81,6 +86,10 @@ public class BayesCounter {
         F1Evaluator f1 = new F1Evaluator(trueLabels);
         double f1Score = f1.evaluateCalledLabels(calledLabels);
         System.out.println("F1 score: " + f1Score);
+
+        MAPEvaluator map = new MAPEvaluator(trueLabels);
+        double MAPScore = map.evaluateCalledLabels(calledLabels);
+        System.out.println("MAP: " + MAPScore);
     }
 
     public void evaluateUnigramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
@@ -109,6 +118,10 @@ public class BayesCounter {
         F1Evaluator f1 = new F1Evaluator(trueLabels);
         double f1Score = f1.evaluateCalledLabels(calledLabels);
         System.out.println("F1 score: " + f1Score);
+
+        MAPEvaluator map = new MAPEvaluator(trueLabels);
+        double MAPScore = map.evaluateCalledLabels(calledLabels);
+        System.out.println("MAP: " + MAPScore);
     }
 
     public void evaluateBigramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
@@ -137,6 +150,10 @@ public class BayesCounter {
         F1Evaluator f1 = new F1Evaluator(trueLabels);
         double f1Score = f1.evaluateCalledLabels(calledLabels);
         System.out.println("F1 score: " + f1Score);
+
+        MAPEvaluator map = new MAPEvaluator(trueLabels);
+        double MAPScore = map.evaluateCalledLabels(calledLabels);
+        System.out.println("MAP: " + MAPScore);
     }
 
     public void evaluateTrgramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
@@ -165,6 +182,10 @@ public class BayesCounter {
         F1Evaluator f1 = new F1Evaluator(trueLabels);
         double f1Score = f1.evaluateCalledLabels(calledLabels);
         System.out.println("F1 score: " + f1Score);
+
+        MAPEvaluator map = new MAPEvaluator(trueLabels);
+        double MAPScore = map.evaluateCalledLabels(calledLabels);
+        System.out.println("MAP: " + MAPScore);
     }
 
     public void evaluateQuadgramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
@@ -193,6 +214,10 @@ public class BayesCounter {
         F1Evaluator f1 = new F1Evaluator(trueLabels);
         double f1Score = f1.evaluateCalledLabels(calledLabels);
         System.out.println("F1 score: " + f1Score);
+
+        MAPEvaluator map = new MAPEvaluator(trueLabels);
+        double MAPScore = map.evaluateCalledLabels(calledLabels);
+        System.out.println("MAP: " + MAPScore);
     }
 
     /**
