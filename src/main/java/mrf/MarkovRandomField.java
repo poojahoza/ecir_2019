@@ -48,10 +48,12 @@ public class MarkovRandomField
         List<ArrayList<Double>> collective = Evidences.collectiveEvidence(unranked,embedding,SearchCommand.getDimension(),queryVal,SearchCommand.getIndexlocation(),
                 SearchCommand.getkVAL());
 
-        for(ArrayList<Double> val:collective)
-        {
-            MrfHelper.updatescores(result,Normalize.getZScoreNormalized(val));
-        }
+//        for(ArrayList<Double> val:collective)
+//        {
+//            MrfHelper.updatescores(result,Normalize.getZScoreNormalized(val));
+//        }
+
+        MrfHelper.updateCollectiveScores(unranked,collective);
 
         ans = Evidences.evidence3(unranked,embedding,SearchCommand.getDimension(),queryVal,SearchCommand.getIndexlocation(),
                 SearchCommand.getkVAL());

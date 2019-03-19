@@ -13,6 +13,7 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static main.java.utils.RunWriter.checkDir;
@@ -54,6 +55,23 @@ public  class MrfHelper
         for(Map.Entry<String,Container> val: res.entrySet())
         {
             val.getValue().addScores(fet.get(index));
+            index++;
+        }
+    }
+
+    static void updateCollectiveScores(Map<String,Container> res, List<ArrayList<Double>> fet)
+    {
+        int index =0;
+        if(res.size()!= fet.get(0).size())
+        {
+            System.out.println("Mismatch in the size, something wrong");
+            System.exit(-1);
+        }
+
+        for(Map.Entry<String,Container> val: res.entrySet())
+        {
+            val.getValue().addScores(fet.get(0).get(index));
+            val.getValue().addScores(fet.get(1).get(index));
             index++;
         }
     }

@@ -66,8 +66,7 @@ public class Evidences
         ArrayList<Double> bmScore = new ArrayList<>();
         ArrayList<Double> qdScore = new ArrayList<>();
 
-        collective.add(bmScore);
-        collective.add(qdScore);
+
 
         BaseBM25 bm = null;
         try {
@@ -86,7 +85,11 @@ public class Evidences
             Double cosScore = Transforms.cosineDistance(queryVector,doc);
             qdScore.add(cosScore);
         }
-            return collective;
+
+        collective.add(Normalize.getZScoreNormalized(bmScore));
+        collective.add(Normalize.getZScoreNormalized(qdScore));
+
+        return collective;
     }
 
     /*
