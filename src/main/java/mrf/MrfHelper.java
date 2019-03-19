@@ -232,7 +232,6 @@ public  class MrfHelper
         }
 
     }
-
     /*
        This is the helper method for the evidence 3
     */

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -36,8 +37,7 @@ public class Evidences
         Each document is build using embedding vector of some dimension
 
     */
-     static ArrayList<Double> evidence2(Map<String, Container> list, EmbeddingStrategy embedding,Integer Dimension,String Query,String
-                                              indexLoc,Integer kval)
+     static ArrayList<Double> evidence2(Map<String, Container> list, EmbeddingStrategy embedding,Integer Dimension,String Query,String indexLoc,Integer kval)
     {
         ArrayList<Double> res = new ArrayList<Double>();
         BaseBM25 bm = null;
@@ -57,6 +57,36 @@ public class Evidences
             res.add(Transforms.cosineDistance(queryVector,doc));
         }
         return Normalize.getZScoreNormalized(res);
+    }
+
+    static  List<ArrayList<Double>> collectiveEvidence(Map<String, Container> list, EmbeddingStrategy embedding,Integer Dimension,String Query,String indexLoc,Integer kval)
+    {
+        List<ArrayList<Double>> collective = new ArrayList<ArrayList<Double>>(2);
+
+        ArrayList<Double> bmScore = new ArrayList<>();
+        ArrayList<Double> qdScore = new ArrayList<>();
+
+        collective.add(bmScore);
+        collective.add(qdScore);
+
+        BaseBM25 bm = null;
+        try {
+            bm = new BaseBM25(kval,indexLoc);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        INDArray queryVector = MrfHelper.getVector(Query,embedding,Dimension);
+
+        for(Map.Entry<String,Container> val: list.entrySet())
+        {
+            bmScore.add(val.getValue().getScore());
+            int DocID = val.getValue().getDocID();
+            INDArray doc = MrfHelper.getVector(bm.getDocument(DocID),embedding,Dimension);
+            Double cosScore = Transforms.cosineDistance(queryVector,doc);
+            qdScore.add(cosScore);
+        }
+            return collective;
     }
 
     /*

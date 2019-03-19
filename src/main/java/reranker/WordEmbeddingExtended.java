@@ -1,40 +1,37 @@
 package main.java.reranker;
 
 import main.java.rerankerv2.concepts.EmbeddingStrategy;
-import main.java.utils.PreProcessor;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
-
 import java.io.*;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /*
-Class that Holds the Word Embeddings vectors.
+    This class implements the standard Analyzer
 */
-
-public class WordEmbedding extends EmbeddingStrategy
+public class WordEmbeddingExtended extends EmbeddingStrategy
 {
     private Map<String, INDArray> word = null;
     private Integer dimension=0;
     private String embeddingFile=null;
 
-    public WordEmbedding(Integer dimension,String embeddingFile)
+
+    public WordEmbeddingExtended(Integer dimension,String embeddingFile)
     {
         this.dimension =dimension;
         this.embeddingFile=embeddingFile;
         word = readWordVectors();
     }
 
-    private  String processedTerm(String content) throws IOException
+    private String processedTerm(String content) throws IOException
     {
-        EnglishAnalyzer analyzer = new EnglishAnalyzer();
+        StandardAnalyzer analyzer = new StandardAnalyzer();
         TokenStream tokenStream = analyzer.tokenStream("Text", new StringReader(content));
         try {
             tokenStream.reset();
@@ -47,7 +44,6 @@ public class WordEmbedding extends EmbeddingStrategy
         }
         return token;
     }
-
 
     private Map<String, INDArray> readWordVectors()
     {
@@ -79,7 +75,7 @@ public class WordEmbedding extends EmbeddingStrategy
                 float[] temp=new float[dimension];
                 for(int i=0;i < dimension ;i++)
                 {
-                        temp[i] = Float.parseFloat(vec[i+1]);
+                    temp[i] = Float.parseFloat(vec[i+1]);
                 }
 
                 String term = processedTerm(vec[0]);
@@ -93,7 +89,7 @@ public class WordEmbedding extends EmbeddingStrategy
     }
 
 
-   public void DisplayWordEmbeddings(int countval)
+    public void DisplayWordEmbeddings(int countval)
     {
         int count=0;
         for(Map.Entry<String,INDArray> outer:word.entrySet())
@@ -111,42 +107,6 @@ public class WordEmbedding extends EmbeddingStrategy
         }
     }
 
-    private INDArray buildVector(ArrayList<String> processed)
-    {
-        int _number_of_terms=0;
-        INDArray res = Nd4j.create(dimension); //Create the Dimension vector
-        for(String str:processed)
-        {
-            if(getWordEmbeddingVector(str)!= null)
-            {
-                _number_of_terms++;
-                INDArray temp = getWordEmbeddingVector(str);
-                res = res.add(temp);
-            }
-        }
-        return res.div(_number_of_terms); //Taking the mean of the vector
-    }
-
-    /*
-        Given two strings, it gives the Similarity based on the word vectors.
-    */
-    @Deprecated
-    public Double getSimilarity(String para1, String para2)
-    {
-        ArrayList<String> para1List = PreProcessor.processDocument(para1);
-        ArrayList<String> para2List = PreProcessor.processDocument(para2);
-        return Transforms.cosineSim(buildVector(para1List),buildVector(para2List));
-    }
-
-
-    public INDArray getWordEmbeddingVector(String wordEmbedding)
-    {
-        if(word.containsKey(wordEmbedding.toLowerCase()))
-        {
-            return word.get(wordEmbedding);
-        }
-        return null;
-    }
 
     @Override
     public INDArray getEmbeddingVector(String token) {
@@ -157,6 +117,9 @@ public class WordEmbedding extends EmbeddingStrategy
         return null;
     }
 
+    /*
+        This shoulmd return the score between two string
+    */
     public Double getScore(String str1,String str2)
     {
         if(word.containsKey(str1) && word.containsKey(str2))

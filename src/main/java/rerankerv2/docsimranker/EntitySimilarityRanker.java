@@ -33,14 +33,12 @@ public class EntitySimilarityRanker  extends SimilarityRankerBase
         return null;
     }
 
-    public void lead(List<String> ll)
-    {
-        for(String str:ll)
-        {
+    public void lead(List<String> ll) {
+        for (String str : ll) {
             System.out.println(ebs.getAbstract(str));
         }
-    }
 
+    }
 
     public void doEntityReRank()
     {
