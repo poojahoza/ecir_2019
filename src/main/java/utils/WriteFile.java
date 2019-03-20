@@ -151,20 +151,15 @@ public class WriteFile {
             if(qrel_entities == null){
                 continue;
             }
-            System.out.println(m.getKey()+" "+m.getValue().size());
             for(Map.Entry<String, Double[]> n: m.getValue().entrySet())
             {
                 String relevancy = "0";
-                System.out.println(m.getKey()+" "+m.getValue().size());
-                System.out.println("====="+n.getKey()+"=====");
-                System.out.println("============="+qrel_entities+"===========");
                 /*
                 * Handle this patch at the time of feature vectors generation
                 * */
                 if(n.getKey().equals("")){
                     continue;
                 }
-                System.out.println(qrel_entities.containsKey(n.getKey()));
                 if(qrel_entities.containsKey(n.getKey())){
                     relevancy = "1";
                 }
