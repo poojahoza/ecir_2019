@@ -8,7 +8,7 @@ public class DBSettings {
 
     public static final String HOST_NAME = "localhost";
     public static final Integer PORT = 27017;
-    public static MongoClient mongoClient = null;
-    public static DB mongoDB = null;
-    public static DBCollection mongoCollection = null;
+    public static MongoClient mongoClient = new MongoClient(HOST_NAME, PORT);
+    public static DB mongoDB = mongoClient.getDB("test");
+    public static DBCollection mongoCollection = mongoDB.getCollection("entityIndex");
 }
