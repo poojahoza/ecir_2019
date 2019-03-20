@@ -209,12 +209,15 @@ public class BaseBM25 extends BaseSearcher
         return bigramsPredictor;
     }
 
-    public Map<String, Container> getRankingApplyingSpam1(String query)
+    public Map<String, Container> getRankingExactNumber(String query)
     {
         // return the same number as k input
         Map<String,Container> temp;
         Map<String,Container> tempSpam = new LinkedHashMap<>();
         int countOfSpam = 0;
+
+        LabelPredictor LP = createPredictor();
+        SpamClassifier sc = new SpamClassifier();
 
         TopDocs topDocuments = null;
         do  {
@@ -231,9 +234,6 @@ public class BaseBM25 extends BaseSearcher
             ScoreDoc[] scoringDocuments = topDocuments.scoreDocs;
 
             temp = new LinkedHashMap<>();
-
-            LabelPredictor  LP = createPredictor();
-            SpamClassifier sc = new SpamClassifier();
 
             for (ScoreDoc s : scoringDocuments) {
                 Document rankedDoc = null;
