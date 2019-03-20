@@ -90,6 +90,37 @@ public class ValidateCommands
             }
         }
 
+        public void ValidateEntityRelation()
+        {
+            if(searchParser.getEntityIndLoc() == null)
+            {
+                System.out.println("Please pass the entity index location path");
+                CALLEXIT(-1);
+            }
+            if(searchParser.getQrelfile() == null)
+            {
+                System.out.println("Please pass the entity qrel location path");
+                CALLEXIT(-1);
+            }
+
+        }
+
+        public void ValidateEntityRankLib()
+        {
+            if(searchParser.getFeaturevectorfile() == null)
+            {
+                System.out.println("Please pass the feature vector file path");
+                CALLEXIT(-1);
+            }
+            if(searchParser.getRankLibModelFile() == null)
+            {
+                System.out.println("Please pass the entity ranklib model location path");
+                CALLEXIT(-1);
+            }
+
+        }
+
+
         public void ValidateEntitySim()
         {
             if(searchParser.getWordEmbeddingFile()== null)

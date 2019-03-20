@@ -82,6 +82,9 @@ public class RegisterCommands
           @Parameter(names = {"-q", "--query-cbor"}, description = "Query file (CBOR file)", required = true)
           private String queryfile = null;
 
+         @Parameter(names = {"-qrel", "--entity-qrel"}, description = "Entity qrel file")
+         private String qrelfile = null;
+
           @Parameter(names = "--help", help = true)
           private boolean help;
 
@@ -96,6 +99,12 @@ public class RegisterCommands
 
          @Parameter(names = {"-dim","--word-dimension"},description ="Dimension of the Word embeddings")
          private Integer dimension=0;
+
+         @Parameter(names = {"-model","--ranklib-model"},description ="Pass the file location of ranklib model file")
+         private String ranklib_model=null;
+
+         @Parameter(names = {"-f", "--entity-feature"}, description = "Entity feature vector file")
+         private String featurevectorfile = null;
 
          @Parameter(names = {"-bm25","--default-bm25"},description ="Rerank the initial retrieved cluster using document similarity")
          private boolean isBM25 =false;
@@ -145,8 +154,11 @@ public class RegisterCommands
          @Parameter(names = "--entity-expand",description ="Rerank the initial retrieved document using expanded query")
          private boolean isQueryExpand =false;
 
-         @Parameter(names = "--entity-relation",description ="Rerank the initial retrieved document using entity relationship")
+         @Parameter(names = "--entity-relation",description ="Generate the feature vectors and ranklib model")
          private boolean isEntityRelationEnabled =false;
+
+         @Parameter(names = "--entity-ranklib",description ="Rerank the passages using entity ranklib")
+         private boolean isEntityRanklibEnabled =false;
 
          @Parameter(names = "article",description ="Article level retrieval")
          private boolean isArticleEnabled =false;
@@ -188,6 +200,16 @@ public class RegisterCommands
           {
                return queryfile;
           }
+
+         public String getQrelfile()
+         {
+             return qrelfile;
+         }
+
+         public String getFeaturevectorfile()
+         {
+             return featurevectorfile;
+         }
 
           public boolean isReRankEnabled()
           {
@@ -232,6 +254,16 @@ public class RegisterCommands
          public boolean isEntityRelationEnabled()
          {
              return isEntityRelationEnabled;
+         }
+
+         public boolean isEntityRanklibEnabled()
+         {
+             return isEntityRanklibEnabled;
+         }
+
+         public String getRankLibModelFile()
+         {
+             return ranklib_model;
          }
 
             public String getEntityIndLoc(){return entityIndLoc; }

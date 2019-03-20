@@ -4,6 +4,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
@@ -15,7 +16,8 @@ import main.java.containers.Container;
 import main.java.utils.DBSettings;
 import main.java.utils.Entities;
 import main.java.utils.Stats;
-
+import main.java.utils.SortUtils;
+import main.java.database.databaseWrapper;
 
 public class FeatureGenerator {
 
@@ -66,7 +68,7 @@ public class FeatureGenerator {
                 relations[0] = relations[0] + 1.0;
             }
 
-            for(int out = 0; out < outlinkIds.length; out++){
+            /*for(int out = 0; out < outlinkIds.length; out++){
 
                 if(entities_details.containsKey(outlinkIds[out])) {
                     String[] out_entity_details = entities_details.get(outlinkIds[out]);
@@ -95,7 +97,7 @@ public class FeatureGenerator {
                         relations[1] = relations[1] + 1.0;
                     }
                 }
-            }
+            }*/
         }
         return relations;
     }
@@ -122,13 +124,12 @@ public class FeatureGenerator {
         String[][] entities_array = entities_utils.getEntityArray(entities_list);
 
         String[] entities_ids = new String[entities_array.length];
-        Map<String, String[]> entities_details  = new LinkedHashMap<>();
 
         for(int i = 0; i < entities_array.length; i++){
             entities_ids[i] = entities_array[i][0];
         }
 
-        BasicDBObject whereQuery = new BasicDBObject();
+        /*BasicDBObject whereQuery = new BasicDBObject();
         whereQuery.put("Id",new BasicDBObject("$in", entities_ids));
         DBCursor cursor = DBSettings.mongoCollection.find(whereQuery);
         DBObject record;
@@ -142,7 +143,11 @@ public class FeatureGenerator {
             entity_records[1] = record.get("OutlinkIds").toString();
             entity_records[2] = record.get("InlinkIds").toString();
             entities_details.put(record.get("Id").toString(), entity_records);
-        }
+        }*/
+
+        databaseWrapper dbwrapper = new databaseWrapper();
+        Map<String, String[]> entities_details = dbwrapper.getRecordDetails(entities_ids);
+
         //System.out.println(cursor.length());
         int entity_length = entities_ids.length;
         //System.out.println(entity_length);
@@ -200,8 +205,11 @@ public class FeatureGenerator {
 
             }
             entities_features.put(entities_array[c][0], other_entities);
-            entities_normalized_features.put(entities_array[c][0], new Double[] {get1hoprelation_calc/entity_length,
+            /*entities_normalized_features.put(entities_array[c][0], new Double[] {get1hoprelation_calc/entity_length,
                     get2hoprelation_calc/entity_length,
+                    comention_calc/entity_length});*/
+            entities_normalized_features.put(entities_array[c][0], new Double[] {get1hoprelation_calc/entity_length,
+                    //get2hoprelation_calc/entity_length,
                     comention_calc/entity_length});
             System.out.println("Features : "+query_id+" "+c+" "+entity_length+" "+get1hoprelation_calc/entity_length+" "+get2hoprelation_calc/entity_length+" "+comention_calc/entity_length);
         }
@@ -234,5 +242,24 @@ public class FeatureGenerator {
         query_entity_normalized_vec = getFeatureVectors(query_entity_list, bm25_ranking);
         query_entity_normalized_vec = new Stats().normalizeData(query_entity_normalized_vec);
         return query_entity_normalized_vec;
+    }
+
+    public Map<String, Map<String, Double>> generateDotProduct(String feature_vectors, String ranklib_model ){
+
+        Map<String, Map<String, Double>> query_entity_score = new LinkedHashMap<>();
+        Entities e = new Entities();
+        Map<String, Map<String, Double[]>> features = e.readEntityFeatureVectorFile(feature_vectors);
+        Double[] weights = e.readRankLibModelFile(ranklib_model);
+
+        Stats s = new Stats();
+
+        for(Map.Entry<String, Map<String, Double[]>> m : features.entrySet()){
+            Map<String, Double> score = new LinkedHashMap<>();
+            for(Map.Entry<String, Double[]> n: m.getValue().entrySet()) {
+                score.put(n.getKey(), s.getDotProduct(n.getValue(), weights));
+            }
+            query_entity_score.put(m.getKey(), SortUtils.sortByValue(score));
+        }
+        return query_entity_score;
     }
 }

@@ -4,6 +4,10 @@ import main.java.containers.Container;
 import main.java.containers.EntityContainer;
 import main.java.utils.SortUtils;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -200,6 +204,146 @@ public class Entities {
             return true;
         }
         return false;
+    }
+
+    public Map<String, Map<String, String>> readEntityQrelFile(String filename){
+
+        Map<String, Map<String, String>> mp = new LinkedHashMap<>();
+
+        File fp = new File(filename);
+        FileReader fr;
+        BufferedReader br = null;
+
+
+        try {
+            fr = new FileReader(fp);
+            br = new BufferedReader(fr);
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        while (true) {
+            try {
+                String line = br.readLine();
+
+                if (line == null) {
+                    break;
+                }
+
+                String[] words = line.split(" ");
+                String outKey = words[0];
+
+                if (mp.containsKey(outKey)) {
+                    Map<String, String> extract = mp.get(outKey);
+                    extract.put(words[2], words[3]);
+                } else {
+
+                    Map<String, String> temp = new LinkedHashMap<>();
+                    temp.put(words[2], words[3]);
+                    mp.put(outKey, temp);
+                }
+            } catch (NullPointerException n) {
+                System.out.println(n.getMessage());
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+
+        }
+        return mp;
+    }
+
+
+    public Map<String, Map<String, Double[]>> readEntityFeatureVectorFile(String filename){
+
+        Map<String, Map<String, Double[]>> mp = new LinkedHashMap<>();
+
+        File fp = new File(filename);
+        FileReader fr;
+        BufferedReader br = null;
+
+
+        try {
+            fr = new FileReader(fp);
+            br = new BufferedReader(fr);
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        while (true) {
+            try {
+                String line = br.readLine();
+
+                if (line == null) {
+                    break;
+                }
+
+                String[] words = line.split(" ");
+                String outKey = words[0];
+
+                if (mp.containsKey(outKey)) {
+                    Map<String, Double[]> extract = mp.get(outKey);
+                    Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    extract.put(words[1], features);
+                } else {
+
+                    Map<String, Double[]> temp = new LinkedHashMap<>();
+                    Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    temp.put(words[1], features);
+                    mp.put(outKey, temp);
+                }
+            } catch (NullPointerException n) {
+                System.out.println(n.getMessage());
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+
+        }
+        return mp;
+    }
+
+    public Double[] readRankLibModelFile(String filename){
+
+        Double[] mp = new Double[2];
+
+        File fp = new File(filename);
+        FileReader fr;
+        BufferedReader br = null;
+
+
+        try {
+            fr = new FileReader(fp);
+            br = new BufferedReader(fr);
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        while (true) {
+            try {
+                String line = br.readLine();
+
+                if (line == null) {
+                    break;
+                }
+                if(line.startsWith("##")){
+                    continue;
+                }
+
+                String[] words = line.split(" ");
+                for(int s = 0; s<words.length; s++){
+                    mp[s] = Double.parseDouble(words[s].split(":")[1]);
+                }
+            } catch (NullPointerException n) {
+                System.out.println(n.getMessage());
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+
+        }
+        return mp;
+
     }
 
 }

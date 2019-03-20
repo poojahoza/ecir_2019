@@ -244,13 +244,13 @@ public class SearchRunner implements ProgramRunner
         }
 
         if(searchParser.isEntityRelationEnabled()){
-            validate.ValidateEntityDegree();
+            validate.ValidateEntityRelation();
 
             try {
-                Map<String,String> querysecCBOR = SearchUtils.readOutlineSectionPath(searchParser.getQueryfile());
+                //Map<String,String> querysecCBOR = SearchUtils.readOutlineSectionPath(searchParser.getQueryfile());
 
                 BaseBM25 bm25 = new BaseBM25(searchParser.getkVAL(), searchParser.getIndexlocation());
-                Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(querysecCBOR);
+                Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(queryCBOR);
 
                 Entities e = new Entities();
                 Map<String, Map<String, String>> query_ent_list = e.getSortedEntitiesPerQuery(bm25_ranking);
@@ -260,6 +260,31 @@ public class SearchRunner implements ProgramRunner
 
                 WriteFile write_file = new WriteFile();
                 write_file.generateFeatureVectorRunFile(featureVectors, "feature_vectors");
+                write_file.generateEntityRankLibRunFile(featureVectors, searchParser.getQrelfile(), "rank_lib");
+
+            }catch (Exception ioe){
+                ioe.printStackTrace();
+            }
+        }
+        if(searchParser.isEntityRanklibEnabled()){
+            validate.ValidateEntityRankLib();
+
+            try {
+                FeatureGenerator featureGenerator = new FeatureGenerator();
+                Map<String, Map<String, Double>> query_entity_scores = featureGenerator.generateDotProduct(searchParser.getFeaturevectorfile(),
+                        searchParser.getRankLibModelFile());
+                System.out.println(query_entity_scores);
+                WriteFile write_file = new WriteFile();
+                write_file.generateEntityRunFile(query_entity_scores, "entity_ranklib");
+
+                BaseBM25 bm25 = new BaseBM25(searchParser.getkVAL(), searchParser.getIndexlocation());
+                Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(queryCBOR);
+
+                Entities e = new Entities();
+                Map<String, Map<String, Double>> ranked_entities_score = e.getParagraphsScoreDouble(bm25_ranking, query_entity_scores);
+                ranked_entities_score = e.getRerankedParas(ranked_entities_score);
+
+                write_file.generateEntityRunFile(ranked_entities_score, "paragraph_ranklib");
 
             }catch (IOException ioe){
                 ioe.printStackTrace();
