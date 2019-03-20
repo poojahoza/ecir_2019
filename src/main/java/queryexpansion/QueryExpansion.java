@@ -84,12 +84,10 @@ public class QueryExpansion {
     }
 
     public Map<String,Map<String,Container >> doQueryExpansion() {
-        //PrintUtils.displayMap(bm25.getRanking(query));
-
 
         myEntityMap = new HashMap<>();
         myGlobalMap = new HashMap<>();
-
+        Map<String, Map<String, Container>> tempBM25 = new HashMap<>();
         String qID = "";
         EntityContainer entity = null;
         int i = 0;
@@ -103,14 +101,20 @@ public class QueryExpansion {
             String Query = qMain.getValue();
 
             Map<String, Container> temp = bm25.getRanking(Query);
+
+            // Get all the entity from the baseline BM25 and save it to entity map
+            //          with count represent existing of an Entity in the Query result from BM25
+            // them add the query with the entities in Global Map.
             myEntityMap = new HashMap<>();
 
             for (Map.Entry<String, Container> q3 : temp.entrySet()) {
 
                 EntityContainer e = q3.getValue().getEntity();
+
                 if (qMain.getKey() != qID) {
                     // new Query
-                    if (e.getEntityId() != " ") {
+                    if (e.getEntityId() != " " ) {
+
                         entity = e;
                         entity.setCount(1);
                         myEntityMap.put(e.getEntityId(), entity);
@@ -118,7 +122,7 @@ public class QueryExpansion {
                     }
                 } else {
                     // old Query
-                    if (e.getEntityId() != " ") {
+                    if (e.getEntityId() != " " ) {
                         entity = myEntityMap.get(e.getEntityId());
                         if (entity == null) {
                             entity = e;
@@ -132,10 +136,32 @@ public class QueryExpansion {
                     }
                 }
                 qID = qMain.getKey();
+                tempBM25.put(qMain.getKey(),temp);
             }
-        }
-        int i2 = 1;
 
+        }
+
+        String mname = "doc_reranking_BM25"+"_k"+this.searchcommand.getkVAL() + "_Spam_filter_enable" + RegisterCommands.CommandSearch.isSpamFilterEnabled() + "_top"+searchcommand.getNumberOfReturnedEntity();
+        RunWriter.writeRunFile(mname,tempBM25);
+
+        // issue Query expansion based on the selection method
+        switch (searchcommand.getQEType()) {
+            case  entityText:
+                return QEWithEntityText();
+            case   entityID:
+                return QEWithEntityID();
+            case  entityTextID :
+                return QEWithEntityTextAndID();
+            case   entityIDInEntityField:
+                return QEOnlyEntityIDInEntityIDField();
+            default:
+                return QEWithEntityText();
+        }
+    }
+
+    private Map<String,Map<String,Container >> QEWithEntityText () {
+        // Query text + Entity Text.
+        int i2 = 1;
         Map<String, String> expandedQuery = query;
         for (Map.Entry<String, HashMap<String, EntityContainer>> globalQMap : myGlobalMap.entrySet()) {
 
@@ -151,6 +177,113 @@ public class QueryExpansion {
                 if (iq != 0) { // do not take the first entity which is ""
 
                     additionalQuery = additionalQuery + " " + candidateEntity.getEntityVal();
+
+                    if (searchcommand.getisVerbose()) {
+                        System.out.println("\n" + i2 + " query " + globalQMap.getKey() + " the top Entity " + candidateEntity.getEntityId() + " --- Value ---- " + candidateEntity.getEntityVal() + " with count " + candidateEntity.getCount());
+                    }
+                }
+                iq++;
+            }
+            i2++;
+
+            expandedQuery.replace(globalQMap.getKey(), expandedQuery.get(globalQMap.getKey()) + " " + additionalQuery);
+        }
+
+        return ReRank(expandedQuery);
+
+    }
+
+    private Map<String,Map<String,Container >> QEWithEntityID () {
+        // Query text + Entity ID.
+
+        int i2 = 1;
+        Map<String, String> expandedQuery = query;
+        for (Map.Entry<String, HashMap<String, EntityContainer>> globalQMap : myGlobalMap.entrySet()) {
+
+
+            int numberOfReturnedEntity = searchcommand.getNumberOfReturnedEntity();
+
+            // return max entity (the top entity)
+            List<EntityContainer> candidateEntityList = getMaxEntityCount(globalQMap.getValue(), numberOfReturnedEntity + 1);
+
+            int iq = 0;
+            String additionalQuery = "";
+            for (EntityContainer candidateEntity : candidateEntityList) {
+                if (iq != 0) { // do not take the first entity which is ""
+
+                    additionalQuery = additionalQuery + " " + candidateEntity.getEntityId() ;
+
+                    additionalQuery = additionalQuery.replaceAll("enwiki:" , "QQQQ").replaceAll(":","").replaceAll("QQQQ","enwiki:" );
+
+                    if (searchcommand.getisVerbose()) {
+                        System.out.println("\n" + i2 + " query " + globalQMap.getKey() + " the top Entity " + candidateEntity.getEntityId() + " --- Value ---- " + candidateEntity.getEntityVal() + " with count " + candidateEntity.getCount());
+                    }
+                }
+                iq++;
+            }
+            i2++;
+
+            expandedQuery.replace(globalQMap.getKey(), expandedQuery.get(globalQMap.getKey()) + " " + additionalQuery);
+        }
+
+        return   ReRank(expandedQuery);
+    }
+
+    private Map<String,Map<String,Container >> QEWithEntityTextAndID() {
+        // Query text + Entity Text + Entity ID
+
+        int i2 = 1;
+        Map<String, String> expandedQuery = query;
+        for (Map.Entry<String, HashMap<String, EntityContainer>> globalQMap : myGlobalMap.entrySet()) {
+
+
+            int numberOfReturnedEntity = searchcommand.getNumberOfReturnedEntity();
+
+            // return max entity (the top entity)
+            List<EntityContainer> candidateEntityList = getMaxEntityCount(globalQMap.getValue(), numberOfReturnedEntity + 1);
+
+            int iq = 0;
+            String additionalQuery = "";
+            for (EntityContainer candidateEntity : candidateEntityList) {
+                if (iq != 0) { // do not take the first entity which is ""
+
+                    additionalQuery = additionalQuery + " " + candidateEntity.getEntityVal() + " " + candidateEntity.getEntityId() ;
+
+                    additionalQuery = additionalQuery.replaceAll("enwiki:" , "QQQQ").replaceAll(":","").replaceAll("QQQQ","enwiki:" );
+
+                    if (searchcommand.getisVerbose()) {
+                        System.out.println("\n" + i2 + " query " + globalQMap.getKey() + " the top Entity " + candidateEntity.getEntityId() + " --- Value ---- " + candidateEntity.getEntityVal() + " with count " + candidateEntity.getCount());
+                    }
+                }
+                iq++;
+            }
+            i2++;
+
+            expandedQuery.replace(globalQMap.getKey(), expandedQuery.get(globalQMap.getKey()) + " " + additionalQuery);
+        }
+        return ReRank(expandedQuery);
+    }
+
+    private Map<String,Map<String,Container >> QEOnlyEntityIDInEntityIDField() {
+        //Only Entity ID In Entity ID Field
+        int i2 = 1;
+        Map<String, String> expandedQuery = query;
+        for (Map.Entry<String, HashMap<String, EntityContainer>> globalQMap : myGlobalMap.entrySet()) {
+
+
+            int numberOfReturnedEntity = searchcommand.getNumberOfReturnedEntity();
+
+            // return max entity (the top entity)
+            List<EntityContainer> candidateEntityList = getMaxEntityCount(globalQMap.getValue(), numberOfReturnedEntity + 1);
+
+            int iq = 0;
+            String additionalQuery = "";
+            for (EntityContainer candidateEntity : candidateEntityList) {
+                if (iq != 0) { // do not take the first entity which is ""
+
+                    additionalQuery =  candidateEntity.getEntityId() ;
+
+                    additionalQuery = additionalQuery.replaceAll("enwiki:" , "QQQQ").replaceAll(":","").replaceAll("QQQQ","enwiki:" );
 
                     if (searchcommand.getisVerbose()) {
                         System.out.println("\n" + i2 + " query " + globalQMap.getKey() + " the top Entity " + candidateEntity.getEntityId() + " --- Value ---- " + candidateEntity.getEntityVal() + " with count " + candidateEntity.getCount());
@@ -263,6 +396,7 @@ public class QueryExpansion {
         }
 
         return ReRank(expandedQuery);
+
     }
 
     private List<EntityContainer> getMaxEntityCount(Map<String, EntityContainer> entityMap, int numberOfEntityReturn) {
@@ -298,8 +432,7 @@ public class QueryExpansion {
         return tempMaxEntity;
     }
 
-    public Map<String,Map<String,Container >> ReRank(Map<String,String> inputQuery)
-    {
+    public Map<String,Map<String,Container >> ReRank(Map<String,String> inputQuery){
 
         Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
         for(Map.Entry<String,String> q: inputQuery.entrySet())
@@ -310,7 +443,7 @@ public class QueryExpansion {
             result.put(q.getKey(),sortedMap);
         }
 
-        String mname = "doc_reranking_With_QueryExpansion"+"_k"+this.searchcommand.getkVAL()+"_top"+searchcommand.getNumberOfReturnedEntity();
+        String mname = "doc_reranking_With_QueryExpansion"+"_k"+this.searchcommand.getkVAL()+"_top"+searchcommand.getNumberOfReturnedEntity() +"_ExpansionType_"+searchcommand.getQEType() + "_Spam_filter_enable" + RegisterCommands.CommandSearch.isSpamFilterEnabled() ;
 
         RunWriter.writeRunFile(mname,result);
 

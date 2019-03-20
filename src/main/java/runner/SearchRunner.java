@@ -233,6 +233,7 @@ public class SearchRunner implements ProgramRunner
             validate.ValidateQE();
             QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
             qe.doQueryExpansion();
+
         }
 
         if(searchParser.isEntityDocSimEnabled())
