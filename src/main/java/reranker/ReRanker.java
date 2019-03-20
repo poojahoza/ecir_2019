@@ -163,4 +163,43 @@ public class ReRanker
             PrintUtils.displayMap(result);
         }
     }
+
+    public Map<String,Map<String,Container>> getReRankSimilarity(Map<String,Map<String,Container>> res)
+    {
+        System.out.println("Running the ReRank Similarity.....");
+        runnerReRank.setBiasFactor(SearchCommand.getBiasFactor());
+        long start= System.currentTimeMillis();
+        Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
+
+        StreamSupport.stream(res.entrySet().spliterator(),SearchCommand.isParallelEnabled())
+                .forEach(q -> {
+                        Map<String, Container> reOrdered = runnerReRank.getReRank(q.getValue());
+                        result.put(q.getKey(),reOrdered);
+                        System.out.print(".");
+                });
+        long end = System.currentTimeMillis();
+        long timeElapsed = end-start;
+        System.out.println("\nTime took :"+ (double)timeElapsed/1000 +"Minutes : "+ ((double)timeElapsed/1000)/60);
+
+        return result;
+    }
+
+    public Map<String,Map<String,Container>> getReRankSimilarityIDF(Map<String,Map<String,Container>> res)
+    {
+        System.out.println("Running the ReRank IDF Similarity.....");
+        runnerIDFReRank.setBiasFactor(SearchCommand.getBiasFactor());
+        Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
+        long start= System.currentTimeMillis();
+        StreamSupport.stream(res.entrySet().spliterator(),SearchCommand.isParallelEnabled())
+                .forEach(q -> {
+                    Map<String, Container> reOrdered = runnerIDFReRank.getReRank(q.getValue());
+                    result.put(q.getKey(),reOrdered);
+                    System.out.print(".");
+                });
+        long end = System.currentTimeMillis();
+        long timeElapsed = end-start;
+        System.out.println("\nTime took :"+ (double)timeElapsed/1000 +"Minutes : "+ ((double)timeElapsed/1000)/60);
+        return result;
+    }
+
 }

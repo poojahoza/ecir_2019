@@ -137,7 +137,7 @@ public abstract class SimilarityRankerBase {
         long start= System.currentTimeMillis();
 
 
-        StreamSupport.stream(query.entrySet().spliterator(),true)
+        StreamSupport.stream(query.entrySet().spliterator(),SearchCommand.isParallelEnabled())
                 .forEach(q -> {
                     try {
                         BaseBM25 bm = new BaseBM25(SearchCommand.getkVAL(),SearchCommand.getIndexlocation());
