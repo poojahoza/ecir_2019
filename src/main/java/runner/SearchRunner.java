@@ -273,7 +273,7 @@ public class SearchRunner implements ProgramRunner
                 FeatureGenerator featureGenerator = new FeatureGenerator();
                 Map<String, Map<String, Double>> query_entity_scores = featureGenerator.generateDotProduct(searchParser.getFeaturevectorfile(),
                         searchParser.getRankLibModelFile());
-                System.out.println(query_entity_scores);
+                //System.out.println(query_entity_scores);
                 WriteFile write_file = new WriteFile();
                 write_file.generateEntityRunFile(query_entity_scores, "entity_ranklib");
 

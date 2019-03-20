@@ -118,19 +118,21 @@ public class Entities {
 
         for(Map.Entry<String, Map<String, Container>> m: bm25_ranking.entrySet())
         {
+            Map<String, Double> query_entities_list = ranked_entities.get(m.getKey());
             for(Map.Entry<String, Container> n:m.getValue().entrySet())
             {
                 EntityContainer e = n.getValue().getEntity();
                 //int entity_counter = 1;
                 String [] entity_ids = e.getEntityId().split("[\r\n]+");
+
                 for(int s = 0; s  < entity_ids.length; s++) {
-                    Map<String, Double> query_entities_list = ranked_entities.get(m.getKey());
+
 
                     /*if(query_entities_list.containsKey(entity_ids[s]))
                     {
                         entity_counter += 1;
                     }*/
-                    if(ranked_para.containsKey(m.getKey()))
+                    /*if(ranked_para.containsKey(m.getKey()))
                     {
                         Map<String, Double> query_extract = ranked_para.get(m.getKey());
                         if(query_extract.containsKey(entity_ids[s]))
@@ -141,6 +143,25 @@ public class Entities {
                             query_extract.put(n.getKey(), n.getValue().getScore());
                         }
 
+                    }*/
+                    Double score = 0.0;
+                    if(query_entities_list.containsKey(entity_ids[s])){
+                        score = query_entities_list.get(entity_ids[s]);
+                    }
+                    if(ranked_para.containsKey(m.getKey())){
+                        Map<String, Double> query_extract = ranked_para.get(m.getKey());
+
+                        if(query_extract.containsKey(n.getKey())){
+                            query_extract.put(n.getKey(), query_extract.get(n.getKey())+score);
+                        }else{
+                            Map<String, Double> temp_query = new LinkedHashMap<>();
+                            temp_query.put(n.getKey(), n.getValue().getScore()+score);
+                            ranked_para.put(m.getKey(), temp_query);
+                        }
+                    }else{
+                        Map<String, Double> temp_query = new LinkedHashMap<>();
+                        temp_query.put(n.getKey(), n.getValue().getScore()+score);
+                        ranked_para.put(m.getKey(), temp_query);
                     }
 
                 }
