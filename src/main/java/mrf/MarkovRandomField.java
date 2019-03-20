@@ -10,6 +10,7 @@ import main.java.utils.PrintUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
 
@@ -37,13 +38,22 @@ public class MarkovRandomField
         Map<String,Container> result = new LinkedHashMap<String,Container>();
         result.putAll(unranked);
 
-        ans = Evidences.evidence1(unranked);
-        MrfHelper.updatescores(result,ans);
+//        ans = Evidences.evidence1(unranked);
+//        MrfHelper.updatescores(result,ans);
+//
+//
+//        ans = Evidences.evidence2(unranked,embedding,SearchCommand.getDimension(),queryVal,SearchCommand.getIndexlocation(),SearchCommand.getkVAL());
+//        MrfHelper.updatescores(result,ans);
 
+        List<ArrayList<Double>> collective = Evidences.collectiveEvidence(unranked,embedding,SearchCommand.getDimension(),queryVal,SearchCommand.getIndexlocation(),
+                SearchCommand.getkVAL());
 
-        ans = Evidences.evidence2(unranked,embedding,SearchCommand.getDimension(),queryVal,SearchCommand.getIndexlocation(),
-                    SearchCommand.getkVAL());
-        MrfHelper.updatescores(result,ans);
+//        for(ArrayList<Double> val:collective)
+//        {
+//            MrfHelper.updatescores(result,Normalize.getZScoreNormalized(val));
+//        }
+
+        MrfHelper.updateCollectiveScores(unranked,collective);
 
         ans = Evidences.evidence3(unranked,embedding,SearchCommand.getDimension(),queryVal,SearchCommand.getIndexlocation(),
                 SearchCommand.getkVAL());
@@ -80,6 +90,7 @@ public class MarkovRandomField
                     }
 
                 });
+        System.out.println("\n");
         long end = System.currentTimeMillis();
         long timeElapsed = end-start;
         System.out.println("Time took :"+ (double)timeElapsed/1000 +" sec "+ ((double)timeElapsed/1000)/60 +" min");

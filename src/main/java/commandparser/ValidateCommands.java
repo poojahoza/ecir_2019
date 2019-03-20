@@ -112,6 +112,28 @@ public class ValidateCommands
 
         }
 
+        public void ValidateMRF()
+        {
+            if(searchParser.getWordEmbeddingFile()== null)
+            {
+                System.out.println("Please pass the word Embeddings file");
+                CALLEXIT(-1);
+            }
+
+            if(searchParser.getDimension()==0)
+            {
+                System.out.println("Please pass the dimension of the word vectors");
+                CALLEXIT(-1);
+            }
+
+           if(searchParser.getQrelPath()==null)
+           {
+               System.out.println("Please pass the Qrel file for the learning to rank");
+               CALLEXIT(-1);
+           }
+
+        }
+
     }
 
     public static class ValidateIndexHamSpamCommands

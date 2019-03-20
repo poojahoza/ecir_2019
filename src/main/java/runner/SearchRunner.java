@@ -20,6 +20,7 @@ import main.java.wordsimilarityranker.*;
 import main.java.queryexpansion.QueryExpansion;
 
 
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -190,6 +191,8 @@ public class SearchRunner implements ProgramRunner
             }catch (IOException ioe){
                 System.out.println(ioe.getMessage());
             }
+
+
         }
         if(searchParser.isQueryExpand()){
             validate.ValidateEntityDegree();
@@ -234,6 +237,7 @@ public class SearchRunner implements ProgramRunner
 
         if(searchParser.isEntityDocSimEnabled())
         {
+            validate.ValidateReRank();
             EntitySimilarityRanker ent = new EntitySimilarityRanker(searchParser,queryCBOR);
             ent.doEntityReRank();
         }
@@ -255,7 +259,6 @@ public class SearchRunner implements ProgramRunner
             PrintUtils.displayQuery(queryCBOR);
         }
 
-
-        }
+       }
     }
 
