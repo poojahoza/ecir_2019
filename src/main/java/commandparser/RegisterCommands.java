@@ -194,11 +194,18 @@ public class RegisterCommands
          @Parameter(names = "--rank-lib",description ="Provide path to the Ranklib")
          private String ranklibpath = null;
 
-         @Parameter(names = "--qe-reranking",description ="Provide path to the Ranklib")
+         @Parameter(names = "--qe-reranking",description ="Query expansion method based on the Entities and reranking")
          private boolean qe_reranking = false;
+
+         @Parameter(names = "--qe-entity-degree",description ="Query expansion based on the entity degree and reranking")
+         private boolean qe_entity_degree_reranking = false;
 
          public boolean is_qe_reranking(){return qe_reranking;}
 
+         public boolean isQe_entity_degree_rerankingEnabled()
+         {
+             return  qe_entity_degree_reranking;
+         }
 
          public String getRanklibPath()
          {

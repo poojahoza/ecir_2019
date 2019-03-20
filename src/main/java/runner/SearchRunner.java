@@ -287,6 +287,7 @@ public class SearchRunner implements ProgramRunner
         if(searchParser.is_qe_reranking())
         {
             validate.ValidateQE();
+            validate.ValidateReRank();
             QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
             Map<String,Map<String,Container >> res = qe.doQueryExpansion();
             QueryExpansionReRanking geReRank = new QueryExpansionReRanking(searchParser,queryCBOR,res);
@@ -294,6 +295,40 @@ public class SearchRunner implements ProgramRunner
 
         }
 
+        if(searchParser.isQe_entity_degree_rerankingEnabled()) {
+            validate.ValidateEntityDegree();
+            validate.ValidateReRank();
+
+            try {
+                BaseBM25 bm25 = new BaseBM25(searchParser.getkVAL(), searchParser.getIndexlocation());
+                Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(queryCBOR);
+
+                Entities e = new Entities();
+                Map<String, Map<String, String>> query_ent_list = e.getEntitiesPerQuery(bm25_ranking);
+
+                PageSearcher pgs = new PageSearcher(searchParser.getEntityIndLoc());
+                Map<String, Map<String, String>> query_entities = pgs.getRanking(query_ent_list);
+
+                GraphDegreeConstructor gdc = new GraphDegreeConstructor();
+                Map<String, Map<String, Integer>> ranked_entities = gdc.getGraphDegree(query_entities);
+
+                Map<String, Map<String, Double>> ranked_entities_score = e.getParagraphsScore(bm25_ranking, ranked_entities);
+                ranked_entities_score = e.getRerankedParas(ranked_entities_score);
+
+                Map<String, String> expanded_query = e.expandQuery(queryCBOR, ranked_entities_score);
+
+                //BaseBM25 bm25 = new BaseBM25(100, searchParser.getIndexlocation());
+                Map<String, Map<String, Container>> expanded_bm25_ranking = bm25.getRanking(expanded_query);
+
+
+                QueryExpansionReRanking geReRank = new QueryExpansionReRanking(searchParser, queryCBOR, expanded_bm25_ranking);
+                geReRank.getDocumentFrequencyReRanking("QE_Entity_degree");
+
+            } catch (IOException io) {
+                        io.getStackTrace();
+            }
+
+         }
        }
     }
 
