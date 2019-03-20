@@ -32,6 +32,7 @@ public class Normalize
         return Math.sqrt(getVariance(vec));
     }
 
+
     static ArrayList<Double> getZScoreNormalized(ArrayList<Double> unnorm)
     {
         if(unnorm.size()<2) return unnorm;
