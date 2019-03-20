@@ -32,7 +32,7 @@ public class PreProcessor
 
         EnglishAnalyzer analyzer = new EnglishAnalyzer();
         ArrayList<String> data = new ArrayList<>();
-        TokenStream tokenStream = analyzer.tokenStream("Text", new StringReader(content));
+            TokenStream tokenStream = analyzer.tokenStream("Text", new StringReader(content));
         try {
             tokenStream.reset();
         } catch (IOException e) {
