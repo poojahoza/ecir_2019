@@ -10,7 +10,7 @@ import main.java.utils.SortUtils;
 import java.io.IOException;
 
 import java.util.*;
-import org.apache.jena.query.*;
+
 
 
 public class QueryExpansion {
@@ -35,53 +35,54 @@ public class QueryExpansion {
         }
 
     }
-    public int returnDBPediaEntityCount(String s) {
-        int count = 0;
-        if (s !="") {
-            String sparqlQueryString1 =
-               /* "PREFIX dbont: <http://dbpedia.org/ontology/> " +
-                        "PREFIX dbp: <http://dbpedia.org/property/>" +
-                        "prefix rdf:<http://xmlns.com/foaf/0.1/>" +
-                        "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
-                        "prefix owl: <http://www.w3.org/2002/07/owl#>" +
-                        "prefix xsd: <http://www.w3.org/2001/XMLSchema#>" +
-                        "prefix dc: <http://purl.org/dc/elements/1.1/>" +
-                        "prefix foaf: <http://xmlns.com/foaf/0.1/>" +
-                        "prefix obo: <  http://purl.obolibrary.org/obo/>" +
-                        "   SELECT  ?x ?name ?type  " +
-                        "   WHERE { ?x dbont:name ?name . " +
-                        "  ?x dbp:type ?type.    " +*/
-                    " PREFIX dbont: <http://dbpedia.org/ontology/> " +
-                            " PREFIX dbp: <http://dbpedia.org/property/>" +
-                            " PREFIX dbo: <http://dbpedia.org/resource/classes#>" +
-                            " prefix rdf:<http://xmlns.com/foaf/0.1/>" +
-                            " prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
-                            " prefix owl: <http://www.w3.org/2002/07/owl#>" +
-                            " prefix xsd: <http://www.w3.org/2001/XMLSchema#>" +
-                            " prefix dc: <http://purl.org/dc/elements/1.1/>" +
-                            " prefix foaf: <http://xmlns.com/foaf/0.1/>" +
-                            " prefix obo: <http://purl.obolibrary.org/obo/>" +
-                            " SELECT  DISTINCT ?x ?name ?abstract ?comment " +
-                            " WHERE {    ?x dbont:name ?name ." +
-                            " ?x dbo:abstract ?abstract." +
-                            " ?x rdfs:comment ?comment." +
-                            " FILTER (langMatches(lang(?abstract),'en')). FILTER (langMatches(lang(?comment),'en'))." +
-                            " FILTER ( contains(?abstract ,'" + s + "')).   " +
-                            " FILTER ( contains(?comment,'" + s + "')).  }";
 
-            Query query = QueryFactory.create(sparqlQueryString1, Syntax.syntaxSPARQL_11);
-            QueryExecution qexec = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql", query);
-            ResultSet results = qexec.execSelect();
-//            ResultSetFormatter.out(System.out, results, query);
-//            System.out.println(s);
-             count = results.getRowNumber();
-            if (count > 0) {
-                int a = 0;
-            }
-            qexec.close();
-        }
-        return count;
-    }
+//    public int returnDBPediaEntityCount(String s) {
+//        int count = 0;
+//        if (s !="") {
+//            String sparqlQueryString1 =
+//               /* "PREFIX dbont: <http://dbpedia.org/ontology/> " +
+//                        "PREFIX dbp: <http://dbpedia.org/property/>" +
+//                        "prefix rdf:<http://xmlns.com/foaf/0.1/>" +
+//                        "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
+//                        "prefix owl: <http://www.w3.org/2002/07/owl#>" +
+//                        "prefix xsd: <http://www.w3.org/2001/XMLSchema#>" +
+//                        "prefix dc: <http://purl.org/dc/elements/1.1/>" +
+//                        "prefix foaf: <http://xmlns.com/foaf/0.1/>" +
+//                        "prefix obo: <  http://purl.obolibrary.org/obo/>" +
+//                        "   SELECT  ?x ?name ?type  " +
+//                        "   WHERE { ?x dbont:name ?name . " +
+//                        "  ?x dbp:type ?type.    " +*/
+//                    " PREFIX dbont: <http://dbpedia.org/ontology/> " +
+//                            " PREFIX dbp: <http://dbpedia.org/property/>" +
+//                            " PREFIX dbo: <http://dbpedia.org/resource/classes#>" +
+//                            " prefix rdf:<http://xmlns.com/foaf/0.1/>" +
+//                            " prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
+//                            " prefix owl: <http://www.w3.org/2002/07/owl#>" +
+//                            " prefix xsd: <http://www.w3.org/2001/XMLSchema#>" +
+//                            " prefix dc: <http://purl.org/dc/elements/1.1/>" +
+//                            " prefix foaf: <http://xmlns.com/foaf/0.1/>" +
+//                            " prefix obo: <http://purl.obolibrary.org/obo/>" +
+//                            " SELECT  DISTINCT ?x ?name ?abstract ?comment " +
+//                            " WHERE {    ?x dbont:name ?name ." +
+//                            " ?x dbo:abstract ?abstract." +
+//                            " ?x rdfs:comment ?comment." +
+//                            " FILTER (langMatches(lang(?abstract),'en')). FILTER (langMatches(lang(?comment),'en'))." +
+//                            " FILTER ( contains(?abstract ,'" + s + "')).   " +
+//                            " FILTER ( contains(?comment,'" + s + "')).  }";
+//
+//            Query query = QueryFactory.create(sparqlQueryString1, Syntax.syntaxSPARQL_11);
+//            QueryExecution qexec = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql", query);
+//            ResultSet results = qexec.execSelect();
+////            ResultSetFormatter.out(System.out, results, query);
+////            System.out.println(s);
+//             count = results.getRowNumber();
+//            if (count > 0) {
+//                int a = 0;
+//            }
+//            qexec.close();
+//        }
+//        return count;
+//    }
 
     public Map<String,Map<String,Container >> doQueryExpansion() {
 
@@ -298,106 +299,106 @@ public class QueryExpansion {
         return ReRank(expandedQuery);
     }
 
-    public Map<String,Map<String,Container >> doQueryExpansionWithDBpedia() {
-        //PrintUtils.displayMap(bm25.getRanking(query));
-
-        myEntityMap = new HashMap<>();
-        myGlobalMap = new HashMap<>();
-
-        String qID = "";
-        EntityContainer entity = null;
-        int i = 0;
-        for (Map.Entry<String, String> qMain : query.entrySet()) {
-
-            if (searchcommand.getisVerbose()) {
-                System.out.println(i + " of " + query.entrySet().size());
-            }
-
-            i++;
-            String Query = qMain.getValue();
-
-            Map<String, Container> temp = bm25.getRanking(Query);
-            myEntityMap = new HashMap<>();
-
-            for (Map.Entry<String, Container> q3 : temp.entrySet()) {
-
-                EntityContainer e = q3.getValue().getEntity();
-                if (qMain.getKey() != qID) {
-                    // new Query
-                    if (e.getEntityId() != " ") {
-                        entity = e;
-                        int a = 0;
-                        for (String s : e.getEntityVal().replaceAll("'s", "").replaceAll("\\'","").replaceAll("'","").split("\n")) {
-                            if (e.getEntityVal() != "" && s != "") {
-                                a += returnDBPediaEntityCount(Query.replaceAll("'s", "").replaceAll("\\'","").replaceAll("'","") + " " + s);
-                            }
-                        }
-                        entity.setCount(a);
-                        myEntityMap.put(e.getEntityId(), entity);
-                        myGlobalMap.put(qMain.getKey(), myEntityMap);
-                    }
-                } else {
-                    // old Query
-                    if (e.getEntityId() != " ") {
-                        entity = myEntityMap.get(e.getEntityId());
-                        if (entity == null) {
-                            entity = e;
-                            int a = 0;
-                            if (e.getEntityVal()!="") {
-                                for (String s : e.getEntityVal().replaceAll("'s","").replaceAll("\\'","").replaceAll("'","").split("\n")) {
-                                    a += returnDBPediaEntityCount(Query.replaceAll("'s","").replaceAll("\\'","").replaceAll("'","") + " " + s);
-                                }
-                            }
-                            entity.setCount(a);
-                            myEntityMap.put(e.getEntityId(), entity);
-                        } else {
-                            int a = 0;
-                            if (e.getEntityVal()!="") {
-                                for (String s : e.getEntityVal().replaceAll("'s","").replaceAll("\\'","").replaceAll("'","").split("\n")) {
-                                    a += returnDBPediaEntityCount(Query.replaceAll("'s","").replaceAll("\\'","").replaceAll("'","") + " " + s);
-                                }
-                            }
-                            entity.setCount(entity.getCount() + a);
-                            myEntityMap.replace(e.getEntityId(), entity);
-                        }
-                        myGlobalMap.replace(qMain.getKey(), myEntityMap);
-                    }
-                }
-                qID = qMain.getKey();
-            }
-        }
-        int i2 = 1;
-
-        Map<String, String> expandedQuery = query;
-        for (Map.Entry<String, HashMap<String, EntityContainer>> globalQMap : myGlobalMap.entrySet()) {
-
-
-            int numberOfReturnedEntity = searchcommand.getNumberOfReturnedEntity();
-
-            // return max entity (the top entity)
-            List<EntityContainer> candidateEntityList = getMaxEntityCount(globalQMap.getValue(), numberOfReturnedEntity + 1);
-
-            int iq = 0;
-            String additionalQuery = "";
-            for (EntityContainer candidateEntity : candidateEntityList) {
-                if (iq != 0) { // do not take the first entity which is ""
-
-                    additionalQuery = additionalQuery + " " + candidateEntity.getEntityVal();
-
-                    if (searchcommand.getisVerbose()) {
-                        System.out.println("\n" + i2 + " query " + globalQMap.getKey() + " the top Entity " + candidateEntity.getEntityId() + " --- Value ---- " + candidateEntity.getEntityVal() + " with count " + candidateEntity.getCount());
-                    }
-                }
-                iq++;
-            }
-            i2++;
-
-            expandedQuery.replace(globalQMap.getKey(), expandedQuery.get(globalQMap.getKey()) + " " + additionalQuery);
-        }
-
-        return ReRank(expandedQuery);
-
-    }
+//    public Map<String,Map<String,Container >> doQueryExpansionWithDBpedia() {
+//        //PrintUtils.displayMap(bm25.getRanking(query));
+//
+//        myEntityMap = new HashMap<>();
+//        myGlobalMap = new HashMap<>();
+//
+//        String qID = "";
+//        EntityContainer entity = null;
+//        int i = 0;
+//        for (Map.Entry<String, String> qMain : query.entrySet()) {
+//
+//            if (searchcommand.getisVerbose()) {
+//                System.out.println(i + " of " + query.entrySet().size());
+//            }
+//
+//            i++;
+//            String Query = qMain.getValue();
+//
+//            Map<String, Container> temp = bm25.getRanking(Query);
+//            myEntityMap = new HashMap<>();
+//
+//            for (Map.Entry<String, Container> q3 : temp.entrySet()) {
+//
+//                EntityContainer e = q3.getValue().getEntity();
+//                if (qMain.getKey() != qID) {
+//                    // new Query
+//                    if (e.getEntityId() != " ") {
+//                        entity = e;
+//                        int a = 0;
+//                        for (String s : e.getEntityVal().replaceAll("'s", "").replaceAll("\\'","").replaceAll("'","").split("\n")) {
+//                            if (e.getEntityVal() != "" && s != "") {
+//                                a += returnDBPediaEntityCount(Query.replaceAll("'s", "").replaceAll("\\'","").replaceAll("'","") + " " + s);
+//                            }
+//                        }
+//                        entity.setCount(a);
+//                        myEntityMap.put(e.getEntityId(), entity);
+//                        myGlobalMap.put(qMain.getKey(), myEntityMap);
+//                    }
+//                } else {
+//                    // old Query
+//                    if (e.getEntityId() != " ") {
+//                        entity = myEntityMap.get(e.getEntityId());
+//                        if (entity == null) {
+//                            entity = e;
+//                            int a = 0;
+//                            if (e.getEntityVal()!="") {
+//                                for (String s : e.getEntityVal().replaceAll("'s","").replaceAll("\\'","").replaceAll("'","").split("\n")) {
+//                                    a += returnDBPediaEntityCount(Query.replaceAll("'s","").replaceAll("\\'","").replaceAll("'","") + " " + s);
+//                                }
+//                            }
+//                            entity.setCount(a);
+//                            myEntityMap.put(e.getEntityId(), entity);
+//                        } else {
+//                            int a = 0;
+//                            if (e.getEntityVal()!="") {
+//                                for (String s : e.getEntityVal().replaceAll("'s","").replaceAll("\\'","").replaceAll("'","").split("\n")) {
+//                                    a += returnDBPediaEntityCount(Query.replaceAll("'s","").replaceAll("\\'","").replaceAll("'","") + " " + s);
+//                                }
+//                            }
+//                            entity.setCount(entity.getCount() + a);
+//                            myEntityMap.replace(e.getEntityId(), entity);
+//                        }
+//                        myGlobalMap.replace(qMain.getKey(), myEntityMap);
+//                    }
+//                }
+//                qID = qMain.getKey();
+//            }
+//        }
+//        int i2 = 1;
+//
+//        Map<String, String> expandedQuery = query;
+//        for (Map.Entry<String, HashMap<String, EntityContainer>> globalQMap : myGlobalMap.entrySet()) {
+//
+//
+//            int numberOfReturnedEntity = searchcommand.getNumberOfReturnedEntity();
+//
+//            // return max entity (the top entity)
+//            List<EntityContainer> candidateEntityList = getMaxEntityCount(globalQMap.getValue(), numberOfReturnedEntity + 1);
+//
+//            int iq = 0;
+//            String additionalQuery = "";
+//            for (EntityContainer candidateEntity : candidateEntityList) {
+//                if (iq != 0) { // do not take the first entity which is ""
+//
+//                    additionalQuery = additionalQuery + " " + candidateEntity.getEntityVal();
+//
+//                    if (searchcommand.getisVerbose()) {
+//                        System.out.println("\n" + i2 + " query " + globalQMap.getKey() + " the top Entity " + candidateEntity.getEntityId() + " --- Value ---- " + candidateEntity.getEntityVal() + " with count " + candidateEntity.getCount());
+//                    }
+//                }
+//                iq++;
+//            }
+//            i2++;
+//
+//            expandedQuery.replace(globalQMap.getKey(), expandedQuery.get(globalQMap.getKey()) + " " + additionalQuery);
+//        }
+//
+//        return ReRank(expandedQuery);
+//
+//    }
 
     private List<EntityContainer> getMaxEntityCount(Map<String, EntityContainer> entityMap, int numberOfEntityReturn) {
         // do not care of the entity that appear one time.
