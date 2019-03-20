@@ -19,7 +19,7 @@ import main.java.graph.GraphDegreeConstructor;
 import main.java.wordsimilarityranker.*;
 import main.java.queryexpansion.QueryExpansion;
 import main.java.entityrelation.FeatureGenerator;
-
+import main.java.wrapper.QueryExpansionReRanking;
 
 
 import java.io.IOException;
@@ -282,6 +282,16 @@ public class SearchRunner implements ProgramRunner
         if(searchParser.getisVerbose())
         {
             PrintUtils.displayQuery(queryCBOR);
+        }
+
+        if(searchParser.is_qe_reranking())
+        {
+            validate.ValidateQE();
+            QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
+            Map<String,Map<String,Container >> res = qe.doQueryExpansion();
+            QueryExpansionReRanking geReRank = new QueryExpansionReRanking(searchParser,queryCBOR,res);
+            geReRank.getDocumentFrequencyReRanking("QE_ReRank");
+
         }
 
        }
