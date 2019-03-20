@@ -11,6 +11,10 @@ All the necessary commands should be registered here first for your implementati
 
 public class RegisterCommands
 {
+    public enum qeType
+    {
+        entityText , entityID , entityTextID,entityIDInEntityField;
+    }
      /*
       All the commands as part of the index should be registered here
       */
@@ -133,6 +137,9 @@ public class RegisterCommands
          @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the document using Query expansion")
          private boolean isQE =false;
 
+         @Parameter(names = {"-qe-type","--query-expansion-type"},description ="Select type of Query expansion (entityText, entityID , entityTextID) ")
+         private qeType qeTypeValue = qeType.entityText;
+
          @Parameter(names = {"-top"},description ="specify the top number of selected entity to used in the Query expansion")
          private int numberOfReturnedEntity = 3;
 
@@ -187,6 +194,10 @@ public class RegisterCommands
          @Parameter(names = "--rank-lib",description ="Provide path to the Ranklib")
          private String ranklibpath = null;
 
+         @Parameter(names = "--qe-reranking",description ="Provide path to the Ranklib")
+         private boolean qe_reranking = false;
+
+         public boolean is_qe_reranking(){return qe_reranking;}
 
 
          public String getRanklibPath()
@@ -226,9 +237,10 @@ public class RegisterCommands
              return isSectionEnabled;
          }
          public boolean isQEEnabled(){return isQE;}
+         public qeType getQEType () {return qeTypeValue;}
          public int getNumberOfReturnedEntity() {return numberOfReturnedEntity;}
 
-        public Integer getBiasFactor() {return biasFactor;}
+         public Integer getBiasFactor() {return biasFactor;}
          public boolean isDiceEnabled() { return isDiceEnabled;}
          public boolean isJaroSimilarityEnabled(){return isJaroEnabled;}
          public boolean isJaccardSimilarityEnabled(){return isJaccardSimilarity;}
