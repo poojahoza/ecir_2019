@@ -2,7 +2,9 @@ package main.java.utils;
 
 import main.java.containers.Container;
 import main.java.containers.EntityContainer;
+import main.java.utils.SortUtils;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -32,6 +34,31 @@ public class Entities {
         return query_entity_list;
     }
 
+    public Map<String, Map<String, String>> getSortedEntitiesPerQuery(Map<String, Map<String, Container>> input){
+        Map<String, Map<String, String>> query_entity_list = new LinkedHashMap<>();
+        for(Map.Entry<String, Map<String, Container>> m: input.entrySet()){
+            Map<String, String> entity_list = new LinkedHashMap<>();
+
+            for(Map.Entry<String, Container> n: m.getValue().entrySet())
+            {
+                EntityContainer e = n.getValue().getEntity();
+                String [] entity_ids = e.getEntityId().split("[\r\n]+");
+                for(int s = 0; s  < entity_ids.length; s++) {
+                    if(entity_list.containsKey(entity_ids[s])){
+                        int freq = Integer.valueOf(entity_list.get(entity_ids[s]));
+                        freq++;
+                        entity_list.put(entity_ids[s], String.valueOf(freq));
+                    }else{
+                        entity_list.put(entity_ids[s], "1");
+                    }
+
+                }
+            }
+            entity_list = SortUtils.sortByValue(entity_list);
+            query_entity_list.put(m.getKey(), entity_list);
+        }
+        return query_entity_list;
+    }
 
 
     public Map<String, Map<String, Double>> getParagraphsScore(Map<String, Map<String, Container>> bm25_ranking,
@@ -153,6 +180,26 @@ public class Entities {
 
         }
         return expanded_query;
+    }
+
+    public String[][] getEntityArray(Map<String, String> entities_list){
+        String[][] edge_array = new String[entities_list.size()][2];
+        int counter = 0;
+        for(Map.Entry<String, String> m: entities_list.entrySet())
+        {
+            edge_array[counter][0] = m.getKey();
+            edge_array[counter][1] = m.getValue();
+            counter++;
+        }
+        return edge_array;
+    }
+
+    public static boolean searchArrayElement(String[] search_array, String target){
+        int count = Arrays.binarySearch(search_array, target);
+        if(count > 0){
+            return true;
+        }
+        return false;
     }
 
 }

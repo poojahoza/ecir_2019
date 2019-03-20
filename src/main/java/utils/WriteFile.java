@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
@@ -85,4 +86,37 @@ public class WriteFile {
             }
         }
     }
+
+    public void generateFeatureVectorRunFile(Map<String, Map<String, Double[]>> results, String methodname)
+    {
+        String output_file = "output_ranking_"+methodname+".txt";
+        List<String> rankings = new ArrayList<String>();
+        Path file = Paths.get(System.getProperty("user.dir"), output_file);
+        checkFileExistence(output_file);
+        try {
+            Files.createFile(file);
+        }catch(IOException ioe)
+        {
+            System.out.println(ioe.getMessage());
+        }
+        for(Map.Entry<String, Map<String, Double[]>> m: results.entrySet())
+        {
+            //int rank = 0;
+            rankings.clear();
+            for(Map.Entry<String, Double[]> n: m.getValue().entrySet())
+            {
+                //rank += 1;
+                rankings.add(m.getKey() + Arrays.toString(n.getValue()));
+
+            }
+            try {
+                Files.write(file, rankings, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
+            }
+            catch (IOException io)
+            {
+                System.out.println("Error writing in file");
+            }
+        }
+    }
+
 }
