@@ -4,53 +4,38 @@ import main.java.commandparser.RegisterCommands;
 import main.java.containers.Container;
 import main.java.containers.EntityContainer;
 import main.java.searcher.EntityAbstractSearcher;
+import main.java.utils.RunWriter;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
 import java.util.*;
 
 public class EntitySimilarityRanker  extends SimilarityRankerBase
 {
-    private EntityAbstractSearcher ebs =null;
     public EntitySimilarityRanker(RegisterCommands.CommandSearch SearchCommand, Map<String,String> query)
     {
         super(SearchCommand,query);
-        ebs = new EntityAbstractSearcher(SearchCommand.getEntityIndLoc());
     }
 
-
-    public List<String> getEntities(Container input)
+    private String[] getEntities(Container input)
     {
-            List<String> emention = new ArrayList<>();
             EntityContainer e = input.getEntity();
-            String [] entity_val = e.getEntityVal().split("[\r\n]+");
-            emention = Arrays.asList(entity_val);
-            return emention;
+            if(e.getEntityVal()== null)
+            {
+
+            }
+            return e.getEntityVal().split("[\r\n]+");
     }
 
     @Override
-    INDArray getVector(Container docID) {
-        //getEntities()
+    INDArray getVector(Container docID)
+    {
+        String[] entitiesID = getEntities(docID);
         return null;
-    }
-
-    public void lead(List<String> ll) {
-        for (String str : ll) {
-            System.out.println(ebs.getAbstract(str));
-        }
-
     }
 
     public void doEntityReRank()
     {
-        for(Map.Entry<String,String> q: query.entrySet())
-        {
-            Map<String,Container> re = bm25.getRanking(q.getValue());
-            for(Map.Entry<String,Container> val: re.entrySet())
-            {
-                //lead(getEntities(val.getValue()));
-                System.out.println(ebs.getAbstract(q.getValue()));
-            }
-        }
-
+        Map<String,Map<String,Container>> res = rerank();
+        RunWriter.writeRunFile("Entity_similarity_ranking",res);
     }
 }

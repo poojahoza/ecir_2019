@@ -291,7 +291,8 @@ public class SearchRunner implements ProgramRunner
             QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
             Map<String,Map<String,Container >> res = qe.doQueryExpansion();
             QueryExpansionReRanking geReRank = new QueryExpansionReRanking(searchParser,queryCBOR,res);
-            geReRank.getDocumentFrequencyReRanking("QE_ReRank");
+            String mname= "qe_rerank_"+searchParser.getQEType().toString();
+            geReRank.getDocumentFrequencyReRanking(mname);
 
         }
 
