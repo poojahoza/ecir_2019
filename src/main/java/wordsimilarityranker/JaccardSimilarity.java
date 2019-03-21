@@ -1,6 +1,7 @@
 package main.java.wordsimilarityranker;
 
 import info.debatty.java.stringsimilarity.Jaccard;
+import main.java.commandparser.RegisterCommands;
 import main.java.containers.Container;
 import main.java.searcher.BaseBM25;
 import main.java.utils.RunWriter;
@@ -9,9 +10,9 @@ import java.util.Map;
 
 public class JaccardSimilarity extends SimilarityBase
 {
-    public JaccardSimilarity(BaseBM25 bm , Map<String,String> query)
+    public JaccardSimilarity(RegisterCommands.CommandSearch searchCommand, Map<String,String> query)
     {
-        super(bm,query);
+        super(searchCommand,query);
     }
 
     @Override

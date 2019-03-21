@@ -1,6 +1,5 @@
 package main.java.reranker;
 
-import com.sun.jna.platform.win32.OaIdl;
 import main.java.containers.Container;
 import main.java.searcher.BaseBM25;
 import main.java.utils.PreProcessor;
@@ -128,6 +127,7 @@ class ReRankRunner
             double newScore = ((val.getValue().getScore() * cosineScore) + biasedScore);
 
             Container temp = new Container(newScore, val.getValue().getDocID());
+            //temp.addEntityContainer(val.getValue().getEntity());
             unsorted.put(val.getKey(), temp);
         }
         return SortUtils.sortByValue(unsorted);

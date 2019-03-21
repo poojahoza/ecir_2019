@@ -1,26 +1,28 @@
 package main.java.runner;
 
 
+import main.java.clustering.ClusteringRanker;
 import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
+import main.java.mrf.MarkovRandomField;
 import main.java.reranker.ReRanker;
+import main.java.rerankerv2.docsimranker.DocumentFrequencySimilarity;
+import main.java.rerankerv2.docsimranker.EntitySimilarityRanker;
 import main.java.searcher.BaseBM25;
 import main.java.utils.*;
-import main.java.searcher.BaseBM25;
 import main.java.searcher.PageSearcher;
 import main.java.searcher.LeadtextSearcher;
 import main.java.graph.GraphSimConstructor;
 import main.java.graph.GraphDegreeConstructor;
 import main.java.wordsimilarityranker.*;
-import org.jgrapht.Graph;
 import main.java.queryexpansion.QueryExpansion;
 import main.java.entityrelation.FeatureGenerator;
+import main.java.wrapper.QueryExpansionReRanking;
 
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /*
@@ -94,61 +96,43 @@ public class SearchRunner implements ProgramRunner
 
         if(searchParser.isDFReRankEnabled())
         {
+
             validate.ValidateReRank();
-            ReRanker re = new ReRanker(searchParser,queryCBOR);
-            re.ReRankDF();
+//            ReRanker re = new ReRanker(searchParser,queryCBOR);
+//            re.ReRankDF();
+
+            DocumentFrequencySimilarity df = new DocumentFrequencySimilarity(searchParser,queryCBOR);
+            df.doDocumentFrequency();
         }
 
         if(searchParser.isCosineSimilarityEnabled())
         {
-            BaseBM25 bm = null;
-            try {
-                 bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            CosineSimilarity cosineSimilarity = new CosineSimilarity(bm,queryCBOR);
+            CosineSimilarity cosineSimilarity = new CosineSimilarity(searchParser,queryCBOR);
             cosineSimilarity.doCosine();
         }
 
         if(searchParser.isJaccardSimilarityEnabled())
         {
-            BaseBM25 bm = null;
-            try {
-                bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            JaccardSimilarity jaccardSimilarity = new JaccardSimilarity(bm,queryCBOR);
+            JaccardSimilarity jaccardSimilarity = new JaccardSimilarity(searchParser,queryCBOR);
             jaccardSimilarity.doJaccard();
         }
 
         if(searchParser.isJaroSimilarityEnabled())
         {
-            BaseBM25 bm = null;
-            try {
-                bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            JaroWinklerSim jaroWinkler = new JaroWinklerSim(bm,queryCBOR);
+            JaroWinklerSim jaroWinkler = new JaroWinklerSim(searchParser,queryCBOR);
             jaroWinkler.doJaroWinkler();
         }
 
         if(searchParser.isDiceEnabled())
         {
-            BaseBM25 bm = null;
-            try {
-                bm = new BaseBM25(searchParser.getkVAL(),searchParser.getIndexlocation());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            SorensenDiceCoefficient sorensenDiceCoefficient = new SorensenDiceCoefficient(bm,queryCBOR);
+            SorensenDiceCoefficient sorensenDiceCoefficient = new SorensenDiceCoefficient(searchParser,queryCBOR);
             sorensenDiceCoefficient.doSorsenCoff();
+        }
+
+        if(searchParser.isLevenSimEnabled())
+        {
+            NormalizedLevenshteinSimilarity normalizedLevenshteinSimilarity = new NormalizedLevenshteinSimilarity(searchParser,queryCBOR);
+            normalizedLevenshteinSimilarity.doNormalizedLevenshtein();
         }
 
 
@@ -208,6 +192,8 @@ public class SearchRunner implements ProgramRunner
             }catch (IOException ioe){
                 System.out.println(ioe.getMessage());
             }
+
+
         }
         if(searchParser.isQueryExpand()){
             validate.ValidateEntityDegree();
@@ -349,6 +335,26 @@ public class SearchRunner implements ProgramRunner
             validate.ValidateQE();
             QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
             qe.doQueryExpansion();
+
+        }
+
+        if(searchParser.isEntityDocSimEnabled())
+        {
+            validate.ValidateReRank();
+            EntitySimilarityRanker ent = new EntitySimilarityRanker(searchParser,queryCBOR);
+            ent.doEntityReRank();
+        }
+
+        if(searchParser.isMrfEnabled())
+        {
+            MarkovRandomField mrf = new MarkovRandomField(searchParser,queryCBOR);
+            mrf.doMarkovRandomField();
+        }
+
+        if(searchParser.isClusterRankerEnabled())
+        {
+            ClusteringRanker cr = new ClusteringRanker(searchParser,queryCBOR);
+            cr.doCluster();
         }
 
         if(searchParser.getisVerbose())
@@ -356,7 +362,52 @@ public class SearchRunner implements ProgramRunner
             PrintUtils.displayQuery(queryCBOR);
         }
 
+        if(searchParser.is_qe_reranking())
+        {
+            validate.ValidateQE();
+            validate.ValidateReRank();
+            QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
+            Map<String,Map<String,Container >> res = qe.doQueryExpansion();
+            QueryExpansionReRanking geReRank = new QueryExpansionReRanking(searchParser,queryCBOR,res);
+            String mname= "qe_rerank_"+searchParser.getQEType().toString();
+            geReRank.getDocumentFrequencyReRanking(mname);
 
         }
+
+        if(searchParser.isQe_entity_degree_rerankingEnabled()) {
+            validate.ValidateEntityDegree();
+            validate.ValidateReRank();
+
+            try {
+                BaseBM25 bm25 = new BaseBM25(searchParser.getkVAL(), searchParser.getIndexlocation());
+                Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(queryCBOR);
+
+                Entities e = new Entities();
+                Map<String, Map<String, String>> query_ent_list = e.getEntitiesPerQuery(bm25_ranking);
+
+                PageSearcher pgs = new PageSearcher(searchParser.getEntityIndLoc());
+                Map<String, Map<String, String>> query_entities = pgs.getRanking(query_ent_list);
+
+                GraphDegreeConstructor gdc = new GraphDegreeConstructor();
+                Map<String, Map<String, Integer>> ranked_entities = gdc.getGraphDegree(query_entities);
+
+                Map<String, Map<String, Double>> ranked_entities_score = e.getParagraphsScore(bm25_ranking, ranked_entities);
+                ranked_entities_score = e.getRerankedParas(ranked_entities_score);
+
+                Map<String, String> expanded_query = e.expandQuery(queryCBOR, ranked_entities_score);
+
+                //BaseBM25 bm25 = new BaseBM25(100, searchParser.getIndexlocation());
+                Map<String, Map<String, Container>> expanded_bm25_ranking = bm25.getRanking(expanded_query);
+
+
+                QueryExpansionReRanking geReRank = new QueryExpansionReRanking(searchParser, queryCBOR, expanded_bm25_ranking);
+                geReRank.getDocumentFrequencyReRanking("QE_Entity_degree");
+
+            } catch (IOException io) {
+                        io.getStackTrace();
+            }
+
+         }
+       }
     }
 

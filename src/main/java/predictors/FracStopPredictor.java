@@ -1,17 +1,17 @@
 package main.java.predictors;
 
 import main.java.BayesCounter;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.search.IndexSearcher;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class NaiveBayesTrigramPredictor extends LabelPredictor {
+public class FracStopPredictor extends LabelPredictor{
+
     private BayesCounter bc = new BayesCounter();
 
-    public  NaiveBayesTrigramPredictor() {
+    public FracStopPredictor() {
         super();
     }
 
@@ -21,7 +21,11 @@ public class NaiveBayesTrigramPredictor extends LabelPredictor {
      * @param tokens List of tokens in the document
      */
     public void trainHamTokens(List<String> tokens) {
-        bc.buildTrigramsHashMap("ham", tokens);
+        try {
+            bc.buildFracStopHashMap("ham", tokens);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -30,7 +34,11 @@ public class NaiveBayesTrigramPredictor extends LabelPredictor {
      * @param tokens List of tokens in the document
      */
     public void trainSpamTokens(List<String> tokens) {
-        bc.buildTrigramsHashMap("spam", tokens);
+        try {
+            bc.buildFracStopHashMap("spam", tokens);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -40,9 +48,14 @@ public class NaiveBayesTrigramPredictor extends LabelPredictor {
      * @param tokens List of tokens in the document
      * @return String The label ("spam" or "ham") that is predicted given the document  tokens
      */
-    @Override
     public String predict(List<String> tokens) {
-        return bc.classifyWithTrigrams(tokens);
+        String label = null;
+        try {
+            label =  bc.classifyWithFracStops(tokens);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return label;
     }
 
     /**
@@ -51,9 +64,8 @@ public class NaiveBayesTrigramPredictor extends LabelPredictor {
      * @param tokens List of tokens in the document
      * @return ArrayList The ham and spam scores of the given document tokens
      */
-    @Override
     public ArrayList<Double> score(List<String> tokens) {
-        return bc.getTrigramScores(tokens);
+        return null;
     }
 
     /**
@@ -63,10 +75,11 @@ public class NaiveBayesTrigramPredictor extends LabelPredictor {
      * @param ham, a hash map of the spam test data by itself.
      * @param docs of mixed ham and spam documents mapping their pids to their text.
      */
-    @Override
     public void evaluate(HashMap<String, String> spam, HashMap<String, String> ham, HashMap<String, String> docs) {
-        bc.evaluateTrgramPredictor(spam, ham, docs);
+        try {
+            bc.evaluateFracStopPredictor(spam, ham, docs);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
-
 }
-

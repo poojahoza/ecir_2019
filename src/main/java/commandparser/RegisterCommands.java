@@ -11,6 +11,10 @@ All the necessary commands should be registered here first for your implementati
 
 public class RegisterCommands
 {
+    public enum qeType
+    {
+        entityText , entityID , entityTextID,entityIDInEntityField;
+    }
      /*
       All the commands as part of the index should be registered here
       */
@@ -136,8 +140,14 @@ public class RegisterCommands
          @Parameter(names = {"--dice-sim"},description ="Rerank the document based on the Sorensen Dice coefficient similarity between two strings")
          private boolean isDiceEnabled = false;
 
+         @Parameter(names = {"--leven-sim"},description ="Rerank the document based on the NormalizedLevenshtein similarity between two strings")
+         private boolean isLevenSim = false;
+
          @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the document using Query expansion")
          private boolean isQE =false;
+
+         @Parameter(names = {"-qe-type","--query-expansion-type"},description ="Select type of Query expansion (entityText, entityID , entityTextID) ")
+         private qeType qeTypeValue = qeType.entityText;
 
          @Parameter(names = {"-top"},description ="specify the top number of selected entity to used in the Query expansion")
          private int numberOfReturnedEntity = 3;
@@ -169,6 +179,77 @@ public class RegisterCommands
          @Parameter(names = "section",description ="Section level retrieval")
          private boolean isSectionEnabled =false;
 
+         @Parameter(names = "--entity-doc-sim",description ="Rerank the initial retrieved document using entity abstract similarity")
+         private boolean isEntityDocSimEnabled = false;
+
+         @Parameter(names = "--spam-filter",description ="Uses the spam filter before performing the re-rank")
+         private static boolean isSpamFilterEnabled = false;
+
+
+         @Parameter(names = {"--spam-loc"}, description = "Directory to spam train file")
+         private static String spamLocation = null;
+
+
+         @Parameter(names = {"--ham-loc"}, description = "Directory to ham train file")
+         private static String hamLocation = null;
+
+
+         @Parameter(names = "--parallel",description ="Uses the parallel stream for the reranker methods")
+         private boolean isParallelEnabled = false;
+
+         @Parameter(names = "--mrf",description ="Uses the parallel stream for the reranker methods")
+         private boolean isMrfEnabled = false;
+
+         @Parameter(names = "--cluster",description ="Cluster Ranking")
+         private boolean isClusterRankerEnabled = false;
+
+         @Parameter(names = "--qrel-path",description ="Pass the absolute path of the Qrel")
+         private String qrelPath = null;
+
+         @Parameter(names = "--rank-lib",description ="Provide path to the Ranklib")
+         private String ranklibpath = null;
+
+         @Parameter(names = "--qe-reranking",description ="Query expansion method based on the Entities and reranking")
+         private boolean qe_reranking = false;
+
+         @Parameter(names = "--qe-entity-degree",description ="Query expansion based on the entity degree and reranking")
+         private boolean qe_entity_degree_reranking = false;
+
+         public boolean is_qe_reranking(){return qe_reranking;}
+
+         public boolean isQe_entity_degree_rerankingEnabled()
+         {
+             return  qe_entity_degree_reranking;
+         }
+
+         public String getRanklibPath()
+         {
+             return ranklibpath;
+         }
+
+         public boolean isClusterRankerEnabled()
+         {
+             return isClusterRankerEnabled;
+         }
+         public boolean isLevenSimEnabled() {return isLevenSim;}
+         public String getQrelPath()
+         {
+             return qrelPath;
+         }
+         public boolean isMrfEnabled() {return  isMrfEnabled;}
+         public boolean isParallelEnabled(){return isParallelEnabled;}
+         public static boolean isSpamFilterEnabled()
+         {
+             return isSpamFilterEnabled;
+         }
+         public static String SpamLocation()
+         {
+             return spamLocation;
+         }
+         public static String hamLocation()
+         {
+             return hamLocation;
+         }
          public boolean isArticleEnabled()
          {
              return isArticleEnabled;
@@ -178,9 +259,10 @@ public class RegisterCommands
              return isSectionEnabled;
          }
          public boolean isQEEnabled(){return isQE;}
+         public qeType getQEType () {return qeTypeValue;}
          public int getNumberOfReturnedEntity() {return numberOfReturnedEntity;}
 
-        public Integer getBiasFactor() {return biasFactor;}
+         public Integer getBiasFactor() {return biasFactor;}
          public boolean isDiceEnabled() { return isDiceEnabled;}
          public boolean isJaroSimilarityEnabled(){return isJaroEnabled;}
          public boolean isJaccardSimilarityEnabled(){return isJaccardSimilarity;}
@@ -247,7 +329,10 @@ public class RegisterCommands
           public boolean isCosineSimilarityEnabled() {return isCosineSimilarity;}
 
 
-
+            public boolean isEntityDocSimEnabled()
+            {
+                return isEntityDocSimEnabled;
+            }
 
           public boolean isEntityDegreeEnabled()
          {
@@ -287,23 +372,30 @@ public class RegisterCommands
           }
      }
 
-    @Parameters(separators = "=",commandDescription = "Command to create ham-spam index")
+    @Parameters(separators = "=",commandDescription = "Command to create training and test data for the spam classifier")
     public static class IndexHamSpam
     {
-        @Parameter(names = {"-i","--corpus-file"},description = "Index",required=true)
-        private String IndexPath;
 
-        @Parameter(names = {"-q","--new-qrels-file"},description = "qrels file")
-        private String QrelPath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+        @Parameter(names = {"-p","--paragraphs-file"},description = "paragraph corpus directory")
+        private String paragraphPath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
 
-        @Parameter(names = {"-s","--dest-spamtrain"},description = "Location to save the spam training data")
-        private String spamDestpath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+        @Parameter(names = {"-q","--qrels-file"},description = "qrels file")
+        private String qrelPath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
 
-        @Parameter(names = {"-h","--dest-hamtrain"},description = "Location to save the ham training data")
-        private String hamDestpath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+        @Parameter(names = {"-spamTrain"},description = "Location to save the spam training data")
+        private String spamTrainPath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
 
-        @Parameter(names = {"-d","--dest-test"},description = "Location to save the test data")
-        private String hamSpamDestpath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+        @Parameter(names = {"-hamTrain"},description = "Location to save the ham training data")
+        private String hamTrainPath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+
+        @Parameter(names = {"-hamSpamTest"},description = "Location to save the ham and spam test data")
+        private String hamSpamTestpath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+
+        @Parameter(names = {"-hamTest"},description = "Location to save the ham test data")
+        private String hamTestpath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
+
+        @Parameter(names = {"-spamTest"},description = "Location to save the spam test data")
+        private String spamTestpath=System.getProperty("user.dir") + System.getProperty("file.separator") + "indexed_file";
 
 
         @Parameter(names = "--help", help = true)
@@ -314,62 +406,40 @@ public class RegisterCommands
             return help;
         }
 
-        public String getIndexPath()
+        public String getParagraphPath()
         {
-            return IndexPath;
+            return paragraphPath;
         }
 
         public String getQrelPath()
         {
-            return QrelPath;
+            return qrelPath;
         }
 
-        public String getSpamDestPath()
+        public String getSpamTrainPath()
         {
-            return spamDestpath;
+            return spamTrainPath;
         }
 
-        public String getHamDestPath()
+        public String getHamTrainPath()
         {
-            return hamDestpath;
+            return hamTrainPath;
         }
 
-        public String getHamSpamDestPath()
+        public String getHamSpamTestPath()
         {
-            return hamSpamDestpath;
+            return hamSpamTestpath;
         }
 
-    }
-
-    @Parameters(separators = "=",commandDescription = "Use the ham and spam data sets to detect and filter spam from search results")
-    public static class CommandFilter
-    {
-        @Parameter(names = {"-i","--index"},description = "Location of the main index", required=true)
-        private String indexPath;
-
-        @Parameter(names = {"-s","--spam-index"},description = "Location of the spam training data", required=true)
-        private String spamIndexPath;
-
-        @Parameter(names = {"-h","--ham-index"},description = "Location of the ham training data", required=true)
-        private String hamIndexPath;
-
-        @Parameter(names = {"-t","--test-index"},description = "Location of the test data", required=true)
-        private String hamSpamIndexPath;
-
-        @Parameter(names = "--help", help = true)
-        private boolean help;
-
-        boolean isHelp() {
-            return help;
+        public String getHamTestPath()
+        {
+            return hamTestpath;
         }
 
-        public String getIndexPath(){return indexPath;}
-
-        public String getSpamIndexPath(){return spamIndexPath;}
-
-        public String getHamIndexPath(){return hamIndexPath;}
-
-        public String getTestIndexPath(){return hamSpamIndexPath;}
+        public String getSpamTestPath()
+        {
+            return spamTestpath;
+        }
 
     }
 
@@ -378,5 +448,23 @@ public class RegisterCommands
      {
 
      }
+
+    @Parameters(separators = "=",commandDescription = "Ranker")
+    public static class Ranker
+    {
+        @Parameter(names = {"--model-file"},description = "Location of the model file",required=true)
+        private String modelFile=null;
+
+        @Parameter(names = {"--run-file"},description = "Location of the run file",required=true)
+        private String runfile=null;
+
+        @Parameter(names = {"--mname"},description = "Method name suffix")
+        private String mname="mrfupdated";
+
+        public String getModelFile(){return modelFile;}
+        public String getRunfile() {return  runfile;}
+        public String getMname(){return mname;}
+
+    }
 
 }

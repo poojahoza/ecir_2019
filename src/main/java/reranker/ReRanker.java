@@ -47,15 +47,27 @@ public class ReRanker
     public void ReRank()
     {
         runnerReRank.setBiasFactor(SearchCommand.getBiasFactor());
-
         Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
-        for(Map.Entry<String,String> q: query.entrySet())
-        {
-            String Query = q.getValue();
-            Map<String, Container> BM25Val = bm25.getRanking(Query);
-            Map<String, Container> reOrdered = runnerReRank.getReRank(BM25Val);
-            result.put(q.getKey(),reOrdered);
-        }
+//        for(Map.Entry<String,String> q: query.entrySet())
+//        {
+//            String Query = q.getValue();
+//            Map<String, Container> BM25Val = bm25.getRanking(Query);
+//            Map<String, Container> reOrdered = runnerReRank.getReRank(BM25Val);
+//            result.put(q.getKey(),reOrdered);
+//        }
+
+        StreamSupport.stream(query.entrySet().spliterator(),true)
+                .forEach(q -> {
+                    try {
+                        BaseBM25 bm = new BaseBM25(SearchCommand.getkVAL(),SearchCommand.getIndexlocation());
+                        Map<String, Container> BM25Val = bm.getRanking(q.getValue());
+                        Map<String, Container> reOrdered = runnerReRank.getReRank(BM25Val);
+                        result.put(q.getKey(),reOrdered);
+                        System.out.print(".");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
 
         String datafile ="";
         if(SearchCommand.getQueryfile().toLowerCase().contains("test".toLowerCase()))
@@ -151,4 +163,43 @@ public class ReRanker
             PrintUtils.displayMap(result);
         }
     }
+
+    public Map<String,Map<String,Container>> getReRankSimilarity(Map<String,Map<String,Container>> res)
+    {
+        System.out.println("Running the ReRank Similarity.....");
+        runnerReRank.setBiasFactor(SearchCommand.getBiasFactor());
+        long start= System.currentTimeMillis();
+        Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
+
+        StreamSupport.stream(res.entrySet().spliterator(),SearchCommand.isParallelEnabled())
+                .forEach(q -> {
+                        Map<String, Container> reOrdered = runnerReRank.getReRank(q.getValue());
+                        result.put(q.getKey(),reOrdered);
+                        System.out.print(".");
+                });
+        long end = System.currentTimeMillis();
+        long timeElapsed = end-start;
+        System.out.println("\nTime took :"+ (double)timeElapsed/1000 +"Minutes : "+ ((double)timeElapsed/1000)/60);
+
+        return result;
+    }
+
+    public Map<String,Map<String,Container>> getReRankSimilarityIDF(Map<String,Map<String,Container>> res)
+    {
+        System.out.println("Running the ReRank IDF Similarity.....");
+        runnerIDFReRank.setBiasFactor(SearchCommand.getBiasFactor());
+        Map<String,Map<String,Container >> result = new LinkedHashMap<String,Map<String,Container>>();
+        long start= System.currentTimeMillis();
+        StreamSupport.stream(res.entrySet().spliterator(),SearchCommand.isParallelEnabled())
+                .forEach(q -> {
+                    Map<String, Container> reOrdered = runnerIDFReRank.getReRank(q.getValue());
+                    result.put(q.getKey(),reOrdered);
+                    System.out.print(".");
+                });
+        long end = System.currentTimeMillis();
+        long timeElapsed = end-start;
+        System.out.println("\nTime took :"+ (double)timeElapsed/1000 +"Minutes : "+ ((double)timeElapsed/1000)/60);
+        return result;
+    }
+
 }

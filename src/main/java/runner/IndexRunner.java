@@ -70,7 +70,6 @@ public class IndexRunner implements ProgramRunner
 
         if(indexParser.getIsEntityAbstract()){
             validate.ValidateIndex();
-
             EntityIndexReader eir = null;
             try {
                 eir = new EntityIndexReader(indexParser.getIndexPath());
