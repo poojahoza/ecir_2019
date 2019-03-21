@@ -262,4 +262,34 @@ public class FeatureGenerator {
         }
         return query_entity_score;
     }
+
+    public Map<String, Map<String, Double>> generateAverageCentroidVector(String feature_vectors){
+
+        Map<String, Map<String, Double>> query_entity_score = new LinkedHashMap<>();
+        Entities e = new Entities();
+        Map<String, Map<String, Double[]>> features = e.readEntityFeatureVectorFile(feature_vectors);
+
+        Stats s = new Stats();
+
+        for(Map.Entry<String, Map<String, Double[]>> m : features.entrySet()){
+            Map<String, Double> score = new LinkedHashMap<>();
+            int entities_size = m.getValue().size();
+            Double[] centroid = new Double[] {0.0, 0.0};
+            for(Map.Entry<String, Double[]> n: m.getValue().entrySet()) {
+                centroid[0] += n.getValue()[0];
+                centroid[1] += n.getValue()[1];
+            }
+            centroid[0] = centroid[0]/entities_size;
+            centroid[1] = centroid[1]/entities_size;
+
+
+            for(Map.Entry<String, Double[]> n: m.getValue().entrySet()) {
+                score.put(n.getKey(), s.getDotProduct(n.getValue(), centroid));
+            }
+            query_entity_score.put(m.getKey(), SortUtils.sortByValue(score));
+
+        }
+        return query_entity_score;
+
+    }
 }

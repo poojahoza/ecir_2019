@@ -120,6 +120,15 @@ public class ValidateCommands
 
         }
 
+        public void ValidateEntityCentroid()
+        {
+            if(searchParser.getFeaturevectorfile() == null)
+            {
+                System.out.println("Please pass the feature vector file path");
+                CALLEXIT(-1);
+            }
+        }
+
 
         public void ValidateEntitySim()
         {

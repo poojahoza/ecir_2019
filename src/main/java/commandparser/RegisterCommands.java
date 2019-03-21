@@ -160,6 +160,9 @@ public class RegisterCommands
          @Parameter(names = "--entity-ranklib",description ="Rerank the passages using entity ranklib")
          private boolean isEntityRanklibEnabled =false;
 
+         @Parameter(names = "--entity-centroid",description ="Rerank the passages using entity average centroid")
+         private boolean isEntityCentroidEnabled =false;
+
          @Parameter(names = "article",description ="Article level retrieval")
          private boolean isArticleEnabled =false;
 
@@ -259,6 +262,11 @@ public class RegisterCommands
          public boolean isEntityRanklibEnabled()
          {
              return isEntityRanklibEnabled;
+         }
+
+         public boolean isEntityCentroidEnabled()
+         {
+             return isEntityCentroidEnabled;
          }
 
          public String getRankLibModelFile()

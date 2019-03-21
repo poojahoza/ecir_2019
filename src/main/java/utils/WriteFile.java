@@ -9,10 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+
+import main.java.utils.WriteFile;
 
 public class WriteFile {
 
@@ -29,7 +30,12 @@ public class WriteFile {
     {
         String output_file = "output_ranking_"+methodname+".txt";
         List<String> rankings = new ArrayList<String>();
-        Path file = Paths.get(System.getProperty("user.dir"), output_file);
+        String result_dir = "result";
+        File directory = new File(result_dir);
+        if (! directory.exists()){
+            directory.mkdir();
+        }
+        Path file = Paths.get(System.getProperty("user.dir")+"/"+result_dir, output_file);
         checkFileExistence(output_file);
         try {
             Files.createFile(file);
@@ -60,7 +66,12 @@ public class WriteFile {
     {
         String output_file = "output_ranking_"+methodname+".txt";
         List<String> rankings = new ArrayList<String>();
-        Path file = Paths.get(System.getProperty("user.dir"), output_file);
+        String result_dir = "result";
+        File directory = new File(result_dir);
+        if (! directory.exists()){
+            directory.mkdir();
+        }
+        Path file = Paths.get(System.getProperty("user.dir")+"/"+result_dir, output_file);
         checkFileExistence(output_file);
         try {
             Files.createFile(file);
@@ -91,7 +102,12 @@ public class WriteFile {
     {
         String output_file = "output_ranking_"+methodname+".txt";
         List<String> rankings = new ArrayList<String>();
-        Path file = Paths.get(System.getProperty("user.dir"), output_file);
+        String result_dir = "result";
+        File directory = new File(result_dir);
+        if (! directory.exists()){
+            directory.mkdir();
+        }
+        Path file = Paths.get(System.getProperty("user.dir")+"/"+result_dir, output_file);
         checkFileExistence(output_file);
         try {
             Files.createFile(file);
@@ -133,7 +149,12 @@ public class WriteFile {
     {
         String output_file = "output_ranking_"+methodname+".txt";
         List<String> rankings = new ArrayList<String>();
-        Path file = Paths.get(System.getProperty("user.dir"), output_file);
+        String result_dir = "result";
+        File directory = new File(result_dir);
+        if (! directory.exists()){
+            directory.mkdir();
+        }
+        Path file = Paths.get(System.getProperty("user.dir")+"/"+result_dir, output_file);
         Entities entities = new Entities();
         Map<String, Map<String, String>> mp = entities.readEntityQrelFile(qrelfilepath);
         checkFileExistence(output_file);
