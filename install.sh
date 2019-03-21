@@ -21,8 +21,8 @@ function usage()
 function call_maven()
 {
 echo "Executing the Maven for the dependency"
-sudo mvn clean compile
-sudo mvn package
+mvn clean compile
+mvn package
 sleep 4
 }
 
@@ -36,14 +36,14 @@ function change_path_target()
 	echo "**********************************************************"
 	pwdCurrent=$(pwd)
 	pwdCurrent=$pwdCurrent/target/cs953-team1-1.0-SNAPSHOT-jar-with-dependencies.jar
-        java -jar $pwdCurrent search -i $index_path -q $outlines_path --dice-sim --cosine-sim --jaccard-sim --jaro-sim 
-        java -jar $pwdCurrent search -i $index_path -q $outlines_path --rerank -we $embeddings_path -dim=50 -k=300 --bias-fact=20
-        java -jar $pwdCurrent search -i $index_path -q $outlines_path --rerank-idf -we $embeddings_path -dim=50 -k=300 --bias-fact=20
-        java -jar $pwdCurrent search -i $index_path -q $outlines_path --rerank-df -we $embeddings_path -dim=50 -k=300 --bias-fact=20
-        java -jar $pwdCurrent search --entity-degree -i $index_path -q $outlines_path --entity-index $entities_path 
-        java -jar $pwdCurrent search --entity-expand -i $index_path -q $outlines_path --entity-index $entities_path 
-        #java -jar $pwdCurrent filter -i $index_path $spam_train $ham_train $hamspam_test
-        java -jar $pwdCurrent search --entity-sim -i $index_path -q $outlines_path --entity-index $entities_path -we $embeddings_path -dim=50 
+    java -jar -Xmx20g $pwdCurrent ranker --model-file /home/team1/prototype2/amith_data/model.txt --run-file /home/team1/prototype2/amith_data/output_mrf_ranking.txt
+    java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path --dice-sim --cosine-sim --jaccard-sim --jaro-sim --leven-sim --parallel
+    java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path -we $embeddings_path -dim=50 -k=300 --bias-fact=20 --entity-doc-sim --parallel
+    java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path -we $embeddings_path -dim=50 -k=100 --bias-fact=20 -qe-type entityText --qe-reranking --parallel
+    java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path -we $embeddings_path -dim=50 -k=100 --bias-fact=20 -qe-type entityID  --qe-reranking --parallel
+    java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path -we $embeddings_path -dim=50 -k=100 --bias-fact=20 -qe-type entityTextID --qe-reranking --parallel
+    java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path --entity-ranklib -f /home/team1/prototype2/pooja_data/output_ranking_feature_vectors_section_test.txt -model /home/team1/prototype2/pooja_data/model_section_train.txt
+    java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path --entity-centroid -f /home/team1/prototype2/pooja_data/output_ranking_feature_vectors_section_test.txt
 }
 
 if [ $# -eq 0 ]
