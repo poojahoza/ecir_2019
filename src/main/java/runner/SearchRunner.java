@@ -262,7 +262,7 @@ public class SearchRunner implements ProgramRunner
 
         if(searchParser.isEntityDocSimEnabled())
         {
-            validate.ValidateReRank();
+
             EntitySimilarityRanker ent = new EntitySimilarityRanker(searchParser,queryCBOR);
             ent.doEntityReRank();
         }
