@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class StopCoveragePredictor extends LabelPredictor{
+public class StopCoveragePredictor extends StopWordLabelPredictor{
 
     private BayesCounter bc = new BayesCounter();
 
@@ -19,8 +19,8 @@ public class StopCoveragePredictor extends LabelPredictor{
      *
      * @param tokens List of tokens in the document
      */
-    public void trainHamTokens(List<String> tokens) {
-        bc.buildStopWordHashMap("ham", tokens);
+    public void trainHamTokens(List<String> tokens, String pid) {
+        bc.buildStopWordHashMap("ham", tokens, pid);
     }
 
     /**
@@ -28,8 +28,8 @@ public class StopCoveragePredictor extends LabelPredictor{
      *
      * @param tokens List of tokens in the document
      */
-    public void trainSpamTokens(List<String> tokens) {
-        bc.buildStopWordHashMap("spam", tokens);
+    public void trainSpamTokens(List<String> tokens, String pid) {
+        bc.buildStopWordHashMap("spam", tokens, pid);
     }
 
 
@@ -46,11 +46,11 @@ public class StopCoveragePredictor extends LabelPredictor{
     /**
      * Desc: Get the ham and spam scores for the test data.
      *
-     * @param tokens List of tokens in the document
+     * @param pid of the document
      * @return ArrayList The ham and spam scores of the given document tokens
      */
-     public ArrayList<Double> score(List<String> tokens) {
-        return null;
+     public ArrayList<Double> score(String pid) {
+        return bc.getStopCoverScores(pid);
     }
 
     /**

@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -180,21 +181,21 @@ SpamClassifier {
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
      */
-    public LabelPredictor classifyWithStopCover(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
+    public StopWordLabelPredictor classifyWithStopCover(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
 
-        LabelPredictor stopCoverPredictor = new StopCoveragePredictor();
+        StopWordLabelPredictor stopCoverPredictor = new StopCoveragePredictor();
         HashMap<String, String> test = null;
 
         for (String key : spamCorpus.keySet()) {
             String text = spamCorpus.get(key);
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
-            stopCoverPredictor.trainSpamTokens(tokens);
+            stopCoverPredictor.trainSpamTokens(tokens, key);
         }
 
         for (String key: hamCorpus.keySet()) {
             String text = hamCorpus.get(key);
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
-            stopCoverPredictor.trainHamTokens(tokens);
+            stopCoverPredictor.trainHamTokens(tokens, key);
         }
 
         return stopCoverPredictor;
@@ -207,21 +208,21 @@ SpamClassifier {
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
      */
-    public LabelPredictor classifyWithFracStops(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
+    public StopWordLabelPredictor classifyWithFracStops(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
 
-        LabelPredictor fracStopPredictor = new FracStopPredictor();
+        StopWordLabelPredictor fracStopPredictor = new FracStopPredictor();
         HashMap<String, String> test = null;
 
         for (String key : spamCorpus.keySet()) {
             String text = spamCorpus.get(key);
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
-            fracStopPredictor.trainSpamTokens(tokens);
+            fracStopPredictor.trainSpamTokens(tokens, key);
         }
 
         for (String key: hamCorpus.keySet()) {
             String text = hamCorpus.get(key);
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
-            fracStopPredictor.trainHamTokens(tokens);
+            fracStopPredictor.trainHamTokens(tokens, key);
         }
 
         return fracStopPredictor;
@@ -246,6 +247,43 @@ SpamClassifier {
 
         return labels;
     }
+
+    /**
+     * Desc: Get ham and spam scores for the trained predictor.
+     *
+     * @param predictor the predictor that was previously trained.
+     * @param test the test data that was held out.
+     */
+    public HashMap<String, ArrayList<Double>> getScores(StopWordLabelPredictor predictor, HashMap<String, String> test) {
+
+        HashMap<String, ArrayList<Double>> allScores = new HashMap<>();
+        for (String key : test.keySet()) {
+            ArrayList<Double> scores = predictor.score(key);
+            allScores.put(key, scores);
+        }
+
+        return allScores;
+    }
+
+    /**
+     * Desc: Get ham and spam scores for the trained fracStopPredictor.
+     *
+     * @param predictor the predictor that was previously trained.
+     * @param test the test data that was held out.
+     */
+    public HashMap<String, ArrayList<Double>> getScores(LabelPredictor predictor, HashMap<String, String> test) {
+
+        HashMap<String, ArrayList<Double>> allScores = new HashMap<>();
+        for (String key : test.keySet()) {
+            String text = test.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            ArrayList<Double> scores = predictor.score(tokens);
+            allScores.put(key, scores);
+        }
+
+        return allScores;
+    }
+
 
     public boolean isSpam(LabelPredictor predictor,  String text ) {
         List<String> tokens = createTokenList(text, new EnglishAnalyzer());
