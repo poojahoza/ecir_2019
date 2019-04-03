@@ -21,7 +21,7 @@ public class BayesCounter {
      * Makes a new BayesCounter with empty hash map.
      */
     public final HashMap<String, HashMap<String, Integer>> bayesMap;
-    public final HashMap<String, ArrayList<Double>> stopWordMap;
+    public final HashMap<String, HashMap<String, Double>> stopWordMap;
 
     public BayesCounter() {
         bayesMap = new HashMap<>();
@@ -542,7 +542,7 @@ public class BayesCounter {
      * @param tokens List of tokens in the document.
      * @return scores a list containing the hamScore, followed by the spamScore.
      */
-    public ArrayList<Double> getQuadramScores(List<String> tokens) {
+    public ArrayList<Double> getQuadgramScores(List<String> tokens) {
 
         HashMap<String, Integer> spamDist = bayesMap.get("spam");
         HashMap<String, Integer> hamDist = bayesMap.get("ham");
@@ -563,14 +563,14 @@ public class BayesCounter {
     }
 
 
-    public void buildStopWordHashMap(String docClass, List<String> tokens) {
+    public void buildStopWordHashMap(String docClass, List<String> tokens, String pid) {
 
         if (stopWordMap.get(docClass) == null) {
-            ArrayList<Double> classList = new ArrayList<>();
-            stopWordMap.put(docClass, classList);
+            HashMap<String, Double> classMap = new HashMap<>();
+            stopWordMap.put(docClass, classMap);
         }
 
-        ArrayList<Double> curList = stopWordMap.get(docClass);
+        HashMap<String, Double> curMap = stopWordMap.get(docClass);
         // Get the stop coverage for each document in the ham and spam sets.
         double stop = 0;
         double total = 0;
@@ -583,7 +583,7 @@ public class BayesCounter {
         }
 
         double result = (stop / total) * 100;
-        curList.add(result);
+        curMap.put(pid, result);
     }
 
     /**
@@ -595,19 +595,19 @@ public class BayesCounter {
      */
     public String classifyWithStopCover(List<String> tokens) {
 
-        ArrayList<Double> spamDist = stopWordMap.get("spam");
-        ArrayList<Double> hamDist = stopWordMap.get("ham");
+        HashMap<String, Double> spamDist = stopWordMap.get("spam");
+        HashMap<String, Double> hamDist = stopWordMap.get("ham");
 
         // Get the average number of stopwords for spam and ham training
         double sum = 0;
         for (int i = 0; i < spamDist.size(); i++) {
-            sum += spamDist.get(i);
+            sum += spamDist.getOrDefault(i, 0.0);
         }
         double spamAverage = sum/spamDist.size();
 
         sum = 0;
         for (int i = 0; i < hamDist.size(); i++) {
-            sum += hamDist.get(i);
+            sum += hamDist.getOrDefault(i, 0.0);
         }
         double hamAverage = sum/hamDist.size();
 
@@ -631,27 +631,23 @@ public class BayesCounter {
         }
     }
 
-    public ArrayList<Double> getFracStopScores(List<String> tokens) {
 
-        HashMap<String, Integer> spamDist = bayesMap.get("spam");
-        HashMap<String, Integer> hamDist = bayesMap.get("ham");
+    public ArrayList<Double> getStopCoverScores(String pid) {
+
+        HashMap<String, Double> spamDist = stopWordMap.get("spam");
+        HashMap<String, Double> hamDist = stopWordMap.get("ham");
         ArrayList<Double> scores = new ArrayList<>();
 
-        double hamScore = 0;
-        double spamScore = 0;
-
-        for (String token : tokens) {
-            //String quadgram = tokens.get(i) + tokens.get(i + 1) + tokens.get(i + 2) + tokens.get(i + 3);
-            spamScore += Math.log(spamDist.getOrDefault(token, 1));
-            hamScore += Math.log(hamDist.getOrDefault(token, 1));
-        }
+        double spamScore = Math.log(spamDist.getOrDefault(pid, 1.0));
+        double hamScore = Math.log(hamDist.getOrDefault(pid, 1.0));
 
         scores.add(hamScore);
         scores.add(spamScore);
         return scores;
     }
 
-    public void buildFracStopHashMap(String docClass, List<String> tokens) throws FileNotFoundException {
+
+    public void buildFracStopHashMap(String docClass, List<String> tokens, String pid) throws FileNotFoundException {
 
         // Get list of the most common stopwords
         ArrayList<String> stopwords = new ArrayList<>();
@@ -662,11 +658,11 @@ public class BayesCounter {
         s.close();
 
         if (stopWordMap.get(docClass) == null) {
-            ArrayList<Double> classList = new ArrayList<>();
-            stopWordMap.put(docClass, classList);
+            HashMap<String, Double> classMap = new HashMap<>();
+            stopWordMap.put(docClass, classMap);
         }
 
-        ArrayList<Double> curList = stopWordMap.get(docClass);
+        HashMap<String, Double> curMap = stopWordMap.get(docClass);
         // Get the stop coverage for each document in the ham and spam sets.
         double stop = 0;
         double total = 0;
@@ -679,8 +675,9 @@ public class BayesCounter {
         }
 
         double result = (stop / total) * 100;
-        curList.add(result);
+        curMap.put(pid, result);
     }
+
 
     public String classifyWithFracStops(List<String> tokens) throws FileNotFoundException {
 
@@ -692,19 +689,19 @@ public class BayesCounter {
         }
         s.close();
 
-        ArrayList<Double> spamDist = stopWordMap.get("spam");
-        ArrayList<Double> hamDist = stopWordMap.get("ham");
+        HashMap<String,  Double> spamDist = stopWordMap.get("spam");
+        HashMap<String, Double> hamDist = stopWordMap.get("ham");
 
         // Get the average number of stopwords for spam and ham training
         double sum = 0;
         for (int i = 0; i < spamDist.size(); i++) {
-            sum += spamDist.get(i);
+            sum += spamDist.getOrDefault(i, 0.0);
         }
         double spamAverage = sum/spamDist.size();
 
         sum = 0;
         for (int i = 0; i < hamDist.size(); i++) {
-            sum += hamDist.get(i);
+            sum += hamDist.getOrDefault(i, 0.0);
         }
         double hamAverage = sum/hamDist.size();
 
@@ -726,5 +723,19 @@ public class BayesCounter {
         else {
             return "spam";
         }
+    }
+
+    public ArrayList<Double> getFracStopScores(String pid) {
+
+        HashMap<String, Double> spamDist = stopWordMap.get("spam");
+        HashMap<String, Double> hamDist = stopWordMap.get("ham");
+        ArrayList<Double> scores = new ArrayList<>();
+
+        double spamScore = Math.log(spamDist.getOrDefault(pid, 1.0));
+        double hamScore = Math.log(hamDist.getOrDefault(pid, 1.0));
+
+        scores.add(hamScore);
+        scores.add(spamScore);
+        return scores;
     }
 }
