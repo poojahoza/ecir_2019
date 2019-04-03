@@ -13,9 +13,11 @@ public class DemoPythonSVM {
         PythonSVM pythonSVM = new PythonSVM(freqMap, words);
 
 
-        /* Data preprocessing stage. The train set is already created on the server, so all
-            you'll have to do is call ReadIndex on your test set. Data mush be in the form
-            pid -> text.
+        /* Data preprocessing stage. Data mush be in the form pid -> text, and you'll have to change the paths
+            below as appropriate. The ham and spam test sets from the Naive Bayes classifier can be used, and
+            are still in the same location on the server.
+            IMPORTANT NOTE: Once you have your train and test csvs, you'll have to change the paths
+            in svm.py to match them.
          */
         ArrayList<HashMap<Integer, Double>> spamTrain = pythonSVM.readIndex("/home/rachel/grad_courses/data_science/spamTrain");
         ArrayList<HashMap<Integer, Double>> hamTrain = pythonSVM.readIndex("/home/rachel/grad_courses/data_science/hamTrain");
@@ -30,7 +32,6 @@ public class DemoPythonSVM {
          */
         ArrayList<String> labels = pythonSVM.execLinearSVC();
         System.out.println("Finished classifying, printing labels");
-        //System.out.println(labels.size());
         for (int i = 0; i < labels.size(); i++) {
             System.out.println(labels.get(i));
         }
