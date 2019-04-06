@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class FracStopPredictor extends LabelPredictor{
+public class FracStopPredictor extends StopWordLabelPredictor{
 
     private BayesCounter bc = new BayesCounter();
 
@@ -20,9 +20,9 @@ public class FracStopPredictor extends LabelPredictor{
      *
      * @param tokens List of tokens in the document
      */
-    public void trainHamTokens(List<String> tokens) {
+    public void trainHamTokens(List<String> tokens, String pid) {
         try {
-            bc.buildFracStopHashMap("ham", tokens);
+            bc.buildFracStopHashMap("ham", tokens, pid);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -33,9 +33,9 @@ public class FracStopPredictor extends LabelPredictor{
      *
      * @param tokens List of tokens in the document
      */
-    public void trainSpamTokens(List<String> tokens) {
+    public void trainSpamTokens(List<String> tokens, String pid) {
         try {
-            bc.buildFracStopHashMap("spam", tokens);
+            bc.buildFracStopHashMap("spam", tokens, pid);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -61,11 +61,12 @@ public class FracStopPredictor extends LabelPredictor{
     /**
      * Desc: Get the ham and spam scores for the test data.
      *
-     * @param tokens List of tokens in the document
+     * @param pid of the document
      * @return ArrayList The ham and spam scores of the given document tokens
      */
-    public ArrayList<Double> score(List<String> tokens) {
-        return null;
+    public ArrayList<Double> score(String pid) {
+
+        return bc.getFracStopScores(pid);
     }
 
     /**

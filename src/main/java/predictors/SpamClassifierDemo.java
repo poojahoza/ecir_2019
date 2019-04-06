@@ -3,6 +3,7 @@ package main.java.predictors;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SpamClassifierDemo {
@@ -18,17 +19,27 @@ public class SpamClassifierDemo {
         HashMap<String, String> hamTest = sc.readIndex("/home/rachel/grad_courses/data_science/hamTest");
 
         LabelPredictor unigramsPredictor = sc.classifyWithUnigrams(spamTrain, hamTrain);
-        HashMap<String, String> labels = sc.predict(unigramsPredictor, test);
-
-       for (String key : labels.keySet()) {
-           System.out.println(key + '\t' + labels.get(key));
-       }
-
         LabelPredictor bigramsPredictor = sc.classifyWithBigrams(spamTrain, hamTrain);
         LabelPredictor trigramsPredictor = sc.classifyWithTrigrams(spamTrain, hamTrain);
         LabelPredictor quadgramsPredictor = sc.classifyWithQuadgrams(spamTrain, hamTrain);
-        LabelPredictor stopCoverPredictor = sc.classifyWithStopCover(spamTrain, hamTrain);
-        LabelPredictor fracStopsPredictor = sc.classifyWithFracStops(spamTrain, hamTrain);
+        StopWordLabelPredictor stopCoverPredictor = sc.classifyWithStopCover(spamTrain, hamTrain);
+        StopWordLabelPredictor fracStopsPredictor = sc.classifyWithFracStops(spamTrain, hamTrain);
+
+        HashMap<String, ArrayList<Double>> unigramScores = sc.getScores(unigramsPredictor, test);
+        HashMap<String, ArrayList<Double>> bigramScores = sc.getScores(bigramsPredictor, test);
+        HashMap<String, ArrayList<Double>> trigramScores = sc.getScores(trigramsPredictor, test);
+        HashMap<String, ArrayList<Double>> quadgramScores = sc.getScores(quadgramsPredictor, test);
+
+        for (String key: unigramScores.keySet()) {
+            ArrayList<Double> curList = unigramScores.get(key);
+            System.out.println("Pid: " + key + "  Ham score: " + curList.get(0) + "  Spam score; " + curList.get(1));
+        }
+
+        HashMap<String, String> labels = sc.predict(unigramsPredictor, test);
+
+        for (String key : labels.keySet()) {
+           System.out.println(key + '\t' + labels.get(key));
+        }
 
         System.out.println("\n++++++++ UNIGRAMS ++++++++");
         unigramsPredictor.evaluate(spamTest, hamTest, test);

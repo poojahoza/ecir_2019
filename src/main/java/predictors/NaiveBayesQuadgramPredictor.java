@@ -53,7 +53,7 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
      */
     @Override
     public ArrayList<Double> score(List<String> tokens) {
-        return bc.getQuadramScores(tokens);
+        return bc.getQuadgramScores(tokens);
     }
 
     /**
