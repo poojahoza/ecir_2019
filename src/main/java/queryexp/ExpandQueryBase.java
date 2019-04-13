@@ -1,26 +1,285 @@
 package main.java.queryexp;
 
 import main.java.commandparser.RegisterCommands;
+import main.java.containers.Container;
+import main.java.reranker.WordEmbeddingExtended;
+import main.java.rerankerv2.concepts.EmbeddingStrategy;
+import main.java.searcher.BaseBM25;
+
+import main.java.utils.CorpusStats;
+import main.java.utils.PreProcessor;
+
+import main.java.utils.SortUtils;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.ops.transforms.Transforms;
+
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 
 
-/*
-        Base class
-*/
-class ExpandQueryBase {
+/**
+ * All query expansion methods extends the abstract class
+ * and implement how to get new terms for the queries
+ * This base class provides the common functions for all query
+ * expansion method
+ */
+
+abstract class ExpandQueryBase {
 
     private RegisterCommands.CommandSearch SearchCommand = null;
-    private Map<String,String> query=null;
+    private Map<String, String> query = null;
+    protected EmbeddingStrategy embedding = null;
 
-    ExpandQueryBase(RegisterCommands.CommandSearch searchCommand,Map<String,String> query)
-    {
-        this.SearchCommand=searchCommand;
-        this.query=query;
+    /**
+     * All the query expansion methods should implement this method
+     * to find new terms for the given query
+     *
+     * @param originalQuery
+     * @param retrievedList
+     * @return Expanded query
+     */
+    abstract public String getExpandedTerms(String originalQuery, Map<String, Container> retrievedList);
+
+
+    /**
+     * Constructor, this will be called by the sub class
+     *
+     * @param searchCommand
+     * @param query
+     */
+    ExpandQueryBase(RegisterCommands.CommandSearch searchCommand, Map<String, String> query) {
+        this.SearchCommand = searchCommand;
+        this.query = query;
+        embedding = new WordEmbeddingExtended(SearchCommand.getDimension(), SearchCommand.getWordEmbeddingFile());
+    }
+
+    /**
+     * Helper function to display all candidates
+     *
+     * @param candidates
+     */
+    protected void dumpCandidates(ArrayList<String> candidates) {
+        for (String str : candidates) {
+            System.out.println(str);
+        }
     }
 
 
+    /**
+     * Get the candidate terms from the K dodcuments, remove the stop words and process with standard analyzer.
+     *
+     * @param retrievedList
+     * @return ArrayList<String>
+     */
+    public ArrayList<String> getCandidateTerms(Map<String, Container> retrievedList) {
+        int PRF_VAL = SearchCommand.getPrfVAL();
+        int counter = 0;
+
+        BaseBM25 bm25 = null;
+        try {
+            bm25 = new BaseBM25(SearchCommand.getkVAL(), SearchCommand.getIndexlocation());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, Container> doc : retrievedList.entrySet()) {
+            counter++;
+            int docID = doc.getValue().getDocID();
+            String content = bm25.getDocument(docID);
+            sb.append(content);
+            sb.append(" ");
+            if (counter == PRF_VAL) break;
+        }
+
+        ArrayList<String> candidates = null;
+        try {
+            candidates = PreProcessor.processTermsUsingLuceneStandard(sb.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return candidates;
+    }
+
+    protected String getTopK(Map<String,Double> q,String OriginalQueryTerms)
+    {
+        int c = 0;
+        String[] split = OriginalQueryTerms.split(" ");
+        ArrayList<String> uniqueList=new ArrayList<>(Arrays.asList(split));
+
+        for(Map.Entry<String,Double> m:q.entrySet())
+        {
+            c++;
+            if(!uniqueList.contains(m.getKey()))
+            {
+                uniqueList.add(m.getKey());
+            }
+            if(c == SearchCommand.getPrfValTerms()) break;
+        }
+        StringBuilder build = new StringBuilder();
+
+        for(String s:uniqueList)
+        {
+            build.append(s);
+            build.append(" ");
+        }
+
+        return build.toString();
+    }
+
+    protected ArrayList<String> getTopK(Map<String,Double> q)
+    {
+        Map<String, Double> sorted = SortUtils.sortByValue(q);
+
+        int c=0;
+        ArrayList<String> res= new ArrayList<>();
+
+        for(Map.Entry<String,Double> s:sorted.entrySet())
+        {
+            c++;
+            res.add(s.getKey());
+            if(c == SearchCommand.getPrfValTerms()) break;
+        }
+        return res;
+    }
+
+
+    protected ArrayList<String> getSemanticTerms(String orignalquery, ArrayList<String> candidates) {
 
 
 
+        /*
+        * Process the original query using the standard Analyzer
+        */
+        ArrayList<String> qterms = null;
+        CorpusStats cs = new CorpusStats(SearchCommand.getIndexlocation());
+        try {
+            qterms = PreProcessor.processTermsUsingLuceneStandard(orignalquery);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+        /*
+         * All all the original terms into the list
+        */
+        ArrayList<String> topTerms= new ArrayList<>();
+
+        for(String str:qterms)
+        {
+            topTerms.add(str);
+        }
+
+        if(qterms.size()<2 && embedding.getEmbeddingVector(qterms.get(0))== null)
+        {
+            for(String str:candidates)
+            {
+                topTerms.add(str);
+            }
+            return  topTerms;
+        }
+
+
+
+        /*
+        Find all the new terms
+         */
+
+        for (String qterm : qterms) {
+            Map<String, Double> perEachQuery = new LinkedHashMap<>();
+            INDArray v1 = null;
+            if (embedding.getEmbeddingVector(qterm) != null) {
+                v1 = embedding.getEmbeddingVector(qterm);
+            } else {
+                continue;
+            }
+
+            for (String cterm : candidates) {
+                if (embedding.getEmbeddingVector(cterm) != null  && (!qterms.contains(cterm)))
+                {
+                    INDArray v2 = embedding.getEmbeddingVector(cterm);
+                    double score = Transforms.cosineSim(v1, v2);
+                    perEachQuery.put(cterm, score);
+                }
+            }
+
+            if(!perEachQuery.isEmpty())
+            {
+                ArrayList<String> temp = getTopK(perEachQuery);
+                for(String s:temp)
+                {
+                    topTerms.add(s);
+                }
+            }
+        }
+        return topTerms;
+    }
+
+    protected String ArrayListInToString(ArrayList<String> list)
+    {
+        StringBuilder sb= new StringBuilder();
+        for(String s:list)
+        {
+            sb.append(s);
+            sb.append(" ");
+        }
+        return sb.toString();
+    }
+
+
+    protected String processedTerm(String content) throws IOException {
+        EnglishAnalyzer analyzer = new EnglishAnalyzer();
+        TokenStream tokenStream = analyzer.tokenStream("Text", new StringReader(content));
+        try {
+            tokenStream.reset();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String token = null;
+        while (tokenStream.incrementToken()) {
+            token = tokenStream.getAttribute(CharTermAttribute.class).toString();
+        }
+        return token;
+    }
+
+
+    /**
+     * Common method for all query expansion methods, this performs the query expansion and
+     * returns the results. The same function will be called by all query expansion methods
+     *
+     * @return For Each query, its expanded results
+     */
+
+    protected Map<String, Map<String, Container>> performQueryExpansion() {
+        Map<String, Map<String, Container>> res = new LinkedHashMap<>();
+        StreamSupport.stream(query.entrySet().spliterator(), SearchCommand.isParallelEnabled())
+                .forEach(q -> {
+                    try {
+                        BaseBM25 bm = new BaseBM25(SearchCommand.getkVAL(), SearchCommand.getIndexlocation());
+                        System.out.println("Query :" + q.getValue());
+                        Map<String, Container> bm25init = bm.getRanking(q.getValue());
+                        String expandedTerms = getExpandedTerms(q.getValue(), bm25init);
+                        System.out.println(expandedTerms);
+                        Map<String, Container> expanded = bm.getRanking(expandedTerms);
+                        res.put(q.getKey(), expanded);
+                        System.out.print(".");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+
+        return res;
+    }
 }
 

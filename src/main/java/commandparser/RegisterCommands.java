@@ -215,6 +215,30 @@ public class RegisterCommands
          @Parameter(names = "--qe-entity-degree",description ="Query expansion based on the entity degree and reranking")
          private boolean qe_entity_degree_reranking = false;
 
+         @Parameter(names = "--qe-exp-df",description ="Query expansion using PRF and the terms selected using DF")
+         private boolean isQueryExDF = false;
+
+
+         @Parameter(names = "--prf-val",description ="Top k documents to consider as Pseudo relevance feedback")
+         private Integer prfVAL = 5;
+
+         @Parameter(names = "--prf-val-term",description ="Top k terms to consider per query term")
+         private Integer prfValTerms = 70;
+
+         public Integer getPrfVAL()
+         {
+             return prfVAL;
+         }
+
+         public Integer getPrfValTerms()
+         {
+             return prfValTerms;
+         }
+
+         public boolean isQueryExDFEnabled()
+         {
+             return isQueryExDF;
+         }
          public boolean is_qe_reranking(){return qe_reranking;}
 
          public boolean isQe_entity_degree_rerankingEnabled()
