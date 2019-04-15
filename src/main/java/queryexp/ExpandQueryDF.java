@@ -20,6 +20,7 @@ public class ExpandQueryDF extends ExpandQueryBase implements ExpandQuery {
 
     /**
      * Constructor calls super class to initialize the value
+     *
      * @param searchCommand
      * @param query
      */
@@ -44,6 +45,7 @@ public class ExpandQueryDF extends ExpandQueryBase implements ExpandQuery {
     /**
      * This method is wrapper for this class that it can be used outside.
      * Returns the expanded results in the hashmap
+     *
      * @return
      */
     @Override
@@ -54,6 +56,7 @@ public class ExpandQueryDF extends ExpandQueryBase implements ExpandQuery {
     /**
      * Returns the expanded query terms, computes K nearest words for each term in the query.
      * --prf-val-term option dictates the value of k
+     *
      * @param originalQuery
      * @param retrievedList
      * @return
@@ -62,7 +65,7 @@ public class ExpandQueryDF extends ExpandQueryBase implements ExpandQuery {
     @Override
     public String getExpandedTerms(String originalQuery, Map<String, Container> retrievedList) {
         ArrayList<String> candidates = getCandidateTerms(retrievedList);
-        ArrayList<String> top =  getSemanticTerms(originalQuery, candidates);
+        ArrayList<String> top = getSemanticTerms(originalQuery, candidates);
         CorpusStats cs = new CorpusStats(SearchCommand.getIndexlocation());
         ArrayList<String> topDF = null;
         try {
@@ -70,7 +73,7 @@ public class ExpandQueryDF extends ExpandQueryBase implements ExpandQuery {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ArrayList<String> finalTerms = getTopK(topDF,originalQuery);
+        ArrayList<String> finalTerms = getTopK(topDF, originalQuery);
         return ArrayListInToString(finalTerms);
     }
 }

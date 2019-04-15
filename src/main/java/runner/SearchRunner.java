@@ -8,6 +8,7 @@ import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
 import main.java.mrf.MarkovRandomField;
 import main.java.queryexp.ExpandQuery;
+import main.java.queryexp.ExpandQueryAbstract;
 import main.java.queryexp.ExpandQueryDF;
 import main.java.queryexp.ExpandQueryIDF;
 import main.java.reranker.ReRanker;
@@ -426,9 +427,14 @@ public class SearchRunner implements ProgramRunner
 
         if(searchParser.isTestEnabled())
         {
-            ExpandQuery exp = new ExpandQueryIDF(searchParser,queryCBOR);
-            Map<String,Map<String,Container>> res = exp.getExpandedQuery();
-            RunWriter.writeRunFile("Test_IDF",res);
+//            ExpandQuery exp = new ExpandQueryIDF(searchParser,queryCBOR);
+//            Map<String,Map<String,Container>> res = exp.getExpandedQuery();
+//            RunWriter.writeRunFile("Test_IDF",res);
+
+            ExpandQuery exp = new ExpandQueryAbstract(searchParser,queryCBOR);
+            exp.doQueryExpansion();
+
+
         }
 
        }

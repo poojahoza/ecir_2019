@@ -9,17 +9,16 @@ public class RelevanceModel3 extends ExpandQueryBase implements ExpandQuery {
 
 
     private RegisterCommands.CommandSearch SearchCommand = null;
-    private Map<String,String> query=null;
+    private Map<String, String> query = null;
 
-    public RelevanceModel3(RegisterCommands.CommandSearch searchCommand, Map<String,String> query)
-    {
-        super(searchCommand,query);
-        this.SearchCommand=searchCommand;
-        this.query=query;
+    public RelevanceModel3(RegisterCommands.CommandSearch searchCommand, Map<String, String> query) {
+        super(searchCommand, query);
+        this.SearchCommand = searchCommand;
+        this.query = query;
     }
 
     @Override
-    public String getExpandedTerms(String originalQuery,Map<String,Container> retrievedList) {
+    public String getExpandedTerms(String originalQuery, Map<String, Container> retrievedList) {
         return null;
     }
 
@@ -28,7 +27,6 @@ public class RelevanceModel3 extends ExpandQueryBase implements ExpandQuery {
     public void doQueryExpansion() {
 
     }
-
 
 
     @Override

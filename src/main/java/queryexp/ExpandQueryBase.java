@@ -2,6 +2,9 @@ package main.java.queryexp;
 
 import main.java.commandparser.RegisterCommands;
 import main.java.containers.Container;
+import main.java.containers.DBContainer;
+import main.java.containers.EntityContainer;
+import main.java.database.databaseWrapper;
 import main.java.reranker.WordEmbeddingExtended;
 import main.java.rerankerv2.concepts.EmbeddingStrategy;
 import main.java.searcher.BaseBM25;
@@ -14,6 +17,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
 
@@ -72,20 +76,16 @@ abstract class ExpandQueryBase {
         }
     }
 
-    protected String getFileSuffix(String mname)
-    {
-        return mname+"_"+(SearchCommand.isSectionEnabled() ? "section_" : "article_")+"k"+SearchCommand.getDimension()
-                +"_"+"prf"+SearchCommand.getPrfVAL()+"_"+"prfval"+SearchCommand.getPrfValTermsKterms();
+    protected String getFileSuffix(String mname) {
+        return mname + "_" + (SearchCommand.isSectionEnabled() ? "section_" : "article_") + "k" + SearchCommand.getDimension()
+                + "_" + "prf" + SearchCommand.getPrfVAL() + "_" + "prfval" + SearchCommand.getPrfValTermsKterms();
 
     }
 
-    private ArrayList<String> checkForNumerics(ArrayList<String> candidates)
-    {
+    private ArrayList<String> checkForNumerics(ArrayList<String> candidates) {
         ArrayList<String> terms = new ArrayList<>();
-        for(String candidate:candidates)
-        {
-            if (!(candidate.matches("[0-9]+")&& candidate.length()>=1))
-            {
+        for (String candidate : candidates) {
+            if (!(candidate.matches("[0-9]+") && candidate.length() >= 1)) {
                 terms.add(candidate);
             }
         }
@@ -95,6 +95,7 @@ abstract class ExpandQueryBase {
 
     /**
      * Get the candidate terms from the K dodcuments, remove the stop words and process with standard analyzer.
+     *
      * @param retrievedList
      * @return ArrayList<String>
      */
@@ -129,8 +130,73 @@ abstract class ExpandQueryBase {
         return candidates;
     }
 
-    protected ArrayList<String> getTopK(ArrayList<String> q, String OriginalQueryTerms)
-    {
+    private String[] getEntities(Container input) {
+        EntityContainer e = input.getEntity();
+        if (e.getEntityId().equals("")) {
+            return null;
+        }
+        return e.getEntityId().split("[\r\n]+");
+    }
+
+    private String getEntitiesAbstract(Container container) {
+        String[] entitiesID = getEntities(container);
+        if (entitiesID == null) {
+            return null;
+        }
+        databaseWrapper dbwrapper = new databaseWrapper();
+        Map<String, DBContainer> res = dbwrapper.getRecordLeadTextContainer(entitiesID);
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, DBContainer> val : res.entrySet()) {
+            sb.append(val.getValue().getLeadtext());
+            sb.append(" ");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Returns the candidate terms considering each entity abstract
+     *
+     * @param retrievedList
+     * @return
+     */
+    public ArrayList<String> getCandidateTermsWithEntitiesAbstract(Map<String, Container> retrievedList) {
+        int PRF_VAL = SearchCommand.getPrfVAL();
+        int counter = 0;
+
+        BaseBM25 bm25 = null;
+        try {
+            bm25 = new BaseBM25(SearchCommand.getkVAL(), SearchCommand.getIndexlocation());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, Container> doc : retrievedList.entrySet()) {
+            counter++;
+            int docID = doc.getValue().getDocID();
+            String content = bm25.getDocument(docID);
+            sb.append(content);
+            sb.append(" ");
+            String abs = getEntitiesAbstract(doc.getValue());
+            // System.out.println(abs);
+            if (abs != null) {
+                sb.append(abs);
+            }
+
+            if (counter == PRF_VAL) break;
+        }
+
+        ArrayList<String> candidates = null;
+        try {
+            candidates = PreProcessor.processTermsUsingLuceneStandard(sb.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //return checkForNumerics(candidates);
+        return candidates;
+    }
+
+    protected ArrayList<String> getTopK(ArrayList<String> q, String OriginalQueryTerms) {
         ArrayList<String> terms = null;
         try {
             terms = PreProcessor.processTermsUsingLuceneStandard(OriginalQueryTerms);
@@ -138,29 +204,28 @@ abstract class ExpandQueryBase {
             e.printStackTrace();
         }
 
-        int count=0;
+        int count = 0;
 
-        for(String str:q)
-        {
+        for (String str : q) {
             count++;
             terms.add(str);
-            if(count == SearchCommand.getPrfValTermsKterms()) {break;}
+            if (count == SearchCommand.getPrfValTermsKterms()) {
+                break;
+            }
         }
         return terms;
     }
 
-    protected ArrayList<String> getTopK(Map<String,Double> q)
-    {
+    protected ArrayList<String> getTopK(Map<String, Double> q) {
         Map<String, Double> sorted = SortUtils.sortByValue(q);
 
-        int c=0;
-        ArrayList<String> res= new ArrayList<>();
+        int c = 0;
+        ArrayList<String> res = new ArrayList<>();
 
-        for(Map.Entry<String,Double> s:sorted.entrySet())
-        {
+        for (Map.Entry<String, Double> s : sorted.entrySet()) {
             c++;
             res.add(s.getKey());
-            if(c == SearchCommand.getPrfValTerms()) break;
+            if (c == SearchCommand.getPrfValTerms()) break;
         }
         return res;
     }
@@ -169,8 +234,8 @@ abstract class ExpandQueryBase {
     protected ArrayList<String> getSemanticTerms(String orignalquery, ArrayList<String> candidates) {
 
         /*
-        * Process the original query using the standard Analyzer
-        */
+         * Process the original query using the standard Analyzer
+         */
         ArrayList<String> qterms = null;
         CorpusStats cs = new CorpusStats(SearchCommand.getIndexlocation());
         try {
@@ -179,19 +244,17 @@ abstract class ExpandQueryBase {
             e.printStackTrace();
         }
 
-        ArrayList<String> topTerms= new ArrayList<>();
+        ArrayList<String> topTerms = new ArrayList<>();
 
         /*
          * If the query terms is less than one and if there is no word embedding,
          * Trying to use some of the important candidate terms for query expansion
          */
-        if(qterms.size()<2 && embedding.getEmbeddingVector(qterms.get(0))== null)
-        {
-            for(String str:candidates)
-            {
+        if (qterms.size() < 2 && embedding.getEmbeddingVector(qterms.get(0)) == null) {
+            for (String str : candidates) {
                 topTerms.add(str);
             }
-            return  topTerms;
+            return topTerms;
         }
 
         /*
@@ -208,19 +271,16 @@ abstract class ExpandQueryBase {
             }
 
             for (String cterm : candidates) {
-                if (embedding.getEmbeddingVector(cterm) != null  && (!qterms.contains(cterm)))
-                {
+                if (embedding.getEmbeddingVector(cterm) != null && (!qterms.contains(cterm))) {
                     INDArray v2 = embedding.getEmbeddingVector(cterm);
                     double score = Transforms.cosineSim(v1, v2);
                     perEachQuery.put(cterm, score);
                 }
             }
 
-            if(!perEachQuery.isEmpty())
-            {
+            if (!perEachQuery.isEmpty()) {
                 ArrayList<String> temp = getTopK(perEachQuery);
-                for(String s:temp)
-                {
+                for (String s : temp) {
                     topTerms.add(s);
                 }
             }
@@ -228,11 +288,9 @@ abstract class ExpandQueryBase {
         return topTerms;
     }
 
-    protected String ArrayListInToString(ArrayList<String> list)
-    {
-        StringBuilder sb= new StringBuilder();
-        for(String s:list)
-        {
+    protected String ArrayListInToString(ArrayList<String> list) {
+        StringBuilder sb = new StringBuilder();
+        for (String s : list) {
             sb.append(s);
             sb.append(" ");
         }
