@@ -22,8 +22,10 @@ public class SpamClassifierDemo {
         LabelPredictor bigramsPredictor = sc.classifyWithBigrams(spamTrain, hamTrain);
         LabelPredictor trigramsPredictor = sc.classifyWithTrigrams(spamTrain, hamTrain);
         LabelPredictor quadgramsPredictor = sc.classifyWithQuadgrams(spamTrain, hamTrain);
+
         StopWordLabelPredictor stopCoverPredictor = sc.classifyWithStopCover(spamTrain, hamTrain);
         StopWordLabelPredictor fracStopsPredictor = sc.classifyWithFracStops(spamTrain, hamTrain);
+        StopWordLabelPredictor specialCharPredictor = sc.classifyWithSpecialChars(spamTrain, hamTrain);
 
         HashMap<String, ArrayList<Double>> unigramScores = sc.getScores(unigramsPredictor, test);
         HashMap<String, ArrayList<Double>> bigramScores = sc.getScores(bigramsPredictor, test);
@@ -58,6 +60,9 @@ public class SpamClassifierDemo {
 
         System.out.println("\n++++++++ FRAC STOPS ++++++++");
         fracStopsPredictor.evaluate(spamTest, hamTest, test);
+
+        System.out.println("\n++++++++ SPECIAL CHARS ++++++++");
+        specialCharPredictor.evaluate(spamTest, hamTest, test);
 
     }
 }

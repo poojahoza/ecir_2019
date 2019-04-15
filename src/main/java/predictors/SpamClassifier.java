@@ -1,5 +1,6 @@
 package main.java.predictors;
 
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 
@@ -59,6 +60,7 @@ SpamClassifier {
                 String[] curLine = line.split("\\t+");
                 String pid = curLine[0].trim();
                 String test = curLine[1].trim();
+                //System.out.println(curLine[1]);
                 lines.put(pid, test);
             }
         } catch (IOException | NullPointerException e) {
@@ -181,6 +183,35 @@ SpamClassifier {
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
      */
+    public StopWordLabelPredictor classifyWithSpecialChars(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
+
+        StopWordLabelPredictor specialCharPredictor = new SpecialCharPredictor();
+        HashMap<String, String> test = null;
+
+        for (String key : spamCorpus.keySet()) {
+            String text = spamCorpus.get(key);
+            //System.out.println(text);
+            List<String> tokens = createTokenList(text, new WhitespaceAnalyzer());
+            specialCharPredictor.trainSpamTokens(tokens, key);
+        }
+
+        for (String key: hamCorpus.keySet()) {
+            String text = hamCorpus.get(key);
+            //System.out.println(text);
+            List<String> tokens = createTokenList(text, new WhitespaceAnalyzer());
+            specialCharPredictor.trainHamTokens(tokens, key);
+        }
+
+        return specialCharPredictor;
+
+    }
+
+    /**
+     * Desc: Train a NaiveBayesQuadgramPredictor.
+     *
+     * @param spamCorpus the training set of spam documents.
+     * @param hamCorpus the training set of ham documents.
+     */
     public StopWordLabelPredictor classifyWithStopCover(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
 
         StopWordLabelPredictor stopCoverPredictor = new StopCoveragePredictor();
@@ -241,6 +272,24 @@ SpamClassifier {
         for (String key : test.keySet()) {
             String text = test.get(key);
             List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            String prediction = predictor.predict(tokens);
+            labels.put(key, prediction);
+        }
+
+        return labels;
+    }
+
+    /**
+     * Desc: Test the trained predictor.
+     *
+     * @param predictor the predictor that was previously trained.
+     * @param test the test data that was held out.
+     */
+    public HashMap<String, String> predict(StopWordLabelPredictor predictor, HashMap<String, String> test) {
+
+        for (String key : test.keySet()) {
+            String text = test.get(key);
+            List<String> tokens = createTokenList(text, new WhitespaceAnalyzer());
             String prediction = predictor.predict(tokens);
             labels.put(key, prediction);
         }

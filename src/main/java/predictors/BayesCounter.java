@@ -1,8 +1,10 @@
-package main.java;
+package main.java.predictors;
 
 import main.java.evaluators.F1Evaluator;
 import main.java.evaluators.MAPEvaluator;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import weka.core.stopwords.Null;
 import weka.core.stopwords.StopwordsHandler;
 
 import java.io.File;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import static main.java.utils.SearchUtils.createTokenList;
 import static weka.core.Stopwords.isStopword;
@@ -22,10 +25,12 @@ public class BayesCounter {
      */
     public final HashMap<String, HashMap<String, Integer>> bayesMap;
     public final HashMap<String, HashMap<String, Double>> stopWordMap;
+    public final HashMap<String, HashMap<String, Double>> specialCharMap;
 
     public BayesCounter() {
         bayesMap = new HashMap<>();
         stopWordMap = new HashMap<>();
+        specialCharMap = new HashMap<>();
     }
 
     public void evaluateStopCoverPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
@@ -730,12 +735,119 @@ public class BayesCounter {
         HashMap<String, Double> spamDist = stopWordMap.get("spam");
         HashMap<String, Double> hamDist = stopWordMap.get("ham");
         ArrayList<Double> scores = new ArrayList<>();
+        double spamScore = 0.0;
+        double hamScore = 0.0;
 
-        double spamScore = Math.log(spamDist.getOrDefault(pid, 1.0));
-        double hamScore = Math.log(hamDist.getOrDefault(pid, 1.0));
+        try {
+            spamScore = Math.log(spamDist.getOrDefault(pid, 1.0));
+            hamScore = Math.log(hamDist.getOrDefault(pid, 1.0));
+        } catch (NullPointerException e) {}
 
         scores.add(hamScore);
         scores.add(spamScore);
         return scores;
+    }
+
+    public void evaluateSpecialCharPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
+
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
+
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (String key: docs.keySet()) {
+            String text = docs.get(key);
+            List<String> tokens = createTokenList(text, new WhitespaceAnalyzer());
+            String label = this.classifyWithSpecialChars(tokens);
+            calledLabels.put(key, label);
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (String key: docs.keySet()) {
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
+            }
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
+
+        MAPEvaluator map = new MAPEvaluator(trueLabels);
+        double MAPScore = map.evaluateCalledLabels(calledLabels);
+        System.out.println("MAP: " + MAPScore);
+    }
+
+
+    public void buildSpecialCharHashMap(String docClass, List<String> tokens, String pid) {
+
+        if (specialCharMap.get(docClass) == null) {
+            HashMap<String, Double> classMap = new HashMap<>();
+            specialCharMap.put(docClass, classMap);
+        }
+        HashMap<String, Double> curMap = specialCharMap.get(docClass);
+
+        // Record all ratios of special characters to total tokens in the appropriate hash map for the current document class.
+        double specialCharRatio = getSpecialCharRatio(tokens);
+        curMap.put(pid, specialCharRatio);
+    }
+
+
+    public String classifyWithSpecialChars(List<String> tokens) {
+
+        HashMap<String,  Double> spamDist = specialCharMap.get("spam");
+        HashMap<String, Double> hamDist = specialCharMap.get("ham");
+
+        // Get the average ratio of special chars for spam and ham training
+        double sum = 0;
+        for (String key: spamDist.keySet()) {
+            sum += spamDist.get(key);
+        }
+        double spamAverage = sum/spamDist.size();
+
+        sum = 0;
+        for (String key: hamDist.keySet()) {
+            sum += hamDist.get(key);
+        }
+        double hamAverage = sum/hamDist.size();
+
+        double specialCharRatio = getSpecialCharRatio(tokens);
+
+        // check whether the specialCharRatio is closer to the hamAverage or the spamAverage
+        if (Math.abs(spamAverage - specialCharRatio) < Math.abs(hamAverage - specialCharRatio)) {
+            return "spam";
+        }
+        else {
+            return "ham";
+        }
+    }
+
+    // The higher the score returned, the more "spammy" a document is.
+    public ArrayList<Double> getSpecialCharScores(List<String> tokens) {
+
+        ArrayList<Double> score = new ArrayList<>();
+        score.add(getSpecialCharRatio(tokens));
+        return score;
+    }
+
+    public double getSpecialCharRatio (List<String> tokens) {
+
+        //Pattern specialChars = Pattern.compile();
+
+        double numSpecial = 0;
+        double numTokens = 0;
+        for (String token: tokens) {
+            for (int i = 0; i < token.length(); i++) {
+                if (Character.toString(token.charAt(i)).matches("[^a-z]")) {
+                    numSpecial++;
+                }
+            }
+            numTokens++;
+        }
+        //System.out.println(" numSpecial: " + numSpecial + " numTokens: " + numTokens + " ratio: " + numSpecial/numTokens + " score: " + ((numSpecial/numTokens) - numTokens));
+        //System.out.println();
+        return numSpecial/numTokens;
     }
 }

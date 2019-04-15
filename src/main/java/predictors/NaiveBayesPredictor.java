@@ -1,7 +1,7 @@
 package main.java.predictors;
 
 import it.unimi.dsi.fastutil.Hash;
-import main.java.BayesCounter;
+import main.java.predictors.BayesCounter;
 import main.java.utils.SearchUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;

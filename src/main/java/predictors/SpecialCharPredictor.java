@@ -1,19 +1,17 @@
 package main.java.predictors;
 
-import main.java.utils.SearchUtils;
 import main.java.predictors.BayesCounter;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.search.IndexSearcher;
 
-import java.io.IOException;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class NaiveBayesBigramPredictor extends LabelPredictor {
+public class SpecialCharPredictor extends FracStopPredictor {
+
     private BayesCounter bc = new BayesCounter();
 
-    public NaiveBayesBigramPredictor() {
+    public SpecialCharPredictor() {
         super();
     }
 
@@ -22,18 +20,17 @@ public class NaiveBayesBigramPredictor extends LabelPredictor {
      *
      * @param tokens List of tokens in the document
      */
-    public void trainHamTokens(List<String> tokens) {
-        bc.buildBigramsHashMap("ham", tokens);
-    }
+    public void trainHamTokens(List<String> tokens, String pid) { bc.buildSpecialCharHashMap("ham", tokens, pid); }
 
     /**
      * Desc: Train classifier on spam emails.
      *
      * @param tokens List of tokens in the document
      */
-    public void trainSpamTokens(List<String> tokens) {
-        bc.buildBigramsHashMap("spam", tokens);
+    public void trainSpamTokens(List<String> tokens, String pid) {
+        bc.buildSpecialCharHashMap("spam", tokens, pid);
     }
+
 
     /**
      * Desc: Predict whether a document is a ham or spam.
@@ -41,20 +38,18 @@ public class NaiveBayesBigramPredictor extends LabelPredictor {
      * @param tokens List of tokens in the document
      * @return String The label ("spam" or "ham") that is predicted given the document  tokens
      */
-    @Override
     public String predict(List<String> tokens) {
-        return bc.classifyWithBigrams(tokens);
+        return bc.classifyWithSpecialChars(tokens);
     }
 
     /**
      * Desc: Get the ham and spam scores for the test data.
      *
-     * @param tokens List of tokens in the document
-     * @return ArrayList The ham and spam scores of the given document tokens
+     * @param tokens in the document
+     * @return ArrayList The scores of the given document tokens
      */
-    @Override
     public ArrayList<Double> score(List<String> tokens) {
-        return bc.getBigramScores(tokens);
+        return bc.getSpecialCharScores(tokens);
     }
 
     /**
@@ -64,9 +59,7 @@ public class NaiveBayesBigramPredictor extends LabelPredictor {
      * @param ham, a hash map of the spam test data by itself.
      * @param docs of mixed ham and spam documents mapping their pids to their text.
      */
-    @Override
     public void evaluate(HashMap<String, String> spam, HashMap<String, String> ham, HashMap<String, String> docs) {
-        bc.evaluateBigramPredictor(spam, ham, docs);
+        bc.evaluateSpecialCharPredictor(spam, ham, docs);
     }
-
 }
