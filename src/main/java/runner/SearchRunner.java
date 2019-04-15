@@ -9,6 +9,7 @@ import main.java.containers.Container;
 import main.java.mrf.MarkovRandomField;
 import main.java.queryexp.ExpandQuery;
 import main.java.queryexp.ExpandQueryDF;
+import main.java.queryexp.ExpandQueryIDF;
 import main.java.reranker.ReRanker;
 import main.java.rerankerv2.docsimranker.DocumentFrequencySimilarity;
 import main.java.rerankerv2.docsimranker.EntitySimilarityRanker;
@@ -416,6 +417,20 @@ public class SearchRunner implements ProgramRunner
             ExpandQuery exp = new ExpandQueryDF(searchParser,queryCBOR);
             exp.doQueryExpansion();
         }
+
+        if(searchParser.isQueryExDFEnabled())
+        {
+            ExpandQuery exp = new ExpandQueryIDF(searchParser,queryCBOR);
+            exp.doQueryExpansion();
+        }
+
+        if(searchParser.isTestEnabled())
+        {
+            ExpandQuery exp = new ExpandQueryIDF(searchParser,queryCBOR);
+            Map<String,Map<String,Container>> res = exp.getExpandedQuery();
+            RunWriter.writeRunFile("Test_IDF",res);
+        }
+
        }
     }
 

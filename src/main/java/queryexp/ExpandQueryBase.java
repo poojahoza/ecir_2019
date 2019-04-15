@@ -20,7 +20,6 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.StreamSupport;
@@ -73,10 +72,29 @@ abstract class ExpandQueryBase {
         }
     }
 
+    protected String getFileSuffix(String mname)
+    {
+        return mname+"_"+(SearchCommand.isSectionEnabled() ? "section_" : "article_")+"k"+SearchCommand.getDimension()
+                +"_"+"prf"+SearchCommand.getPrfVAL()+"_"+"prfval"+SearchCommand.getPrfValTermsKterms();
+
+    }
+
+    private ArrayList<String> checkForNumerics(ArrayList<String> candidates)
+    {
+        ArrayList<String> terms = new ArrayList<>();
+        for(String candidate:candidates)
+        {
+            if (!(candidate.matches("[0-9]+")&& candidate.length()>=1))
+            {
+                terms.add(candidate);
+            }
+        }
+        return terms;
+    }
+
 
     /**
      * Get the candidate terms from the K dodcuments, remove the stop words and process with standard analyzer.
-     *
      * @param retrievedList
      * @return ArrayList<String>
      */
@@ -107,34 +125,28 @@ abstract class ExpandQueryBase {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        //return checkForNumerics(candidates);
         return candidates;
     }
 
-    protected String getTopK(Map<String,Double> q,String OriginalQueryTerms)
+    protected ArrayList<String> getTopK(ArrayList<String> q, String OriginalQueryTerms)
     {
-        int c = 0;
-        String[] split = OriginalQueryTerms.split(" ");
-        ArrayList<String> uniqueList=new ArrayList<>(Arrays.asList(split));
-
-        for(Map.Entry<String,Double> m:q.entrySet())
-        {
-            c++;
-            if(!uniqueList.contains(m.getKey()))
-            {
-                uniqueList.add(m.getKey());
-            }
-            if(c == SearchCommand.getPrfValTerms()) break;
-        }
-        StringBuilder build = new StringBuilder();
-
-        for(String s:uniqueList)
-        {
-            build.append(s);
-            build.append(" ");
+        ArrayList<String> terms = null;
+        try {
+            terms = PreProcessor.processTermsUsingLuceneStandard(OriginalQueryTerms);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        return build.toString();
+        int count=0;
+
+        for(String str:q)
+        {
+            count++;
+            terms.add(str);
+            if(count == SearchCommand.getPrfValTermsKterms()) {break;}
+        }
+        return terms;
     }
 
     protected ArrayList<String> getTopK(Map<String,Double> q)
@@ -156,8 +168,6 @@ abstract class ExpandQueryBase {
 
     protected ArrayList<String> getSemanticTerms(String orignalquery, ArrayList<String> candidates) {
 
-
-
         /*
         * Process the original query using the standard Analyzer
         */
@@ -169,18 +179,12 @@ abstract class ExpandQueryBase {
             e.printStackTrace();
         }
 
-
-
-        /*
-         * All all the original terms into the list
-        */
         ArrayList<String> topTerms= new ArrayList<>();
 
-        for(String str:qterms)
-        {
-            topTerms.add(str);
-        }
-
+        /*
+         * If the query terms is less than one and if there is no word embedding,
+         * Trying to use some of the important candidate terms for query expansion
+         */
         if(qterms.size()<2 && embedding.getEmbeddingVector(qterms.get(0))== null)
         {
             for(String str:candidates)
@@ -189,8 +193,6 @@ abstract class ExpandQueryBase {
             }
             return  topTerms;
         }
-
-
 
         /*
         Find all the new terms
@@ -267,10 +269,8 @@ abstract class ExpandQueryBase {
                 .forEach(q -> {
                     try {
                         BaseBM25 bm = new BaseBM25(SearchCommand.getkVAL(), SearchCommand.getIndexlocation());
-                        System.out.println("Query :" + q.getValue());
                         Map<String, Container> bm25init = bm.getRanking(q.getValue());
                         String expandedTerms = getExpandedTerms(q.getValue(), bm25init);
-                        System.out.println(expandedTerms);
                         Map<String, Container> expanded = bm.getRanking(expandedTerms);
                         res.put(q.getKey(), expanded);
                         System.out.print(".");

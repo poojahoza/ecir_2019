@@ -218,16 +218,34 @@ public class RegisterCommands
          @Parameter(names = "--qe-exp-df",description ="Query expansion using PRF and the terms selected using DF")
          private boolean isQueryExDF = false;
 
+         @Parameter(names = "--qe-exp-idf",description ="Query expansion using PRF and the terms selected using IDF")
+         private boolean isQueryExIDF = false;
+
 
          @Parameter(names = "--prf-val",description ="Top k documents to consider as Pseudo relevance feedback")
          private Integer prfVAL = 5;
 
          @Parameter(names = "--prf-val-term",description ="Top k terms to consider per query term")
-         private Integer prfValTerms = 70;
+         private Integer prfValTerms = 10;
 
+         @Parameter(names = "--prf-val-k",description ="Top k terms to consider for query expansion")
+         private Integer prfValTermsKterms = 50;
+
+         @Parameter(names = "--test",description ="Only for testing purposes")
+         private boolean isTestEnabled = false;
+
+         public boolean isTestEnabled()
+         {
+             return isTestEnabled;
+         }
          public Integer getPrfVAL()
          {
              return prfVAL;
+         }
+
+         public Integer getPrfValTermsKterms()
+         {
+             return prfValTermsKterms;
          }
 
          public Integer getPrfValTerms()
@@ -239,6 +257,8 @@ public class RegisterCommands
          {
              return isQueryExDF;
          }
+         public boolean isQueryExIDFEnabled(){return  isQueryExIDF;}
+
          public boolean is_qe_reranking(){return qe_reranking;}
 
          public boolean isQe_entity_degree_rerankingEnabled()

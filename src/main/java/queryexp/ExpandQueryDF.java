@@ -2,8 +2,10 @@ package main.java.queryexp;
 
 import main.java.commandparser.RegisterCommands;
 import main.java.containers.Container;
+import main.java.utils.CorpusStats;
 import main.java.utils.RunWriter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -35,7 +37,8 @@ public class ExpandQueryDF extends ExpandQueryBase implements ExpandQuery {
     @Override
     public void doQueryExpansion() {
         Map<String, Map<String, Container>> res = performQueryExpansion();
-        RunWriter.writeRunFile("test_exp", res);
+        String fname = getFileSuffix("DF");
+        RunWriter.writeRunFile(fname, res);
     }
 
     /**
@@ -45,7 +48,7 @@ public class ExpandQueryDF extends ExpandQueryBase implements ExpandQuery {
      */
     @Override
     public Map<String, Map<String, Container>> getExpandedQuery() {
-        return null;
+        return performQueryExpansion();
     }
 
     /**
@@ -60,6 +63,14 @@ public class ExpandQueryDF extends ExpandQueryBase implements ExpandQuery {
     public String getExpandedTerms(String originalQuery, Map<String, Container> retrievedList) {
         ArrayList<String> candidates = getCandidateTerms(retrievedList);
         ArrayList<String> top =  getSemanticTerms(originalQuery, candidates);
-        return ArrayListInToString(top);
+        CorpusStats cs = new CorpusStats(SearchCommand.getIndexlocation());
+        ArrayList<String> topDF = null;
+        try {
+            topDF = cs.getIDFStandardAnalyzer(top);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ArrayList<String> finalTerms = getTopK(topDF,originalQuery);
+        return ArrayListInToString(finalTerms);
     }
 }
