@@ -221,6 +221,9 @@ public class RegisterCommands
          @Parameter(names = "--qe-exp-idf",description ="Query expansion using PRF and the terms selected using IDF")
          private boolean isQueryExIDF = false;
 
+         @Parameter(names = "--qe-exp-entity",description ="Query expansion using PRF, also considering entity abstract")
+         private boolean isQueryExpEntity = false;
+
 
          @Parameter(names = "--prf-val",description ="Top k documents to consider as Pseudo relevance feedback")
          private Integer prfVAL = 5;
@@ -258,6 +261,7 @@ public class RegisterCommands
              return isQueryExDF;
          }
          public boolean isQueryExIDFEnabled(){return  isQueryExIDF;}
+         public boolean isQueryExpEntityEnabled(){return isQueryExpEntity;}
 
          public boolean is_qe_reranking(){return qe_reranking;}
 

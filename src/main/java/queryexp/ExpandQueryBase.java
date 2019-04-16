@@ -77,8 +77,8 @@ abstract class ExpandQueryBase {
     }
 
     protected String getFileSuffix(String mname) {
-        return mname + "_" + (SearchCommand.isSectionEnabled() ? "section_" : "article_") + "k" + SearchCommand.getDimension()
-                + "_" + "prf" + SearchCommand.getPrfVAL() + "_" + "prfval" + SearchCommand.getPrfValTermsKterms();
+        return mname + "_" + (SearchCommand.isSectionEnabled() ? "section_" : "article_") + "d" + SearchCommand.getDimension()
+                + "_" + "prf" + SearchCommand.getPrfVAL() + "_" + "prfval" + SearchCommand.getPrfValTermsKterms()+"_"+"k"+SearchCommand.getkVAL();
 
     }
 
