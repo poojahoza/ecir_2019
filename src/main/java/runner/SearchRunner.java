@@ -431,8 +431,31 @@ public class SearchRunner implements ProgramRunner
 //            Map<String,Map<String,Container>> res = exp.getExpandedQuery();
 //            RunWriter.writeRunFile("Test_IDF",res);
 
-            ExpandQuery exp = new ExpandQueryAbstract(searchParser,queryCBOR);
-            exp.doQueryExpansion();
+
+            ExpandQuery exp = new ExpandQueryDF(searchParser,queryCBOR);
+            Map<String,Map<String,Container>> m1 = exp.getExpandedQuery();
+
+            QueryExpansionReRanking qer1 = new QueryExpansionReRanking(searchParser,queryCBOR,m1);
+            qer1.getDocumentFrequencyReRanking("M1_DF");
+            qer1.getInverseDocumentFrequencyReRanking("M1_IDF");
+            qer1.getReRanking("M1_RE");
+
+            exp = new ExpandQueryIDF(searchParser,queryCBOR);
+            Map<String,Map<String,Container>> m2 = exp.getExpandedQuery();
+
+            qer1 = new QueryExpansionReRanking(searchParser,queryCBOR,m2);
+            qer1.getDocumentFrequencyReRanking("M2_DF");
+            qer1.getInverseDocumentFrequencyReRanking("M2_IDF");
+            qer1.getReRanking("M2_RE");
+
+
+            exp = new ExpandQueryAbstract(searchParser,queryCBOR);
+            Map<String,Map<String,Container>> m3 = exp.getExpandedQuery();
+
+            qer1 = new QueryExpansionReRanking(searchParser,queryCBOR,m3);
+            qer1.getDocumentFrequencyReRanking("M3_DF");
+            qer1.getInverseDocumentFrequencyReRanking("M3_IDF");
+            qer1.getReRanking("M3_RE");
 
 
         }

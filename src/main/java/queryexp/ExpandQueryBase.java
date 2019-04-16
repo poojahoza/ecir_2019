@@ -196,6 +196,12 @@ abstract class ExpandQueryBase {
         return candidates;
     }
 
+    /**
+     * Returns the top K workds from the list along with the original query terms
+     * @param q
+     * @param OriginalQueryTerms
+     * @return
+     */
     protected ArrayList<String> getTopK(ArrayList<String> q, String OriginalQueryTerms) {
         ArrayList<String> terms = null;
         try {
@@ -230,7 +236,13 @@ abstract class ExpandQueryBase {
         return res;
     }
 
-
+    /**
+     * Returns the some of the nearest terms that are near to the query per query term
+     * Based on the --prf-val-term option, it it returns that many nearest terms per query term
+     * @param orignalquery
+     * @param candidates
+     * @return
+     */
     protected ArrayList<String> getSemanticTerms(String orignalquery, ArrayList<String> candidates) {
 
         /*
