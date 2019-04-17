@@ -1,7 +1,6 @@
 package main.java.predictors;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 public class ClassifyUtilsDemo {
 

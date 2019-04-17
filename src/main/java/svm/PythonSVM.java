@@ -172,7 +172,7 @@ public class PythonSVM extends SVM {
         ArrayList<String> labels = new ArrayList<>();
 
         try {
-            Process p = Runtime.getRuntime().exec("python3 /home/rachel/grad_courses/data_science/svm/svm.py");
+            Process p = Runtime.getRuntime().exec("python3 /home/rachel/grad_courses/data_science/cs953-team1/svm.py");
 
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
@@ -195,6 +195,99 @@ public class PythonSVM extends SVM {
 
         return labels;
     }
+
+    public ArrayList<String> execRbfSVC() throws IOException {
+
+        String s = null;
+        ArrayList<String> labels = new ArrayList<>();
+
+        try {
+            Process p = Runtime.getRuntime().exec("python3 /home/rachel/grad_courses/data_science/cs953-team1/rbf_svm.py");
+
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+            while ((s = stdInput.readLine()) != null) {
+                //System.out.println(s);
+                labels.add(s);
+            }
+
+            while ((s = stdError.readLine()) != null) {
+                System.out.println(s);
+            }
+
+        } catch (IOException e) {
+            System.out.println("Exception: ");
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
+        return labels;
+    }
+
+
+    public ArrayList<String> execPolynomialSVC() throws IOException {
+
+        String s = null;
+        ArrayList<String> labels = new ArrayList<>();
+
+        try {
+            Process p = Runtime.getRuntime().exec("python3 /home/rachel/grad_courses/data_science/cs953-team1/polynomial_svm.py");
+
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+            while ((s = stdInput.readLine()) != null) {
+                //System.out.println(s);
+                labels.add(s);
+            }
+
+            while ((s = stdError.readLine()) != null) {
+                System.out.println(s);
+            }
+
+        } catch (IOException e) {
+            System.out.println("Exception: ");
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
+        return labels;
+    }
+
+
+    public ArrayList<String> execSigmoidSVC() throws IOException {
+
+        String s = null;
+        ArrayList<String> labels = new ArrayList<>();
+
+        try {
+            Process p = Runtime.getRuntime().exec("python3 /home/rachel/grad_courses/data_science/cs953-team1/sigmoid_svm.py");
+
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+            while ((s = stdInput.readLine()) != null) {
+                //System.out.println(s);
+                labels.add(s);
+            }
+
+            while ((s = stdError.readLine()) != null) {
+                System.out.println(s);
+            }
+
+        } catch (IOException e) {
+            System.out.println("Exception: ");
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
+        return labels;
+    }
+
 
 
     /**

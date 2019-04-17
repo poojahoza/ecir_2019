@@ -1,13 +1,10 @@
 package main.java.predictors;
 
-import main.java.predictors.BayesCounter;
-
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class SpecialCharPredictor extends FracStopPredictor {
+public class SpecialCharPredictor extends StopWordLabelPredictor {
 
     private BayesCounter bc = new BayesCounter();
 
@@ -16,14 +13,14 @@ public class SpecialCharPredictor extends FracStopPredictor {
     }
 
     /**
-     * Desc: Train classifier on ham emails.
+     * Desc: Train classifier on ham documents.
      *
      * @param tokens List of tokens in the document
      */
     public void trainHamTokens(List<String> tokens, String pid) { bc.buildSpecialCharHashMap("ham", tokens, pid); }
 
     /**
-     * Desc: Train classifier on spam emails.
+     * Desc: Train classifier on spam documents.
      *
      * @param tokens List of tokens in the document
      */
@@ -31,12 +28,11 @@ public class SpecialCharPredictor extends FracStopPredictor {
         bc.buildSpecialCharHashMap("spam", tokens, pid);
     }
 
-
     /**
      * Desc: Predict whether a document is a ham or spam.
      *
      * @param tokens List of tokens in the document
-     * @return String The label ("spam" or "ham") that is predicted given the document  tokens
+     * @return String The label ("spam" or "ham") that is predicted given the document tokens
      */
     public String predict(List<String> tokens) {
         return bc.classifyWithSpecialChars(tokens);
@@ -53,7 +49,7 @@ public class SpecialCharPredictor extends FracStopPredictor {
     }
 
     /**
-     * Desc: Get the F1 score of the Naive Bayes classifiers.
+     * Desc: Get the F1 and MAP scores of the classifier.
      *
      * @param spam, a hash map of the ham test data by itself.
      * @param ham, a hash map of the spam test data by itself.

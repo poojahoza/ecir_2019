@@ -2,7 +2,6 @@ package main.java.predictors;
 
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
-import org.apache.lucene.queryparser.classic.ParseException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,39 +13,23 @@ import java.util.List;
 
 import static main.java.utils.SearchUtils.createTokenList;
 
-/*
- * This class returns a vector of labels, classifying the documents input as either "ham" or "spam".
- *
- * Example usage:
- *      SpamClassifier sc = new SpamClassifier();
- *      HashMap<String, String> hamTrain = sc.readIndex(hamTrainPath);
- *      HashMap<String, String> spamTrain = sc.readIndex(spamTrainPath);
- *      HashMap<String, String> test = sc.readIndex(docsForRerank);
- *
- *      LabelPredictor lp = sc.classifyWithUnigrams(hamTrain, spamTrain);
- *      HashMap<String, String> labels = sc.predict(lp, test);
- *
- */
-public class
-SpamClassifier {
+public class SpamClassifier {
 
     private HashMap<String, String> labels;
 
-    /* This constructor should be invoked if the user doesn't have seperate ham/spam test data and just wants to
-     * classify their documents as ham or spam.
-     */
     public SpamClassifier() {
+
         labels = new HashMap<>();
     }
 
     /**
      * Desc: Read and store the training or test data. The user should call this before any of other methods to make
-     * ham and spam train sets, and a test set.
+     *       ham and spam train sets, and a test set.
      *
      * @param path to the training/test set.
-     * @return train or test data stored as an ArrayList of Documents.
+     * @return HashMap of train or test data in the form pid => tokens
      */
-    public HashMap<String, String> readIndex(String path) throws IOException, ParseException {
+    public HashMap<String, String> readIndex(String path) {
 
         BufferedReader reader = null;
         HashMap<String, String> lines = new HashMap<>();
@@ -60,7 +43,6 @@ SpamClassifier {
                 String[] curLine = line.split("\\t+");
                 String pid = curLine[0].trim();
                 String test = curLine[1].trim();
-                //System.out.println(curLine[1]);
                 lines.put(pid, test);
             }
         } catch (IOException | NullPointerException e) {
@@ -76,6 +58,8 @@ SpamClassifier {
      *
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
+     *
+     * @return LabelPredictor that is trained.
      */
     public LabelPredictor classifyWithUnigrams(HashMap<String, String>spamCorpus, HashMap<String, String> hamCorpus) {
 
@@ -97,11 +81,14 @@ SpamClassifier {
 
     }
 
+
     /**
      * Desc: Train a NaiveBayesBigramPredictor.
      *
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
+     *
+     * @return LabelPredictor that is trained.
      */
     public LabelPredictor classifyWithBigrams(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
 
@@ -128,6 +115,8 @@ SpamClassifier {
      *
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
+     *
+     * @return LabelPredictor that is trained.
      */
     public LabelPredictor classifyWithTrigrams(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
 
@@ -150,11 +139,14 @@ SpamClassifier {
 
     }
 
+
     /**
      * Desc: Train a NaiveBayesQuadgramPredictor.
      *
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
+     *
+     * @return LabelPredictor that is trained.
      */
     public LabelPredictor classifyWithQuadgrams(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
 
@@ -177,11 +169,14 @@ SpamClassifier {
 
     }
 
+
     /**
-     * Desc: Train a NaiveBayesQuadgramPredictor.
+     * Desc: Train a SpecialCharPredictor.
      *
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
+     *
+     * @return StopWordLabelPredictor that is trained.
      */
     public StopWordLabelPredictor classifyWithSpecialChars(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
 
@@ -206,11 +201,14 @@ SpamClassifier {
 
     }
 
+
     /**
-     * Desc: Train a NaiveBayesQuadgramPredictor.
+     * Desc: Train a StopCoverPredictor.
      *
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
+     *
+     * @return StopWordLabelPredictor that is trained.
      */
     public StopWordLabelPredictor classifyWithStopCover(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
 
@@ -234,10 +232,12 @@ SpamClassifier {
     }
 
     /**
-     * Desc: Train a NaiveBayesQuadgramPredictor.
+     * Desc: Train a FracStopsPredictor.
      *
      * @param spamCorpus the training set of spam documents.
      * @param hamCorpus the training set of ham documents.
+     *
+     * @return StopWordLabelPredictor that is trained.
      */
     public StopWordLabelPredictor classifyWithFracStops(HashMap<String, String> spamCorpus, HashMap<String, String> hamCorpus) {
 
@@ -264,8 +264,10 @@ SpamClassifier {
     /**
      * Desc: Test the trained predictor.
      *
-     * @param predictor the predictor that was previously trained.
-     * @param test the test data that was held out.
+     * @param predictor the LabelPredictor that was previously trained.
+     * @param test the test data that was held out in the form pid => tokens.
+     *
+     * @return HashMap containing pid => label of "spam" or "ham".
      */
     public HashMap<String, String> predict(LabelPredictor predictor, HashMap<String, String> test) {
 
@@ -279,11 +281,14 @@ SpamClassifier {
         return labels;
     }
 
+
     /**
      * Desc: Test the trained predictor.
      *
-     * @param predictor the predictor that was previously trained.
-     * @param test the test data that was held out.
+     * @param predictor the StopWordsLabelPredictor that was previously trained.
+     * @param test the test data that was held out in the form pid => tokens.
+     *
+     * @return HashMap containing pid => label of "spam" or "ham".
      */
     public HashMap<String, String> predict(StopWordLabelPredictor predictor, HashMap<String, String> test) {
 
@@ -298,27 +303,10 @@ SpamClassifier {
     }
 
     /**
-     * Desc: Get ham and spam scores for the trained predictor.
+     * Desc: Get ham and spam scores for the trained LabelPredictor.
      *
-     * @param predictor the predictor that was previously trained.
-     * @param test the test data that was held out.
-     */
-    public HashMap<String, ArrayList<Double>> getScores(StopWordLabelPredictor predictor, HashMap<String, String> test) {
-
-        HashMap<String, ArrayList<Double>> allScores = new HashMap<>();
-        for (String key : test.keySet()) {
-            ArrayList<Double> scores = predictor.score(key);
-            allScores.put(key, scores);
-        }
-
-        return allScores;
-    }
-
-    /**
-     * Desc: Get ham and spam scores for the trained fracStopPredictor.
-     *
-     * @param predictor the predictor that was previously trained.
-     * @param test the test data that was held out.
+     * @param predictor the LabelPredictor that was previously trained.
+     * @param test the test data that was held out in the form pid => tokens.
      */
     public HashMap<String, ArrayList<Double>> getScores(LabelPredictor predictor, HashMap<String, String> test) {
 
@@ -334,23 +322,14 @@ SpamClassifier {
     }
 
 
-    public boolean isSpam(LabelPredictor predictor,  String text ) {
-
-        List<String> tokens = createTokenList(text, new EnglishAnalyzer());
-        String prediction = predictor.predict(tokens);
-        switch (prediction.toLowerCase()){
-            case "ham": { return false; }
-            case "spam": { return true; }
-            default: { return true; }
-        }
-    }
-
-
-    /*
-     * The user can evaluate their predictor if they have ham and spam test data.
+    /**
+     * Desc: Get the F1 and MAP scores of the classifier.
+     *
+     * @param spamTest, a hash map of the ham test data by itself.
+     * @param hamTest, a hash map of the spam test data by itself.
+     * @param testDocs of mixed ham and spam documents mapping their pids to their text.
      */
-    public void evaluate(HashMap<String, String> spamTest, LabelPredictor predictor, HashMap<String, String> hamTest, HashMap<String, String> testDocs) throws IOException, ParseException {
-
+    public void evaluate(HashMap<String, String> spamTest, LabelPredictor predictor, HashMap<String, String> hamTest, HashMap<String, String> testDocs) {
         predictor.evaluate(spamTest, hamTest, testDocs);
     }
 }
