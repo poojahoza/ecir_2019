@@ -9,7 +9,7 @@ import java.util.*;
 import static main.java.utils.SearchUtils.createTokenList;
 
 public class PythonSVM extends SVM {
-    ;
+
     private HashMap<String, HashMap<String, Integer>> freqMap = new LinkedHashMap<>();
     private ArrayList<String> words = new ArrayList<>();
 
@@ -17,6 +17,14 @@ public class PythonSVM extends SVM {
         super(freqMap, words);
     }
 
+
+    /**
+     * Desc: Read and store the training or test data. The user should call this before any of other methods to make
+     *       ham and spam train sets, and a test set.
+     *
+     * @param path to the training/test set.
+     * @return ArrayList of HashMaps, each representing the tokens of a single document.
+     */
     public ArrayList<HashMap<Integer, Double>> readIndex(String path) {
 
         BufferedReader reader = null;
@@ -44,7 +52,8 @@ public class PythonSVM extends SVM {
     /**
      * Desc: Put the data into a form that the SVM can read and use.
      *
-     * @param corpus the training or test set of spam or ham documents.
+     * @param corpus the training or test set of spam or ham documents in the form pid => tokens.
+     * @return ArrayList of HashMaps, each representing the tokens of a single document.
      */
     public ArrayList<HashMap<Integer, Double>> parse(HashMap<String, String>corpus) {
 
@@ -68,10 +77,19 @@ public class PythonSVM extends SVM {
         return featureVectorList;
     }
 
+
+    /**
+     * Desc: Put the data into a form that the SVM can read and use by writing train and test ArrayLists to csv files.
+     *
+     * @param hamData the ham train set that was created in the previous step.
+     * @param spamData the spam train set that was created in the previous step.
+     * @param test the test set that was created from the previous step.
+     * @param trainPath to where you want to write the train set.
+     * @param testPath to where you want to write the test set.
+     */
     public void prepareData(ArrayList<HashMap<Integer, Double>> hamData, ArrayList<HashMap<Integer, Double>> spamData, ArrayList<HashMap<Integer, Double>> test, String trainPath, String testPath) {
 
         File file = new File(trainPath);
-
 
         try {
             FileWriter outputfile = new FileWriter(file);
@@ -166,20 +184,20 @@ public class PythonSVM extends SVM {
     }
 
 
-        public ArrayList<String> execLinearSVC() throws IOException {
+    /**
+     * Desc: Create a sklearn SVC with a linear kernal.
+     */
+    public ArrayList<String> execLinearSVC() throws IOException {
 
         String s = null;
         ArrayList<String> labels = new ArrayList<>();
 
         try {
             Process p = Runtime.getRuntime().exec("python3 /home/rachel/grad_courses/data_science/cs953-team1/svm.py");
-
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
             BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
             while ((s = stdInput.readLine()) != null) {
-                //System.out.println(s);
                 labels.add(s);
             }
 
@@ -196,6 +214,10 @@ public class PythonSVM extends SVM {
         return labels;
     }
 
+
+    /**
+     * Desc: Create a sklearn SVC with a rbf kernal.
+     */
     public ArrayList<String> execRbfSVC() throws IOException {
 
         String s = null;
@@ -203,13 +225,10 @@ public class PythonSVM extends SVM {
 
         try {
             Process p = Runtime.getRuntime().exec("python3 /home/rachel/grad_courses/data_science/cs953-team1/rbf_svm.py");
-
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
             BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
             while ((s = stdInput.readLine()) != null) {
-                //System.out.println(s);
                 labels.add(s);
             }
 
@@ -227,6 +246,9 @@ public class PythonSVM extends SVM {
     }
 
 
+    /**
+     * Desc: Create a sklearn SVC with a polynomial kernal.
+     */
     public ArrayList<String> execPolynomialSVC() throws IOException {
 
         String s = null;
@@ -234,13 +256,10 @@ public class PythonSVM extends SVM {
 
         try {
             Process p = Runtime.getRuntime().exec("python3 /home/rachel/grad_courses/data_science/cs953-team1/polynomial_svm.py");
-
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
             BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
             while ((s = stdInput.readLine()) != null) {
-                //System.out.println(s);
                 labels.add(s);
             }
 
@@ -258,6 +277,9 @@ public class PythonSVM extends SVM {
     }
 
 
+    /**
+     * Desc: Create a sklearn SVC with a sigmoid kernal.
+     */
     public ArrayList<String> execSigmoidSVC() throws IOException {
 
         String s = null;
@@ -265,13 +287,10 @@ public class PythonSVM extends SVM {
 
         try {
             Process p = Runtime.getRuntime().exec("python3 /home/rachel/grad_courses/data_science/cs953-team1/sigmoid_svm.py");
-
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
             BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
             while ((s = stdInput.readLine()) != null) {
-                //System.out.println(s);
                 labels.add(s);
             }
 
@@ -289,9 +308,11 @@ public class PythonSVM extends SVM {
     }
 
 
-
     /**
-     *  For each paragraph, builds a hash map of tokens to their term frequency.
+     *  Desc: For each paragraph, build a hash map of tokens to their term frequency.
+     *
+     * @param pid of the current document.
+     * @param tokens of the current document.
      */
     public void buildHashMap(String pid, ArrayList<String> tokens) {
 
@@ -312,7 +333,10 @@ public class PythonSVM extends SVM {
 
 
     /**
-     *  Combine information from the list and the hashmap to get a hash map of feature vectors with id => count
+     *  Desc: Combine information from the list and the HashMap to get a HashMap of feature vectors with id => count.
+     *
+     * @param pid of the current document.
+     * @return HashMap that maps a token's unique id to its frequency.
      */
     public HashMap<Integer, Double> createFeatureVectors(String pid) {
 

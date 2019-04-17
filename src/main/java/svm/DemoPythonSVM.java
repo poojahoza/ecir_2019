@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * A class to demonstrate the use of the PythonSVM.
+ */
 public class DemoPythonSVM {
 
     public static void main (String[] args) throws IOException {
