@@ -1,6 +1,6 @@
 package main.java.predictors;
 
-import main.java.BayesCounter;
+import main.java.predictors.BayesCounter;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
 

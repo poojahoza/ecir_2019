@@ -1,6 +1,7 @@
 package main.java.predictors;
 
-import main.java.BayesCounter;
+import main.java.predictors.BayesCounter;
+import weka.core.stopwords.Null;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class FracStopPredictor extends StopWordLabelPredictor{
         String label = null;
         try {
             label =  bc.classifyWithFracStops(tokens);
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | NullPointerException e) {
             e.printStackTrace();
         }
         return label;
@@ -64,7 +65,7 @@ public class FracStopPredictor extends StopWordLabelPredictor{
      * @param pid of the document
      * @return ArrayList The ham and spam scores of the given document tokens
      */
-    public ArrayList<Double> score(String pid) {
+    public ArrayList<Double> score(String pid) throws NullPointerException {
 
         return bc.getFracStopScores(pid);
     }

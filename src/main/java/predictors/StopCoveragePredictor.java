@@ -1,6 +1,6 @@
 package main.java.predictors;
 
-import main.java.BayesCounter;
+import main.java.predictors.BayesCounter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
