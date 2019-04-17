@@ -332,5 +332,24 @@ public class SpamClassifier {
     public void evaluate(HashMap<String, String> spamTest, LabelPredictor predictor, HashMap<String, String> hamTest, HashMap<String, String> testDocs) {
         predictor.evaluate(spamTest, hamTest, testDocs);
     }
+
+
+    /**
+     * Desc: Helper method to check whether a document is spam or not.
+     *
+     * @param predictor, a trained LabelPredictor
+     * @param text, to be classified as ham or spam
+     */
+    public boolean isSpam(LabelPredictor predictor,  String text ) {
+
+        List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+        String prediction = predictor.predict(tokens);
+        switch (prediction.toLowerCase()){
+            case "ham": { return false; }
+            case "spam": { return true; }
+            default: { return true; }
+        }
+    }
+
 }
 

@@ -4,7 +4,7 @@ from sklearn.svm import SVC
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 
-'''train = pd.read_csv("/home/rachel/grad_courses/data_science/train_data.csv") # Check if pandas converts data to numerical values by default.
+train = pd.read_csv("/home/rachel/grad_courses/data_science/train_data.csv") # Check if pandas converts data to numerical values by default.
 test = pd.read_csv("/home/rachel/grad_courses/data_science/test_data.csv")
 
 X_train = train.drop('Class', axis=1)
@@ -14,10 +14,10 @@ svclassifier = SVC(kernel='linear')
 svclassifier.fit(X_train, y_train)
 y_pred = svclassifier.predict(test)
 for prediction in y_pred:
-    print(prediction)'''
+    print(prediction)
 
 ####### Evaluate the resutls using the combined train and test set #######
-data = pd.read_csv("/home/rachel/grad_courses/data_science/train_data.csv")
+'''data = pd.read_csv("/home/rachel/grad_courses/data_science/train_data.csv")
 features = data.drop('Class', axis=1)
 targets = data['Class']
 
@@ -27,6 +27,7 @@ svclassifier.fit(x_train, y_train)
 y_pred = svclassifier.predict(x_test)
 
 print("####### Linear Kernal #######")
+print("F1: ", metrics.f1_score(y_test, y_pred, average="macro"))
 print("Accuracy: ", metrics.accuracy_score(y_test, y_pred))
-print("Precision: ", metrics.precision_score(y_test, y_pred))
-print("Recall: ", metrics.recall_score(y_test, y_pred))
+print("Precision: ", metrics.precision_score(y_test, y_pred, average="macro"))
+print("Recall: ", metrics.recall_score(y_test, y_pred, average="macro"))'''
