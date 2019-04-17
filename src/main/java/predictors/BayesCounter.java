@@ -846,8 +846,15 @@ public class BayesCounter {
             }
             numTokens++;
         }
-        //System.out.println(" numSpecial: " + numSpecial + " numTokens: " + numTokens + " ratio: " + numSpecial/numTokens + " score: " + ((numSpecial/numTokens) - numTokens));
+        // Is the first token a special token? If so, multiply the final ratio by a weight
+        String first = tokens.get(0);
+        String last = tokens.get(tokens.size() - 1);
+        double weight = 1;
+        if (Character.toString(first.charAt(0)).matches("[^A-Za-z]") || (numTokens < 10 && Character.toString(last.charAt(last.length() -1)).matches("[:]"))) {
+            weight =  1.5;
+        }
+        //System.out.println(" numSpecial: " + numSpecial + " numTokens: " + numTokens + " ratio: " + numSpecial/numTokens + " score: " + (weight*(numSpecial/numTokens)));
         //System.out.println();
-        return numSpecial/numTokens;
+        return weight*(numSpecial/numTokens);
     }
 }

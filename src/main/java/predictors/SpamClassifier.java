@@ -219,13 +219,13 @@ SpamClassifier {
 
         for (String key : spamCorpus.keySet()) {
             String text = spamCorpus.get(key);
-            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            List<String> tokens = createTokenList(text, new WhitespaceAnalyzer());
             stopCoverPredictor.trainSpamTokens(tokens, key);
         }
 
         for (String key: hamCorpus.keySet()) {
             String text = hamCorpus.get(key);
-            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            List<String> tokens = createTokenList(text, new WhitespaceAnalyzer());
             stopCoverPredictor.trainHamTokens(tokens, key);
         }
 
@@ -246,13 +246,13 @@ SpamClassifier {
 
         for (String key : spamCorpus.keySet()) {
             String text = spamCorpus.get(key);
-            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            List<String> tokens = createTokenList(text, new WhitespaceAnalyzer());
             fracStopPredictor.trainSpamTokens(tokens, key);
         }
 
         for (String key: hamCorpus.keySet()) {
             String text = hamCorpus.get(key);
-            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            List<String> tokens = createTokenList(text, new WhitespaceAnalyzer());
             fracStopPredictor.trainHamTokens(tokens, key);
         }
 
@@ -335,25 +335,17 @@ SpamClassifier {
 
 
     public boolean isSpam(LabelPredictor predictor,  String text ) {
+
         List<String> tokens = createTokenList(text, new EnglishAnalyzer());
         String prediction = predictor.predict(tokens);
         switch (prediction.toLowerCase()){
-            case "ham":
-            {
-                return false;
-            }
-            case "spam":
-            {
-                return true;
-
-            }
-            default :
-            {
-                // if we did not clarify if it is spam or ham then it is ham
-                return true;
-            }
+            case "ham": { return false; }
+            case "spam": { return true; }
+            default: { return true; }
         }
     }
+
+
     /*
      * The user can evaluate their predictor if they have ham and spam test data.
      */

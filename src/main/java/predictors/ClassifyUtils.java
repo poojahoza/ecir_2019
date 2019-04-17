@@ -44,7 +44,7 @@ public class ClassifyUtils {
     public void parseRunfile() {
 
         BufferedReader reader = null;
-        File runFile = new File("/home/rachel/grad_courses/data_science/extra_data");
+        File runFile = new File("/home/rachel/grad_courses/data_science/txt/heavy_water.txt");
         String line = null;
 
         try {
@@ -84,7 +84,7 @@ public class ClassifyUtils {
 
     private void write() {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("/home/rachel/grad_courses/data_science/dump", true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter("/home/rachel/grad_courses/data_science/dump/dump_heavy_water.txt", true));
             for (String key: dump.keySet()) {
                 writer.write(key + '\t' + dump.get(key));
                 writer.newLine();

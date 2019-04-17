@@ -18,16 +18,16 @@ public class SpamClassifierDemo {
         HashMap<String, String> spamTest = sc.readIndex("/home/rachel/grad_courses/data_science/spamTest");
         HashMap<String, String> hamTest = sc.readIndex("/home/rachel/grad_courses/data_science/hamTest");
 
-        LabelPredictor unigramsPredictor = sc.classifyWithUnigrams(spamTrain, hamTrain);
+        /*LabelPredictor unigramsPredictor = sc.classifyWithUnigrams(spamTrain, hamTrain);
         LabelPredictor bigramsPredictor = sc.classifyWithBigrams(spamTrain, hamTrain);
         LabelPredictor trigramsPredictor = sc.classifyWithTrigrams(spamTrain, hamTrain);
         LabelPredictor quadgramsPredictor = sc.classifyWithQuadgrams(spamTrain, hamTrain);
 
         StopWordLabelPredictor stopCoverPredictor = sc.classifyWithStopCover(spamTrain, hamTrain);
-        StopWordLabelPredictor fracStopsPredictor = sc.classifyWithFracStops(spamTrain, hamTrain);
+        StopWordLabelPredictor fracStopsPredictor = sc.classifyWithFracStops(spamTrain, hamTrain);*/
         StopWordLabelPredictor specialCharPredictor = sc.classifyWithSpecialChars(spamTrain, hamTrain);
 
-        HashMap<String, ArrayList<Double>> unigramScores = sc.getScores(unigramsPredictor, test);
+        /*HashMap<String, ArrayList<Double>> unigramScores = sc.getScores(unigramsPredictor, test);
         HashMap<String, ArrayList<Double>> bigramScores = sc.getScores(bigramsPredictor, test);
         HashMap<String, ArrayList<Double>> trigramScores = sc.getScores(trigramsPredictor, test);
         HashMap<String, ArrayList<Double>> quadgramScores = sc.getScores(quadgramsPredictor, test);
@@ -59,7 +59,7 @@ public class SpamClassifierDemo {
         stopCoverPredictor.evaluate(spamTest, hamTest, test);
 
         System.out.println("\n++++++++ FRAC STOPS ++++++++");
-        fracStopsPredictor.evaluate(spamTest, hamTest, test);
+        fracStopsPredictor.evaluate(spamTest, hamTest, test);*/
 
         System.out.println("\n++++++++ SPECIAL CHARS ++++++++");
         specialCharPredictor.evaluate(spamTest, hamTest, test);
