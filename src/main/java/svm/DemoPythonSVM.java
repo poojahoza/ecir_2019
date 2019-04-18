@@ -42,6 +42,15 @@ public class DemoPythonSVM {
         for (int i = 0; i < linearLabels.size(); i++) {
             System.out.println(linearLabels.get(i));
         }
+        for (int i = 0; i < polynomialLabels.size(); i++) {
+            System.out.println(polynomialLabels.get(i));
+        }
+        for (int i = 0; i < sigmoidLabels.size(); i++) {
+            System.out.println(sigmoidLabels.get(i));
+        }
+        for (int i = 0; i < rbfLabels.size(); i++) {
+            System.out.println(rbfLabels.get(i));
+        }
 
     }
 

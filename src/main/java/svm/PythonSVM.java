@@ -201,9 +201,11 @@ public class PythonSVM extends SVM {
                 labels.add(s);
             }
 
+            BufferedWriter writer = new BufferedWriter(new FileWriter("/home/rachel/grad_courses/data_science/linear_errors.txt", true));
             while ((s = stdError.readLine()) != null) {
-                System.out.println(s);
+                writer.write(s);
             }
+            writer.close();
 
         } catch (IOException e) {
             System.out.println("Exception: ");
@@ -232,9 +234,11 @@ public class PythonSVM extends SVM {
                 labels.add(s);
             }
 
+            BufferedWriter writer = new BufferedWriter(new FileWriter("/home/rachel/grad_courses/data_science/rbf_errors.txt", true));
             while ((s = stdError.readLine()) != null) {
-                System.out.println(s);
+                writer.write(s);
             }
+            writer.close();
 
         } catch (IOException e) {
             System.out.println("Exception: ");
@@ -263,9 +267,11 @@ public class PythonSVM extends SVM {
                 labels.add(s);
             }
 
+            BufferedWriter writer = new BufferedWriter(new FileWriter("/home/rachel/grad_courses/data_science/polynomial_errors.txt", true));
             while ((s = stdError.readLine()) != null) {
-                System.out.println(s);
+                writer.write(s);
             }
+            writer.close();
 
         } catch (IOException e) {
             System.out.println("Exception: ");
@@ -294,9 +300,11 @@ public class PythonSVM extends SVM {
                 labels.add(s);
             }
 
+            BufferedWriter writer = new BufferedWriter(new FileWriter("/home/rachel/grad_courses/data_science/sigmoid_errors.txt", true));
             while ((s = stdError.readLine()) != null) {
-                System.out.println(s);
+                writer.write(s);
             }
+            writer.close();
 
         } catch (IOException e) {
             System.out.println("Exception: ");
