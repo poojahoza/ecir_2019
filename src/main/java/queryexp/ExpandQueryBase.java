@@ -36,7 +36,7 @@ import java.util.stream.StreamSupport;
  * expansion method
  */
 
-abstract class ExpandQueryBase {
+abstract public class ExpandQueryBase {
 
     private RegisterCommands.CommandSearch SearchCommand = null;
     private Map<String, String> query = null;
@@ -59,7 +59,7 @@ abstract class ExpandQueryBase {
      * @param searchCommand
      * @param query
      */
-    ExpandQueryBase(RegisterCommands.CommandSearch searchCommand, Map<String, String> query) {
+    public ExpandQueryBase(RegisterCommands.CommandSearch searchCommand, Map<String, String> query) {
         this.SearchCommand = searchCommand;
         this.query = query;
         embedding = new WordEmbeddingExtended(SearchCommand.getDimension(), SearchCommand.getWordEmbeddingFile());
@@ -90,6 +90,11 @@ abstract class ExpandQueryBase {
             }
         }
         return terms;
+    }
+
+    protected String getQuery(String qid)
+    {
+        return query.get(qid);
     }
 
 

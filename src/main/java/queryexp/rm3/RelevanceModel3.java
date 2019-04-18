@@ -1,7 +1,9 @@
-package main.java.queryexp;
+package main.java.queryexp.rm3;
 
 import main.java.commandparser.RegisterCommands;
 import main.java.containers.Container;
+import main.java.queryexp.ExpandQuery;
+import main.java.queryexp.ExpandQueryBase;
 
 import java.util.Map;
 
@@ -25,6 +27,11 @@ public class RelevanceModel3 extends ExpandQueryBase implements ExpandQuery {
 
     @Override
     public void doQueryExpansion() {
+
+    }
+
+    @Override
+    public void doQueryExpansion(Map<String, Map<String, Container>> input) {
 
     }
 

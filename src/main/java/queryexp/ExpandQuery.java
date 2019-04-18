@@ -15,7 +15,7 @@ public interface ExpandQuery {
      */
     public void doQueryExpansion();
 
-
+    public void doQueryExpansion(Map<String, Map<String, Container>> input);
     /**
      * Method should run for all the queries and return the expanded results.
      * This is the interface for anyone who wants to access it the results

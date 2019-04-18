@@ -416,7 +416,7 @@ public class SearchRunner implements ProgramRunner
             exp.doQueryExpansion();
         }
 
-        if(searchParser.isQueryExDFEnabled())
+        if(searchParser.isQueryExIDFEnabled())
         {
             ExpandQuery exp = new ExpandQueryIDF(searchParser,queryCBOR);
             exp.doQueryExpansion();
@@ -432,10 +432,24 @@ public class SearchRunner implements ProgramRunner
 
         }
 
-//        if(searchParser.isTestEnabled())
-//        {
-//
-//        }
+        if(searchParser.isTestEnabled())
+        {
+            DocumentFrequencySimilarity df = new DocumentFrequencySimilarity(searchParser,queryCBOR);
+            Map<String, Map<String,Container>> res = df.getDocumentFRequencyReRanker();
+
+            ExpandQuery exp = new ExpandQueryDF(searchParser,queryCBOR);
+            exp.doQueryExpansion(res);
+
+            exp = new ExpandQueryIDF(searchParser,queryCBOR);
+            exp.doQueryExpansion(res);
+
+            exp = new ExpandQueryAbstract(searchParser,queryCBOR);
+            exp.doQueryExpansion(res);
+
+            exp = new ExpandQueryAbstractDF(searchParser,queryCBOR);
+            exp.doQueryExpansion(res);
+
+        }
 
        }
     }
