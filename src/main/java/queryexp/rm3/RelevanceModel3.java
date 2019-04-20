@@ -4,6 +4,7 @@ import main.java.commandparser.RegisterCommands;
 import main.java.containers.Container;
 import main.java.queryexp.ExpandQuery;
 import main.java.queryexp.ExpandQueryBase;
+import main.java.utils.RunWriter;
 
 import java.util.Map;
 
@@ -19,15 +20,12 @@ public class RelevanceModel3 extends ExpandQueryBase implements ExpandQuery {
         this.query = query;
     }
 
-    @Override
-    public String getExpandedTerms(String originalQuery, Map<String, Container> retrievedList) {
-        return null;
-    }
-
 
     @Override
     public void doQueryExpansion() {
-
+        Map<String, Map<String, Container>> res = performQueryExpansion();
+        String fname = getFileSuffix("RM3");
+        RunWriter.writeRunFile(fname, res);
     }
 
     @Override
@@ -38,6 +36,16 @@ public class RelevanceModel3 extends ExpandQueryBase implements ExpandQuery {
 
     @Override
     public Map<String, Map<String, Container>> getExpandedQuery() {
+        return null;
+    }
+
+    private void getDocumentStats()
+    {
+
+    }
+
+    @Override
+    public String getExpandedTerms(String originalQuery, Map<String, Container> retrievedList) {
         return null;
     }
 

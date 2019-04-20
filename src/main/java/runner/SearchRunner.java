@@ -8,6 +8,7 @@ import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
 import main.java.mrf.MarkovRandomField;
 import main.java.queryexp.*;
+import main.java.queryexp.rm3.RelevanceModel3;
 import main.java.reranker.ReRanker;
 import main.java.rerankerv2.docsimranker.DocumentFrequencySimilarity;
 import main.java.rerankerv2.docsimranker.EntitySimilarityRanker;
@@ -430,6 +431,12 @@ public class SearchRunner implements ProgramRunner
             exp = new ExpandQueryAbstractDF(searchParser,queryCBOR);
             exp.doQueryExpansion();
 
+        }
+
+        if(searchParser.isQueryExpRm3())
+        {
+            ExpandQuery exp = new RelevanceModel3(searchParser,queryCBOR);
+            exp.doQueryExpansion();
         }
 
         if(searchParser.isTestEnabled())

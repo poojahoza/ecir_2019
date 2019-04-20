@@ -234,8 +234,15 @@ public class RegisterCommands
          @Parameter(names = "--prf-val-k",description ="Top k terms to consider for query expansion")
          private Integer prfValTermsKterms = 50;
 
+         @Parameter(names = "--qe-exp-rm3",description ="Relevance model 3 query expansion")
+         private boolean isQueryExpRm3 = false;
+
          @Parameter(names = "--test",description ="Only for testing purposes")
          private boolean isTestEnabled = false;
+
+         public boolean isQueryExpRm3() {
+             return isQueryExpRm3;
+         }
 
          public boolean isTestEnabled()
          {
