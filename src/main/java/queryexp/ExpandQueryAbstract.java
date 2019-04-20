@@ -24,7 +24,7 @@ public class ExpandQueryAbstract extends ExpandQueryBase implements ExpandQuery 
      * @param query
      */
     public ExpandQueryAbstract(RegisterCommands.CommandSearch searchCommand, Map<String, String> query) {
-        super(searchCommand, query);
+        super(searchCommand, query,true);
         this.SearchCommand = searchCommand;
         this.query = query;
     }

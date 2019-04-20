@@ -59,10 +59,14 @@ abstract public class ExpandQueryBase {
      * @param searchCommand
      * @param query
      */
-    public ExpandQueryBase(RegisterCommands.CommandSearch searchCommand, Map<String, String> query) {
+    public ExpandQueryBase(RegisterCommands.CommandSearch searchCommand, Map<String, String> query,boolean isLoad) {
         this.SearchCommand = searchCommand;
         this.query = query;
-        embedding = new WordEmbeddingExtended(SearchCommand.getDimension(), SearchCommand.getWordEmbeddingFile());
+        if(isLoad)
+        {
+            embedding = new WordEmbeddingExtended(SearchCommand.getDimension(), SearchCommand.getWordEmbeddingFile());
+        }
+
     }
 
     /**

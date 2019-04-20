@@ -28,7 +28,7 @@ public class ExpandQueryDF extends ExpandQueryBase implements ExpandQuery {
      * @param query
      */
     public ExpandQueryDF(RegisterCommands.CommandSearch searchCommand, Map<String, String> query) {
-        super(searchCommand, query);
+        super(searchCommand, query,true);
         this.SearchCommand = searchCommand;
         this.query = query;
     }

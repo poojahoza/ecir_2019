@@ -24,7 +24,7 @@ public class ExpandQueryIDF extends ExpandQueryBase implements ExpandQuery {
      * @param query
      */
     public ExpandQueryIDF(RegisterCommands.CommandSearch searchCommand, Map<String, String> query) {
-        super(searchCommand, query);
+        super(searchCommand, query,true);
         this.SearchCommand = searchCommand;
         this.query = query;
     }
