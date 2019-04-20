@@ -1,9 +1,9 @@
-package main.java;
+package main.java.predictors;
 
 import main.java.evaluators.F1Evaluator;
 import main.java.evaluators.MAPEvaluator;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
-import weka.core.stopwords.StopwordsHandler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,80 +18,26 @@ import static weka.core.Stopwords.isStopword;
 public class BayesCounter {
 
     /**
-     * Makes a new BayesCounter with empty hash map.
+     * Makes a new BayesCounter with empty hash maps.
      */
     public final HashMap<String, HashMap<String, Integer>> bayesMap;
     public final HashMap<String, HashMap<String, Double>> stopWordMap;
+    public final HashMap<String, HashMap<String, Double>> specialCharMap;
 
     public BayesCounter() {
         bayesMap = new HashMap<>();
         stopWordMap = new HashMap<>();
+        specialCharMap = new HashMap<>();
     }
 
-    public void evaluateStopCoverPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
 
-        HashMap <String, String> calledLabels = new HashMap<>();
-        HashMap <String, String> trueLabels = new HashMap<>();
-
-        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
-        for (String key: docs.keySet()) {
-            String text = docs.get(key);
-            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
-            String label = this.classifyWithStopCover(tokens);
-            calledLabels.put(key, label);
-        }
-
-        // For each document, get the real label. Store the pid with its real label in the trueLabels map
-        for (String key: docs.keySet()) {
-            if (hamTest.get(key) != null) {
-                trueLabels.put(key, "ham");
-            }
-            else if (spamTest.get(key) != null) {
-                trueLabels.put(key, "spam");
-            }
-        }
-
-        F1Evaluator f1 = new F1Evaluator(trueLabels);
-        double f1Score = f1.evaluateCalledLabels(calledLabels);
-        System.out.println("F1 score: " + f1Score);
-
-        MAPEvaluator map = new MAPEvaluator(trueLabels);
-        double MAPScore = map.evaluateCalledLabels(calledLabels);
-        System.out.println("MAP: " + MAPScore);
-    }
-
-    public void evaluateFracStopPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) throws FileNotFoundException {
-
-        HashMap <String, String> calledLabels = new HashMap<>();
-        HashMap <String, String> trueLabels = new HashMap<>();
-
-        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
-        for (String key: docs.keySet()) {
-            String text = docs.get(key);
-            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
-            String label = this.classifyWithFracStops(tokens);
-            calledLabels.put(key, label);
-        }
-
-        // For each document, get the real label. Store the pid with its real label in the trueLabels map
-        for (String key: docs.keySet()) {
-            if (hamTest.get(key) != null) {
-                trueLabels.put(key, "ham");
-            }
-            else if (spamTest.get(key) != null) {
-                trueLabels.put(key, "spam");
-            }
-        }
-
-        F1Evaluator f1 = new F1Evaluator(trueLabels);
-        double f1Score = f1.evaluateCalledLabels(calledLabels);
-        System.out.println("F1 score: " + f1Score);
-
-        MAPEvaluator map = new MAPEvaluator(trueLabels);
-        double MAPScore = map.evaluateCalledLabels(calledLabels);
-        System.out.println("MAP: " + MAPScore);
-    }
-
+    /**
+     * Evaluate the trained NaiveBayesUnigramPredictor by computing F1 and MAP scores.
+     *
+     * @param spamTest HashMap in the form pid => tokens
+     * @param hamTest HashMap in the form pid => tokens
+     * @param docs HashMap in the form pid => tokens
+     */
     public void evaluateUnigramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
 
         HashMap <String, String> calledLabels = new HashMap<>();
@@ -124,6 +70,14 @@ public class BayesCounter {
         System.out.println("MAP: " + MAPScore);
     }
 
+
+    /**
+     * Evaluate the trained NaiveBayesBigramPredictor by computing F1 and MAP scores.
+     *
+     * @param spamTest HashMap in the form pid => tokens
+     * @param hamTest HashMap in the form pid => tokens
+     * @param docs HashMap in the form pid => tokens
+     */
     public void evaluateBigramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
 
         HashMap <String, String> calledLabels = new HashMap<>();
@@ -156,6 +110,14 @@ public class BayesCounter {
         System.out.println("MAP: " + MAPScore);
     }
 
+
+    /**
+     * Evaluate the trained NaiveBayesTrigramPredictor by computing F1 and MAP scores.
+     *
+     * @param spamTest HashMap in the form pid => tokens
+     * @param hamTest HashMap in the form pid => tokens
+     * @param docs HashMap in the form pid => tokens
+     */
     public void evaluateTrgramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
 
         HashMap <String, String> calledLabels = new HashMap<>();
@@ -188,6 +150,14 @@ public class BayesCounter {
         System.out.println("MAP: " + MAPScore);
     }
 
+
+    /**
+     * Evaluate the trained NaiveBayesQuadgramPredictor by computing F1 and MAP scores.
+     *
+     * @param spamTest HashMap in the form pid => tokens
+     * @param hamTest HashMap in the form pid => tokens
+     * @param docs HashMap in the form pid => tokens
+     */
     public void evaluateQuadgramPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
 
         HashMap <String, String> calledLabels = new HashMap<>();
@@ -220,10 +190,130 @@ public class BayesCounter {
         System.out.println("MAP: " + MAPScore);
     }
 
+
     /**
-     * Desc: Parse the document tokens and make a hash map of hash maps for the class passed as a parameter.
-     *      Example state of the map after this function: {Spam => ["Viagra", 1000], ["great", 987]}
-     *      This function is for training and should therefore be called on the training set.
+     * Evaluate the trained StopCoverPredictor by computing F1 and MAP scores.
+     *
+     * @param spamTest HashMap in the form pid => tokens
+     * @param hamTest HashMap in the form pid => tokens
+     * @param docs HashMap in the form pid => tokens
+     */
+    public void evaluateStopCoverPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
+
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
+
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (String key: docs.keySet()) {
+            String text = docs.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            String label = this.classifyWithStopCover(tokens);
+            calledLabels.put(key, label);
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (String key: docs.keySet()) {
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
+            }
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
+
+        MAPEvaluator map = new MAPEvaluator(trueLabels);
+        double MAPScore = map.evaluateCalledLabels(calledLabels);
+        System.out.println("MAP: " + MAPScore);
+    }
+
+
+    /**
+     * Evaluate the trained FracStopPredictor by computing F1 and MAP scores.
+     *
+     * @param spamTest HashMap in the form pid => tokens
+     * @param hamTest HashMap in the form pid => tokens
+     * @param docs HashMap in the form pid => tokens
+     */
+    public void evaluateFracStopPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) throws FileNotFoundException {
+
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
+
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (String key: docs.keySet()) {
+            String text = docs.get(key);
+            List<String> tokens = createTokenList(text, new EnglishAnalyzer());
+            String label = this.classifyWithFracStops(tokens);
+            calledLabels.put(key, label);
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (String key: docs.keySet()) {
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
+            }
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
+
+        MAPEvaluator map = new MAPEvaluator(trueLabels);
+        double MAPScore = map.evaluateCalledLabels(calledLabels);
+        System.out.println("MAP: " + MAPScore);
+    }
+
+
+    /**
+     * Evaluate the trained SpecialCharPredictor by computing F1 and MAP scores.
+     *
+     * @param spamTest HashMap in the form pid => tokens
+     * @param hamTest HashMap in the form pid => tokens
+     * @param docs HashMap in the form pid => tokens
+     */
+    public void evaluateSpecialCharPredictor(HashMap<String, String> spamTest, HashMap<String, String> hamTest, HashMap<String, String> docs) {
+
+        HashMap <String, String> calledLabels = new HashMap<>();
+        HashMap <String, String> trueLabels = new HashMap<>();
+
+        // For each document, call the predict method. Store the pid with its prediction in the calledLabels map
+        for (String key: docs.keySet()) {
+            String text = docs.get(key);
+            List<String> tokens = createTokenList(text, new WhitespaceAnalyzer());
+            String label = this.classifyWithSpecialChars(tokens);
+            calledLabels.put(key, label);
+        }
+
+        // For each document, get the real label. Store the pid with its real label in the trueLabels map
+        for (String key: docs.keySet()) {
+            if (hamTest.get(key) != null) {
+                trueLabels.put(key, "ham");
+            }
+            else if (spamTest.get(key) != null) {
+                trueLabels.put(key, "spam");
+            }
+        }
+
+        F1Evaluator f1 = new F1Evaluator(trueLabels);
+        double f1Score = f1.evaluateCalledLabels(calledLabels);
+        System.out.println("F1 score: " + f1Score);
+
+        MAPEvaluator map = new MAPEvaluator(trueLabels);
+        double MAPScore = map.evaluateCalledLabels(calledLabels);
+        System.out.println("MAP: " + MAPScore);
+    }
+
+
+    /**
+     * Desc: Parse the document tokens and make a hash map of hash maps for the class passed as a parameter for the
+     *       NaiveBayesUnigramPredictor.
      *
      * @param docClass the document label of "ham" or "spam"
      * @param tokens List of tokens in the document
@@ -249,8 +339,8 @@ public class BayesCounter {
 
 
     /**
-     * Desc: Parse the tokens of the document passed as a parameter and sum the counts of each word.
-     *       This function is for evaluation and should therefore be called on the evaluation set of emails.
+     * Desc: For the NaiveBayesUnigramPredictor, parse the tokens of the document passed as a parameter and sum the
+     *       counts of each word.
      *
      * @param tokens List of tokens in the document.
      * @return The document class with the larger count.
@@ -278,7 +368,7 @@ public class BayesCounter {
 
 
     /**
-     * Desc: Parse the tokens of the email passed as a parameter and sum the counts of each word.
+     * Desc: For the NaiveBayesUnigramPredictor, parse the tokens for a document and sum the counts of each word.
      *
      * @param tokens List of tokens in the document.
      * @return scores a list containing the hamScore, followed by the spamScore.
@@ -304,9 +394,8 @@ public class BayesCounter {
 
 
     /**
-     * Desc: Parse the document tokens and make a hash map of hash maps for the class passed as a parameter.
-     *      Example state of the map after this function: {Spam => ["Viagra", 1000], ["great", 987]}
-     *      This function is for training and should therefore be called on the training set.
+     * Desc: Parse the document tokens and make a hash map of hash maps for the class passed as a parameter for the
+     *       NaiveBayesBigramPredictor.
      *
      * @param docClass the document label of "ham" or "spam"
      * @param tokens List of tokens in the document
@@ -335,8 +424,8 @@ public class BayesCounter {
 
 
     /**
-     * Desc: Parse the tokens of the document passed as a parameter and sum the counts of each word.
-     *       This function is for evaluation and should therefore be called on the evaluation set of emails.
+     * Desc: For the NaiveBayesBigramPredictor, parse the tokens of the document passed as a parameter and sum the
+     *       counts of each word.
      *
      * @param tokens List of tokens in the document.
      * @return The document class with the larger count.
@@ -365,7 +454,7 @@ public class BayesCounter {
 
 
     /**
-     * Desc: Parse the tokens of the email passed as a parameter and sum the counts of each word.
+     * Desc: For the NaiveBayesBigramPredictor, parse the tokens for a document and sum the counts of each word.
      *
      * @param tokens List of tokens in the document.
      * @return scores a list containing the hamScore, followed by the spamScore.
@@ -392,9 +481,8 @@ public class BayesCounter {
 
 
     /**
-     * Desc: Parse the document tokens and make a hash map of hash maps for the class passed as a parameter.
-     *      Example state of the map after this function: {Spam => ["Viagra", 1000], ["great", 987]}
-     *      This function is for training and should therefore be called on the training set.
+     * Desc: Parse the document tokens and make a hash map of hash maps for the class passed as a parameter for the
+     *       NaiveBayesTrigramPredictor.
      *
      * @param docClass the document label of "ham" or "spam"
      * @param tokens List of tokens in the document
@@ -420,8 +508,8 @@ public class BayesCounter {
     }
 
     /**
-     * Desc: Parse the tokens of the document passed as a parameter and sum the counts of each word.
-     *       This function is for evaluation and should therefore be called on the evaluation set of emails.
+     * Desc: For the NaiveBayesTrigramredictor, parse the tokens of the document passed as a parameter and sum the
+     *       counts of each word.
      *
      * @param tokens List of tokens in the document.
      * @return The document class with the larger count.
@@ -450,7 +538,7 @@ public class BayesCounter {
 
 
     /**
-     * Desc: Parse the tokens of the email passed as a parameter and sum the counts of each word.
+     * Desc: For the NaiveBayesTrigramPredictor, parse the tokens for a document and sum the counts of each word.
      *
      * @param tokens List of tokens in the document.
      * @return scores a list containing the hamScore, followed by the spamScore.
@@ -475,10 +563,10 @@ public class BayesCounter {
         return scores;
     }
 
+
     /**
-     * Desc: Parse the document tokens and make a hash map of hash maps for the class passed as a parameter.
-     *      Example state of the map after this function: {Spam => ["Viagra", 1000], ["great", 987]}
-     *      This function is for training and should therefore be called on the training set.
+     * Desc: Parse the document tokens and make a hash map of hash maps for the class passed as a parameter for the
+     *       NaiveBayesQuadgramPredictor.
      *
      * @param docClass the document label of "ham" or "spam"
      * @param tokens List of tokens in the document
@@ -507,8 +595,8 @@ public class BayesCounter {
 
 
     /**
-     * Desc: Parse the tokens of the document passed as a parameter and sum the counts of each word.
-     *       This function is for evaluation and should therefore be called on the evaluation set of emails.
+     * Desc: For the NaiveBayesQuadgramPredictor, parse the tokens of the document passed as a parameter and sum the
+     *       counts of each word.
      *
      * @param tokens List of tokens in the document.
      * @return The document class with the larger count.
@@ -537,7 +625,7 @@ public class BayesCounter {
 
 
     /**
-     * Desc: Parse the tokens of the email passed as a parameter and sum the counts of each word.
+     * Desc: For the NaiveBayesQuadgramPredictor, parse the tokens for a document and sum the counts of each word.
      *
      * @param tokens List of tokens in the document.
      * @return scores a list containing the hamScore, followed by the spamScore.
@@ -563,6 +651,13 @@ public class BayesCounter {
     }
 
 
+    /**
+     * Desc: Parse the document tokens and make a hash map of hash maps for the class passed as a parameter for the
+     *       StopWordsPredictor.
+     *
+     * @param docClass the document label of "ham" or "spam"
+     * @param tokens List of tokens in the document
+     */
     public void buildStopWordHashMap(String docClass, List<String> tokens, String pid) {
 
         if (stopWordMap.get(docClass) == null) {
@@ -586,9 +681,10 @@ public class BayesCounter {
         curMap.put(pid, result);
     }
 
+
     /**
-     * Desc: Parse the tokens of the document passed as a parameter and get the number of stopwords and non stopwords.
-     *       This function is for evaluation and should therefore be called on the evaluation set of emails.
+     * Desc: For the StopCoverPredictor, parse the tokens of the document passed as a parameter and sum the
+     *       counts of each word.
      *
      * @param tokens List of tokens in the document.
      * @return The document class with the larger count.
@@ -632,21 +728,13 @@ public class BayesCounter {
     }
 
 
-    public ArrayList<Double> getStopCoverScores(String pid) {
-
-        HashMap<String, Double> spamDist = stopWordMap.get("spam");
-        HashMap<String, Double> hamDist = stopWordMap.get("ham");
-        ArrayList<Double> scores = new ArrayList<>();
-
-        double spamScore = Math.log(spamDist.getOrDefault(pid, 1.0));
-        double hamScore = Math.log(hamDist.getOrDefault(pid, 1.0));
-
-        scores.add(hamScore);
-        scores.add(spamScore);
-        return scores;
-    }
-
-
+    /**
+     * Desc: Parse the document tokens and make a hash map of hash maps for the class passed as a parameter for the
+     *       FracStopPredictor.
+     *
+     * @param docClass the document label of "ham" or "spam"
+     * @param tokens List of tokens in the document
+     */
     public void buildFracStopHashMap(String docClass, List<String> tokens, String pid) throws FileNotFoundException {
 
         // Get list of the most common stopwords
@@ -679,6 +767,13 @@ public class BayesCounter {
     }
 
 
+    /**
+     * Desc: For the FracStopPredictor, parse the tokens of the document passed as a parameter and sum the
+     *       counts of each word.
+     *
+     * @param tokens List of tokens in the document.
+     * @return The document class with the larger count.
+     */
     public String classifyWithFracStops(List<String> tokens) throws FileNotFoundException {
 
         // Get list of the most common stopwords
@@ -725,17 +820,106 @@ public class BayesCounter {
         }
     }
 
-    public ArrayList<Double> getFracStopScores(String pid) {
 
-        HashMap<String, Double> spamDist = stopWordMap.get("spam");
-        HashMap<String, Double> hamDist = stopWordMap.get("ham");
-        ArrayList<Double> scores = new ArrayList<>();
+    /**
+     * Desc: Parse the document tokens and make a hash map of hash maps for the class passed as a parameter for the
+     *       SpecialCharPredictor.
+     *
+     * @param docClass the document label of "ham" or "spam"
+     * @param tokens List of tokens in the document
+     */
+    public void buildSpecialCharHashMap(String docClass, List<String> tokens, String pid) {
 
-        double spamScore = Math.log(spamDist.getOrDefault(pid, 1.0));
-        double hamScore = Math.log(hamDist.getOrDefault(pid, 1.0));
+        if (specialCharMap.get(docClass) == null) {
+            HashMap<String, Double> classMap = new HashMap<>();
+            specialCharMap.put(docClass, classMap);
+        }
+        HashMap<String, Double> curMap = specialCharMap.get(docClass);
 
-        scores.add(hamScore);
-        scores.add(spamScore);
-        return scores;
+        // Record all ratios of special characters to total tokens in the appropriate hash map for the current document class.
+        double specialCharRatio = getSpecialCharRatio(tokens);
+        curMap.put(pid, specialCharRatio);
+    }
+
+
+    /**
+     * Desc: For the SpecialCharPredictor, parse the tokens of the document passed as a parameter and sum the
+     *       counts of each word.
+     *
+     * @param tokens List of tokens in the document.
+     * @return The document class with the larger count.
+     */
+    public String classifyWithSpecialChars(List<String> tokens) {
+
+        HashMap<String,  Double> spamDist = specialCharMap.get("spam");
+        HashMap<String, Double> hamDist = specialCharMap.get("ham");
+
+        // Get the average ratio of special chars for spam and ham training
+        double sum = 0;
+        for (String key: spamDist.keySet()) {
+            sum += spamDist.get(key);
+        }
+        double spamAverage = sum/spamDist.size();
+
+        sum = 0;
+        for (String key: hamDist.keySet()) {
+            sum += hamDist.get(key);
+        }
+        double hamAverage = sum/hamDist.size();
+
+        double specialCharRatio = getSpecialCharRatio(tokens);
+
+        // check whether the specialCharRatio is closer to the hamAverage or the spamAverage
+        if (Math.abs(spamAverage - specialCharRatio) < Math.abs(hamAverage - specialCharRatio)) {
+            return "spam";
+        }
+        else {
+            return "ham";
+        }
+    }
+
+
+    /**
+     * Desc: For the SpecialCharPredictor, parse the tokens for a document and get the ratio of special charracters to
+     *       normal characters.
+     *
+     * @param tokens List of tokens in the document.
+     * @return scores a list containing the final score of the document. The higher the score, the spammier the document.
+     */
+    public ArrayList<Double> getSpecialCharScores(List<String> tokens) {
+
+        ArrayList<Double> score = new ArrayList<>();
+        score.add(getSpecialCharRatio(tokens));
+        return score;
+    }
+
+
+    /**
+     * Desc: Helper function to compute the special char ratio for each document.
+     *
+     * @param tokens List of tokens in the document.
+     * @return score of the document. The higher the score, the spammier the document.
+     */
+    public double getSpecialCharRatio (List<String> tokens) {
+
+        double numSpecial = 0;
+        double numTokens = 0;
+        for (String token: tokens) {
+            for (int i = 0; i < token.length(); i++) {
+                if (Character.toString(token.charAt(i)).matches("[^a-z]")) {
+                    numSpecial++;
+                }
+            }
+            numTokens++;
+        }
+
+        // Is the first token a special token? If so, multiply the final ratio by a weight
+        String first = tokens.get(0);
+        String last = tokens.get(tokens.size() - 1);
+        double weight = 1;
+        if (Character.toString(first.charAt(0)).matches("[^A-Za-z]") || (numTokens < 10 && Character.toString(last.charAt(last.length() -1)).matches("[:]"))) {
+            weight = 1.5;
+        }
+        return weight*(numSpecial/numTokens);
     }
 }

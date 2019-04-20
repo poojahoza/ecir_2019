@@ -1,9 +1,10 @@
 package main.java.evaluators;
 
-import it.unimi.dsi.fastutil.Hash;
-
 import java.util.HashMap;
 
+/**
+ * Compute the F1 score of a classifier by comparing true labels to predicted labels.
+ */
 public class F1Evaluator {
 
     private HashMap<String, String> correctLabels;
