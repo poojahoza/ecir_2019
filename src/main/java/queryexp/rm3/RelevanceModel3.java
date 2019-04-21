@@ -2,10 +2,15 @@ package main.java.queryexp.rm3;
 
 import main.java.commandparser.RegisterCommands;
 import main.java.containers.Container;
+import main.java.containers.DocStats;
 import main.java.queryexp.ExpandQuery;
 import main.java.queryexp.ExpandQueryBase;
+import main.java.searcher.BaseBM25;
 import main.java.utils.RunWriter;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class RelevanceModel3 extends ExpandQueryBase implements ExpandQuery {
@@ -14,8 +19,9 @@ public class RelevanceModel3 extends ExpandQueryBase implements ExpandQuery {
     private RegisterCommands.CommandSearch SearchCommand = null;
     private Map<String, String> query = null;
 
+
     public RelevanceModel3(RegisterCommands.CommandSearch searchCommand, Map<String, String> query) {
-        super(searchCommand, query,false);
+        super(searchCommand, query, false);
         this.SearchCommand = searchCommand;
         this.query = query;
     }
@@ -36,17 +42,82 @@ public class RelevanceModel3 extends ExpandQueryBase implements ExpandQuery {
 
     @Override
     public Map<String, Map<String, Container>> getExpandedQuery() {
-        return null;
+        return performQueryExpansion();
     }
 
-    private void getDocumentStats()
-    {
+    private Double getDistributionScore(ArrayList<DocStats> docStats) {
+        Double score = 0.0;
 
+        for (DocStats stats : docStats) {
+            score += stats.getScore();
+        }
+        return score;
+    }
+
+    /**
+     * This builds the document stats , each DocStats holds the all the information about the Document
+     *
+     * @param retrievedList
+     * @return
+     */
+    private ArrayList<DocStats> collectDocumentStats(Map<String, Container> retrievedList) {
+        ArrayList<DocStats> docStats = new ArrayList<>();
+        BaseBM25 bm = null;
+        try {
+            bm = new BaseBM25(SearchCommand.getkVAL(), SearchCommand.getIndexlocation());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        int count = 0;
+        for (Map.Entry<String, Container> val : retrievedList.entrySet()) {
+            count++;
+            String id = val.getKey();
+            Container c = val.getValue();
+            String content = bm.getDocument(c.getDocID());
+            docStats.add(new DocStats(id, c, content));
+
+            if (count == SearchCommand.getPrfVAL()) {
+                break;
+            }
+        }
+        return docStats;
+    }
+
+    private double getProbabilityPerTerm(String term, ArrayList<DocStats> docStats, Double distributeScore) {
+
+        double score = 0.0;
+
+        for (DocStats stats : docStats) {
+
+            Double termgivendoc = stats.getProbabilityTerm(term);
+            Double docDis = (stats.getScore() / distributeScore);
+            //score += stats.getProbabilityTerm(term) * (stats.getScore() / distributeScore);
+            score += termgivendoc * docDis;
+        }
+        return score;
+    }
+
+    private Map<String, Double> getProbability(ArrayList<DocStats> docStats, ArrayList<String> candidateTerms) {
+        Map<String, Double> relevantTerms = new LinkedHashMap<>();
+        Double distributeScore = getDistributionScore(docStats);
+        for (String term : candidateTerms) {
+            relevantTerms.put(term, getProbabilityPerTerm(term, docStats, distributeScore));
+        }
+        return relevantTerms;
     }
 
     @Override
     public String getExpandedTerms(String originalQuery, Map<String, Container> retrievedList) {
-        return null;
+        ArrayList<DocStats> docStats = collectDocumentStats(retrievedList);
+        ArrayList<String> candidates = getCandidateTermsWithEntitiesAbstract(retrievedList);
+        Map<String, Double> ans = getProbability(docStats, candidates);
+
+        for (Map.Entry<String, Double> d : ans.entrySet()) {
+            System.out.println("Term " + d.getKey() + " score " + d.getValue());
+        }
+
+        return originalQuery;
     }
 
 

@@ -22,6 +22,7 @@ public class DocStats {
     private String content = null;
     private Container container = null;
     private Map<String, Integer> termFreq = null;
+    private Double score = 0.0;
 
     /**
      * Constructor to init only the container without having the document ID
@@ -32,6 +33,7 @@ public class DocStats {
     private DocStats(Container container) {
         termFreq = new LinkedHashMap<>();
         this.container = container;
+        score = container.getScore();
     }
 
     /**
@@ -122,5 +124,18 @@ public class DocStats {
         return -1;
     }
 
+    public Double getScore() {
+        return score;
+    }
 
+    public Double getProbabilityTerm(String term) {
+        String processedTerm = null;
+        try {
+            processedTerm = processTerm(term);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return (termFreq.get(processedTerm)) / (double) termFreq.size();
+    }
 }
