@@ -136,6 +136,9 @@ public class DocStats {
             e.printStackTrace();
         }
 
+        if (!termFreq.containsKey(processedTerm)) {
+            return 0.0;
+        }
         return (termFreq.get(processedTerm)) / (double) termFreq.size();
     }
 }

@@ -7,6 +7,7 @@ import main.java.queryexp.ExpandQuery;
 import main.java.queryexp.ExpandQueryBase;
 import main.java.searcher.BaseBM25;
 import main.java.utils.RunWriter;
+import main.java.utils.SortUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -112,10 +113,11 @@ public class RelevanceModel3 extends ExpandQueryBase implements ExpandQuery {
         ArrayList<DocStats> docStats = collectDocumentStats(retrievedList);
         ArrayList<String> candidates = getCandidateTermsWithEntitiesAbstract(retrievedList);
         Map<String, Double> ans = getProbability(docStats, candidates);
-
-        for (Map.Entry<String, Double> d : ans.entrySet()) {
-            System.out.println("Term " + d.getKey() + " score " + d.getValue());
+        System.out.println("query --> " + originalQuery);
+        for (Map.Entry<String, Double> d : SortUtils.sortByValue(ans).entrySet()) {
+            System.out.println("Term -->" + d.getKey() + " score -->" + d.getValue());
         }
+        System.out.println("-----------------------------------------------------------------------------------------");
 
         return originalQuery;
     }
