@@ -8,9 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Entities {
 
@@ -38,10 +36,10 @@ public class Entities {
         return query_entity_list;
     }
 
-    public Map<String, Map<String, String>> getSortedEntitiesPerQuery(Map<String, Map<String, Container>> input){
-        Map<String, Map<String, String>> query_entity_list = new LinkedHashMap<>();
+    public Map<String, Map<String, Integer>> getSortedEntitiesPerQuery(Map<String, Map<String, Container>> input){
+        Map<String, Map<String, Integer>> query_entity_list = new LinkedHashMap<>();
         for(Map.Entry<String, Map<String, Container>> m: input.entrySet()){
-            Map<String, String> entity_list = new LinkedHashMap<>();
+            Map<String, Integer> entity_list = new LinkedHashMap<>();
 
             for(Map.Entry<String, Container> n: m.getValue().entrySet())
             {
@@ -49,11 +47,9 @@ public class Entities {
                 String [] entity_ids = e.getEntityId().split("[\r\n]+");
                 for(int s = 0; s  < entity_ids.length; s++) {
                     if(entity_list.containsKey(entity_ids[s])){
-                        int freq = Integer.valueOf(entity_list.get(entity_ids[s]));
-                        freq++;
-                        entity_list.put(entity_ids[s], String.valueOf(freq));
+                        entity_list.put(entity_ids[s], entity_list.get(entity_ids[s])+1);
                     }else{
-                        entity_list.put(entity_ids[s], "1");
+                        entity_list.put(entity_ids[s], 1);
                     }
 
                 }
@@ -72,39 +68,30 @@ public class Entities {
 
         for(Map.Entry<String, Map<String, Container>> m: bm25_ranking.entrySet())
         {
+            Map<String, Integer> query_entities_list = ranked_entities.get(m.getKey());
             for(Map.Entry<String, Container> n:m.getValue().entrySet())
             {
                 EntityContainer e = n.getValue().getEntity();
-                int entity_counter = 1;
+                int entity_counter = 0;
                 String [] entity_ids = e.getEntityId().split("[\r\n]+");
+
                 for(int s = 0; s  < entity_ids.length; s++) {
-                    Map<String, Integer> query_entities_list = ranked_entities.get(m.getKey());
 
                     if(query_entities_list.containsKey(entity_ids[s]))
                     {
                         entity_counter += 1;
                     }
-                    if(ranked_para.containsKey(m.getKey()))
-                    {
-                        Map<String, Double> query_extract = ranked_para.get(m.getKey());
-                        if(query_extract.containsKey(entity_ids[s]))
-                        {
-                            query_extract.put(n.getKey(), (query_extract.get(entity_ids[s])+1)*n.getValue().getScore());
-                        }
-                        else{
-                            query_extract.put(n.getKey(), entity_counter*n.getValue().getScore());
-                        }
-
-                    }
 
                 }
-
-                if(!ranked_para.containsKey(m.getKey()))
-                {
+                if(ranked_para.containsKey(m.getKey())){
+                    Map<String, Double> ranked_para_extract = ranked_para.get(m.getKey());
+                    ranked_para_extract.put(n.getKey(), n.getValue().getScore()+ entity_counter);
+                }else {
                     Map<String, Double> para_rank = new LinkedHashMap<>();
-                    para_rank.put(n.getKey(), entity_counter*n.getValue().getScore());
+                    para_rank.put(n.getKey(), n.getValue().getScore()+ entity_counter);
                     ranked_para.put(m.getKey(), para_rank);
                 }
+
 
             }
         }
@@ -176,16 +163,35 @@ public class Entities {
         return expanded_query;
     }
 
-    public String[][] getEntityArray(Map<String, String> entities_list){
+    public String[][] getEntityArray(Map<String, Integer> entities_list){
         String[][] edge_array = new String[entities_list.size()][2];
         int counter = 0;
-        for(Map.Entry<String, String> m: entities_list.entrySet())
+        for(Map.Entry<String, Integer> m: entities_list.entrySet())
         {
-            edge_array[counter][0] = m.getKey();
-            edge_array[counter][1] = m.getValue();
-            counter++;
+            if(!m.getKey().equals("")){ //handle empty entity string
+                //System.out.println("Empty entity");
+                edge_array[counter][0] = m.getKey();
+                edge_array[counter][1] = String.valueOf(m.getValue());
+                counter++;
+                //continue;
+            }
+
         }
         return edge_array;
+    }
+
+    public List<String> getEntityIdsList(Map<String, Integer> entities_list){
+        List<String> entities_ids = new ArrayList<String>();
+        for(Map.Entry<String, Integer> m: entities_list.entrySet())
+        {
+            if(!m.getKey().equals("")){ //handle empty entity string
+                //System.out.println("Empty entity");
+                entities_ids.add(m.getKey());
+                //continue;
+            }
+
+        }
+        return entities_ids;
     }
 
     public static boolean searchArrayElement(String[] search_array, String target){
@@ -195,6 +201,56 @@ public class Entities {
         }
         return false;
     }
+
+    public Map<String, Map<String, Double[]>> readEntityRunFile(String filename){
+
+        Map<String, Map<String, Double[]>> mp = new LinkedHashMap<>();
+
+        File fp = new File(filename);
+        FileReader fr;
+        BufferedReader br = null;
+
+
+        try {
+            fr = new FileReader(fp);
+            br = new BufferedReader(fr);
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        while (true) {
+            try {
+                String line = br.readLine();
+
+                if (line == null) {
+                    break;
+                }
+
+                String[] words = line.split(" ");
+                String outKey = words[0];
+
+                if (mp.containsKey(outKey)) {
+                    Map<String, Double[]> extract = mp.get(outKey);
+                    Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    extract.put(words[2], features);
+                } else {
+
+                    Map<String, Double[]> temp = new LinkedHashMap<>();
+                    Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    temp.put(words[2], features);
+                    mp.put(outKey, temp);
+                }
+            } catch (NullPointerException n) {
+                System.out.println(n.getMessage());
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+
+        }
+        return mp;
+    }
+
 
     public Map<String, Map<String, String>> readEntityQrelFile(String filename){
 

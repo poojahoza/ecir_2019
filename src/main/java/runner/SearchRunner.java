@@ -135,6 +135,24 @@ public class SearchRunner implements ProgramRunner
             normalizedLevenshteinSimilarity.doNormalizedLevenshtein();
         }
 
+        if(searchParser.isEntityFreqEnabled()){
+            validate.ValidateEntityDegree();
+            try{
+                BaseBM25 bm25 = new BaseBM25(searchParser.getkVAL(), searchParser.getIndexlocation());
+                Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(queryCBOR);
+
+                Entities e = new Entities();
+                Map<String, Map<String, Integer>> query_ent_list = e.getSortedEntitiesPerQuery(bm25_ranking);
+
+                WriteFile write_file = new WriteFile();
+                write_file.generateEntityRunFile(query_ent_list, "entityBM25Freq");
+
+
+            }catch (IOException ioe){
+                System.out.println(ioe.getMessage());
+            }
+
+        }
 
         if(searchParser.isEntityDegreeEnabled()){
             validate.ValidateEntityDegree();
@@ -239,10 +257,11 @@ public class SearchRunner implements ProgramRunner
                 Map<String, Map<String, Container>> bm25_ranking = bm25.getRanking(queryCBOR);
 
                 Entities e = new Entities();
-                Map<String, Map<String, String>> query_ent_list = e.getSortedEntitiesPerQuery(bm25_ranking);
+                Map<String, Map<String, Integer>> query_ent_list = e.getSortedEntitiesPerQuery(bm25_ranking);
 
                 FeatureGenerator featuregenerator = new FeatureGenerator();
-                Map<String, Map<String, Double[]>> featureVectors = featuregenerator.getNormalizedFeatureVectors(query_ent_list, bm25_ranking);
+                Map<String, Map<String, Double[]>> featureVectors = featuregenerator.getFeatureVectors(query_ent_list, bm25_ranking);
+                //Map<String, Map<String, Double[]>> featureVectors = featuregenerator.getNormalizedFeatureVectors(query_ent_list, bm25_ranking);
 
                 WriteFile write_file = new WriteFile();
                 String level = searchParser.isArticleEnabled()? "_article": "_section";
@@ -256,7 +275,7 @@ public class SearchRunner implements ProgramRunner
                     datafile = "_train";
                 }
                 write_file.generateFeatureVectorRunFile(featureVectors, "feature_vectors"+level+datafile);
-                write_file.generateEntityRankLibRunFile(featureVectors, searchParser.getQrelfile(), "rank_lib"+level+datafile);
+                //write_file.generateEntityRankLibRunFile(featureVectors, searchParser.getQrelfile(), "rank_lib"+level+datafile);
 
             }catch (Exception ioe){
                 ioe.printStackTrace();

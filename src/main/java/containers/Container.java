@@ -10,12 +10,14 @@ public class Container implements Comparable
     private Double scoreVal;
     private EntityContainer entity;
     private ArrayList<Double> scores;
+    private int rank;
 
     public Container(Double scoreVal,int docID)
     {
         this.docID=docID;
         this.scoreVal=scoreVal;
         this.scores = new ArrayList<Double>();
+        this.rank=rank;
     }
 
     public void addEntityContainer(EntityContainer e)
@@ -25,12 +27,14 @@ public class Container implements Comparable
 
     public int  getDocID() {return docID;}
     public Double getScore(){return scoreVal;}
+    public int getRank() {return rank;}
 
     public EntityContainer getEntity() { return entity;}
     public void setScoreVal(Double scoreVal)
     {
         this.scoreVal=scoreVal;
     }
+    public void setRank(int rank){this.rank=rank;}
 
     public void addScores(Double d)
     {

@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ public class WriteFile {
         }
     }
 
-    public void generateEntityRunFile(Map<String, Map<String, Double>> results, String methodname)
+    public <T> void generateEntityRunFile(Map<String, Map<String, T>> results, String methodname)
     {
         String output_file = "output_ranking_"+methodname+".txt";
         List<String> rankings = new ArrayList<String>();
@@ -43,14 +45,14 @@ public class WriteFile {
         {
             System.out.println(ioe.getMessage());
         }
-        for(Map.Entry<String, Map<String, Double>> m: results.entrySet())
+        for(Map.Entry<String, Map<String, T>> m: results.entrySet())
         {
             int rank = 0;
             rankings.clear();
-            for(Map.Entry<String, Double> n: m.getValue().entrySet())
+            for(Map.Entry<String, T> n: m.getValue().entrySet())
             {
                 rank += 1;
-                rankings.add(m.getKey() + " Q0 " + n.getKey() +" "+String.valueOf(rank)+" "+String.valueOf(n.getValue())+ " team1 "+methodname);
+                rankings.add(m.getKey() + " Q0 " + n.getKey() +" "+String.valueOf(rank)+" "+n.getValue().toString()+ " team1 "+methodname);
             }
             try {
                 Files.write(file, rankings, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
@@ -102,6 +104,7 @@ public class WriteFile {
     {
         String output_file = "output_ranking_"+methodname+".txt";
         List<String> rankings = new ArrayList<String>();
+        NumberFormat formatter = new DecimalFormat("#0.000000000000");
         String result_dir = "result";
         File directory = new File(result_dir);
         if (! directory.exists()){
@@ -127,13 +130,14 @@ public class WriteFile {
                 builder.append(n.getKey()+" ");
                 for(Double d: n.getValue()){
                     builder.append(" ");
-                    builder.append(d.toString());
+                    builder.append(formatter.format(d)); //d.toString()
                 }
                 String final_data = builder.toString();
                 rankings.add(final_data);
 
             }
             try {
+                System.out.println(rankings);
                 Files.write(file, rankings, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
             }
             catch (IOException io)

@@ -34,6 +34,11 @@ public class Stats {
     }*/
 
     private Double calculateNormalize(Double val, Double min, Double max){
+        System.out.println("min , max "+min+" "+max+" "+val+" "+((val - min)/(max - min)));
+        if((max - min) == 0.0) {
+            System.out.println("in if min, max");
+            return 0.0;
+        }
         return (val - min)/(max - min);
     }
 
@@ -79,6 +84,7 @@ public class Stats {
                 Double[] val = n_value.getValue();
                 Double[] min_max = query_min_max.get(n.getKey());
                 val[0] = calculateNormalize(val[0], min_max[0], min_max[1]);
+                System.out.println(val[1]+" "+min_max[2]+" "+min_max[3]);
                 val[1] = calculateNormalize(val[1], min_max[2], min_max[3]);
                 //val[2] = calculateNormalize(val[2], min_max[4], min_max[5]);
                 temp.put(n_value.getKey(), val);

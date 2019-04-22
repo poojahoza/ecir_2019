@@ -59,6 +59,7 @@ public class BaseBM25 extends BaseSearcher
     {
         LabelPredictor lp=null;
         SpamClassifier sc=null;
+        int para_rank=1;
         if (isSpamFilterEnabled) {
             lp = createPredictor();
             sc = new SpamClassifier();
@@ -79,8 +80,9 @@ public class BaseBM25 extends BaseSearcher
             //Container that holds all the information
             Container c = new Container((double) s.score,s.doc);
             c.addEntityContainer(new EntityContainer(entity, entityId));
-
+            c.setRank(para_rank);
             createRankingQueryDocPair(queryId, paraId,c);
+            para_rank++;
 
         }
     }
@@ -160,6 +162,7 @@ public class BaseBM25 extends BaseSearcher
 
         LabelPredictor lp=null;
         SpamClassifier sc=null;
+        int para_rank=1;
         if (isSpamFilterEnabled) {
             lp = createPredictor();
             sc = new SpamClassifier();
@@ -186,7 +189,9 @@ public class BaseBM25 extends BaseSearcher
                 //Container that holds all the information
                 Container c = new Container((double) s.score,s.doc);
                 c.addEntityContainer(new EntityContainer(entity, entityId));
+                c.setRank(para_rank);
                 temp.put(paraId,c);
+                para_rank++;
             }
        return temp;
     }
@@ -234,6 +239,7 @@ public class BaseBM25 extends BaseSearcher
             ScoreDoc[] scoringDocuments = topDocuments.scoreDocs;
 
             temp = new LinkedHashMap<>();
+            int para_rank = 1;
 
             for (ScoreDoc s : scoringDocuments) {
                 Document rankedDoc = null;
@@ -254,6 +260,7 @@ public class BaseBM25 extends BaseSearcher
                     countOfSpam += 1;
                     Container c = new Container((double) s.score, s.doc);
                     c.addEntityContainer(new EntityContainer(entity, entityId));
+                    c.setRank(para_rank);
                     tempSpam.put(paraId, c) ;
                     continue;
                 }
@@ -261,7 +268,9 @@ public class BaseBM25 extends BaseSearcher
                 Container c = new Container((double) s.score, s.doc);
 
                 c.addEntityContainer(new EntityContainer(entity, entityId));
+                c.setRank(para_rank);
                 temp.put(paraId, c);
+                para_rank++;
             }
         } while (countOfSpam > 0);
         return temp;
@@ -289,6 +298,7 @@ public class BaseBM25 extends BaseSearcher
 
         LabelPredictor  LP = createPredictor();
         SpamClassifier sc = new SpamClassifier();
+        int para_rank=1;
 
         for (ScoreDoc s : scoringDocuments) {
             Document rankedDoc = null;
@@ -310,7 +320,9 @@ public class BaseBM25 extends BaseSearcher
             Container c = new Container((double) s.score, s.doc);
 
             c.addEntityContainer(new EntityContainer(entity, entityId));
+            c.setRank(para_rank);
             temp.put(paraId, c);
+            para_rank++;
         }
         return temp;
     }

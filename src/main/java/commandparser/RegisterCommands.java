@@ -152,6 +152,10 @@ public class RegisterCommands
          @Parameter(names = {"-top"},description ="specify the top number of selected entity to used in the Query expansion")
          private int numberOfReturnedEntity = 3;
 
+
+         @Parameter(names = "--entity-default-freq",description ="Rerank the initial retrieved document using entity frequency")
+         private boolean isEntityFreq =false;
+
          @Parameter(names = "--entity-degree",description ="Rerank the initial retrieved document using entity degree")
          private boolean isEntityDegree =false;
 
@@ -338,6 +342,8 @@ public class RegisterCommands
          {
              return isEntityDegree;
          }
+
+         public boolean isEntityFreqEnabled() { return isEntityFreq;}
 
          public boolean isEntityRelationEnabled()
          {
