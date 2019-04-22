@@ -6,6 +6,7 @@ import main.java.containers.DocStats;
 import main.java.queryexp.ExpandQuery;
 import main.java.queryexp.ExpandQueryBase;
 import main.java.searcher.BaseBM25;
+import main.java.utils.PreProcessor;
 import main.java.utils.RunWriter;
 import main.java.utils.SortUtils;
 
@@ -108,19 +109,35 @@ public class RelevanceModel3 extends ExpandQueryBase implements ExpandQuery {
         return relevantTerms;
     }
 
+    private ArrayList<String> getRm3ExpansionTerms(Map<String, Double> unsorted, String orig) {
+        ArrayList<String> res = null;
+
+        try {
+            res = PreProcessor.processTermsUsingLuceneStandard(orig);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        int counter = 0;
+
+        for (Map.Entry<String, Double> val : SortUtils.sortByValue(unsorted).entrySet()) {
+            counter++;
+
+            res.add(val.getKey());
+            if (counter == SearchCommand.getPrfValTermsKterms()) {
+                break;
+            }
+        }
+        return res;
+    }
+
     @Override
     public String getExpandedTerms(String originalQuery, Map<String, Container> retrievedList) {
         ArrayList<DocStats> docStats = collectDocumentStats(retrievedList);
         ArrayList<String> candidates = getCandidateTermsWithEntitiesAbstract(retrievedList);
         Map<String, Double> ans = getProbability(docStats, candidates);
-        System.out.println("query --> " + originalQuery);
-        for (Map.Entry<String, Double> d : SortUtils.sortByValue(ans).entrySet()) {
-            System.out.println("Term -->" + d.getKey() + " score -->" + d.getValue());
-        }
-        System.out.println("-----------------------------------------------------------------------------------------");
+        ArrayList<String> expansionterms = getRm3ExpansionTerms(ans, originalQuery);
 
-        return originalQuery;
+        return ArrayListInToString(expansionterms);
     }
-
-
 }

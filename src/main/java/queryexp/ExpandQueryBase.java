@@ -59,11 +59,10 @@ abstract public class ExpandQueryBase {
      * @param searchCommand
      * @param query
      */
-    public ExpandQueryBase(RegisterCommands.CommandSearch searchCommand, Map<String, String> query,boolean isLoad) {
+    public ExpandQueryBase(RegisterCommands.CommandSearch searchCommand, Map<String, String> query, boolean isLoad) {
         this.SearchCommand = searchCommand;
         this.query = query;
-        if(isLoad)
-        {
+        if (isLoad) {
             embedding = new WordEmbeddingExtended(SearchCommand.getDimension(), SearchCommand.getWordEmbeddingFile());
         }
 
@@ -82,7 +81,7 @@ abstract public class ExpandQueryBase {
 
     protected String getFileSuffix(String mname) {
         return mname + "_" + (SearchCommand.isSectionEnabled() ? "section_" : "article_") + "d" + SearchCommand.getDimension()
-                + "_" + "prf" + SearchCommand.getPrfVAL() + "_" + "prfval" + SearchCommand.getPrfValTermsKterms()+"_"+"k"+SearchCommand.getkVAL();
+                + "_" + "prf" + SearchCommand.getPrfVAL() + "_" + "prfval" + SearchCommand.getPrfValTermsKterms() + "_" + "k" + SearchCommand.getkVAL();
 
     }
 
@@ -96,8 +95,7 @@ abstract public class ExpandQueryBase {
         return terms;
     }
 
-    protected String getQuery(String qid)
-    {
+    protected String getQuery(String qid) {
         return query.get(qid);
     }
 
@@ -207,6 +205,7 @@ abstract public class ExpandQueryBase {
 
     /**
      * Returns the top K workds from the list along with the original query terms
+     *
      * @param q
      * @param OriginalQueryTerms
      * @return
@@ -248,6 +247,7 @@ abstract public class ExpandQueryBase {
     /**
      * Returns the some of the nearest terms that are near to the query per query term
      * Based on the --prf-val-term option, it it returns that many nearest terms per query term
+     *
      * @param orignalquery
      * @param candidates
      * @return
