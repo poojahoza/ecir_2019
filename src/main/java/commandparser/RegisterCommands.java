@@ -185,6 +185,8 @@ public class RegisterCommands
          @Parameter(names = "--spam-filter",description ="Uses the spam filter before performing the re-rank")
          private static boolean isSpamFilterEnabled = false;
 
+         @Parameter(names = "--spam-filter2",description ="Uses the spam filter before performing the re-rank")
+         private static boolean isSpecialCharSpamFilterEnabled = false;
 
          @Parameter(names = {"--spam-loc"}, description = "Directory to spam train file")
          private static String spamLocation = null;
@@ -242,6 +244,7 @@ public class RegisterCommands
          {
              return isSpamFilterEnabled;
          }
+         public static boolean isSpecialCharSpamFilterEnabled(){ return isSpecialCharSpamFilterEnabled;}
          public static String SpamLocation()
          {
              return spamLocation;

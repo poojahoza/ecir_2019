@@ -5,6 +5,8 @@ import main.java.containers.Container;
 import main.java.containers.EntityContainer;
 import main.java.predictors.LabelPredictor;
 import main.java.predictors.SpamClassifier;
+import main.java.predictors.SpecialCharPredictor;
+import main.java.predictors.StopWordLabelPredictor;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.ScoreDoc;
@@ -30,6 +32,7 @@ public class BaseBM25 extends BaseSearcher
 {
 
     private boolean isSpamFilterEnabled = RegisterCommands.CommandSearch.isSpamFilterEnabled();
+    private boolean isSpecialCharSpamFilterEnabled = RegisterCommands.CommandSearch.isSpecialCharSpamFilterEnabled();
     private Map<String, Map<String, Container>> ranks=null;
     private int k;
 
@@ -59,9 +62,14 @@ public class BaseBM25 extends BaseSearcher
     {
         LabelPredictor lp=null;
         SpamClassifier sc=null;
+        StopWordLabelPredictor swlp =null;
+        SpecialCharPredictor scp = null;
         if (isSpamFilterEnabled) {
             lp = createPredictor();
             sc = new SpamClassifier();
+        }else if (isSpecialCharSpamFilterEnabled){
+            swlp = createStopWordLabelPredictor();
+            scp = new SpecialCharPredictor();
         }
         for(ScoreDoc s:scoreDocs)
         {
@@ -75,6 +83,9 @@ public class BaseBM25 extends BaseSearcher
                 if (sc.isSpam(lp, text)) {
                     continue;
                 }
+            }else if (isSpecialCharSpamFilterEnabled){
+                swlp = createStopWordLabelPredictor();
+                scp = new SpecialCharPredictor();
             }
             //Container that holds all the information
             Container c = new Container((double) s.score,s.doc);
@@ -143,7 +154,7 @@ public class BaseBM25 extends BaseSearcher
 
     public Map<String, Container> getRanking(String query)
     {
-         Map<String,Container> temp;
+        Map<String,Container> temp;
 
         TopDocs topDocuments = null;
         try {
@@ -160,35 +171,47 @@ public class BaseBM25 extends BaseSearcher
 
         LabelPredictor lp=null;
         SpamClassifier sc=null;
+        StopWordLabelPredictor swlp =null;
+        SpecialCharPredictor scp = null;
         if (isSpamFilterEnabled) {
             lp = createPredictor();
             sc = new SpamClassifier();
+        }else if (isSpecialCharSpamFilterEnabled){
+            swlp = createStopWordLabelPredictor();
+            scp = new SpecialCharPredictor();
         }
 
         for(ScoreDoc s:scoringDocuments)
-            {
-                Document rankedDoc = null;
-                try {
-                    rankedDoc = searcher.doc(s.doc);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                String paraId = rankedDoc.getField("Id").stringValue();
-                String entity = rankedDoc.getField("EntityLinks").stringValue();
-                String entityId = rankedDoc.getField("OutlinkIds").stringValue();
-                if (isSpamFilterEnabled) {
-                    String text = rankedDoc.getField("Text").stringValue();
-                    //check if the doc is spam
-                    if (sc.isSpam(lp, text)) {
-                        continue;
-                    }
-                }
-                //Container that holds all the information
-                Container c = new Container((double) s.score,s.doc);
-                c.addEntityContainer(new EntityContainer(entity, entityId));
-                temp.put(paraId,c);
+        {
+            Document rankedDoc = null;
+            try {
+                rankedDoc = searcher.doc(s.doc);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-       return temp;
+            String paraId = rankedDoc.getField("Id").stringValue();
+            String entity = rankedDoc.getField("EntityLinks").stringValue();
+            String entityId = rankedDoc.getField("OutlinkIds").stringValue();
+            if (isSpamFilterEnabled) {
+                String text = rankedDoc.getField("Text").stringValue();
+                //check if the doc is spam
+                if (sc.isSpam(lp, text)) {
+                    continue;
+                }
+            }else if (isSpecialCharSpamFilterEnabled)
+            {
+                String text = rankedDoc.getField("Text").stringValue();
+                //check if the doc is spam
+                if (scp.isSpam(swlp, text)) {
+                    continue;
+                }
+            }
+            //Container that holds all the information
+            Container c = new Container((double) s.score,s.doc);
+            c.addEntityContainer(new EntityContainer(entity, entityId));
+            temp.put(paraId,c);
+        }
+        return temp;
     }
     private LabelPredictor createPredictor (){
         LabelPredictor bigramsPredictor = null ;
@@ -201,6 +224,17 @@ public class BaseBM25 extends BaseSearcher
         bigramsPredictor = sc.classifyWithBigrams(spamTrain, hamTrain);
 
         return bigramsPredictor;
+    }
+
+    private StopWordLabelPredictor createStopWordLabelPredictor (){
+        StopWordLabelPredictor specialCharPredictor  = null ;
+        SpamClassifier scp = new SpamClassifier();
+        HashMap<String, String> hamTrain  = scp.readIndex(RegisterCommands.CommandSearch.hamLocation());
+        HashMap<String, String> spamTrain = scp.readIndex(RegisterCommands.CommandSearch.SpamLocation());
+
+        specialCharPredictor = scp.classifyWithSpecialChars(spamTrain, hamTrain);
+
+        return specialCharPredictor;
     }
 
     public Map<String, Container> getRankingExactNumber(String query)
