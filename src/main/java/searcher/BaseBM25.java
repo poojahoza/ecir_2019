@@ -83,9 +83,13 @@ public class BaseBM25 extends BaseSearcher
                 if (sc.isSpam(lp, text)) {
                     continue;
                 }
-            }else if (isSpecialCharSpamFilterEnabled){
-                swlp = createStopWordLabelPredictor();
-                scp = new SpecialCharPredictor();
+            }else if (isSpecialCharSpamFilterEnabled)
+            {
+                String text = rankedDoc.getField("Text").stringValue();
+                //check if the doc is spam
+                if (scp.isSpam(swlp, text)) {
+                    continue;
+                }
             }
             //Container that holds all the information
             Container c = new Container((double) s.score,s.doc);
