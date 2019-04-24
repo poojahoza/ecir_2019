@@ -146,7 +146,17 @@ public class SearchRunner implements ProgramRunner
                 Map<String, Map<String, Integer>> query_ent_list = e.getSortedEntitiesPerQuery(bm25_ranking);
 
                 WriteFile write_file = new WriteFile();
-                write_file.generateEntityRunFile(query_ent_list, "entityBM25Freq");
+                String level = searchParser.isArticleEnabled()? "_article": "_section";
+                String datafile ="";
+                if(searchParser.getQueryfile().toLowerCase().contains("test".toLowerCase()))
+                {
+                    datafile = "_test";
+                }
+                else if(searchParser.getQueryfile().toLowerCase().contains("train".toLowerCase()))
+                {
+                    datafile = "_train";
+                }
+                write_file.generateEntityRunFile(query_ent_list, "entityBM25Freq"+level+datafile);
 
 
             }catch (IOException ioe){
