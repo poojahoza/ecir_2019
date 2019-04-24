@@ -184,6 +184,8 @@ public class RegisterCommands {
         @Parameter(names = "--spam-filter", description = "Uses the spam filter before performing the re-rank")
         private static boolean isSpamFilterEnabled = false;
 
+         @Parameter(names = "--spam-filter2",description ="Uses the spam filter before performing the re-rank")
+         private static boolean isSpecialCharSpamFilterEnabled = false;
 
         @Parameter(names = {"--spam-loc"}, description = "Directory to spam train file")
         private static String spamLocation = null;
@@ -283,81 +285,54 @@ public class RegisterCommands {
             return ranklibpath;
         }
 
-        public boolean isClusterRankerEnabled() {
-            return isClusterRankerEnabled;
-        }
+         public boolean isClusterRankerEnabled()
+         {
+             return isClusterRankerEnabled;
+         }
+         public boolean isLevenSimEnabled() {return isLevenSim;}
+         public String getQrelPath()
+         {
+             return qrelPath;
+         }
+         public boolean isMrfEnabled() {return  isMrfEnabled;}
+         public boolean isParallelEnabled(){return isParallelEnabled;}
+         public static boolean isSpamFilterEnabled()
+         {
+             return isSpamFilterEnabled;
+         }
+         public static String SpamLocation()
+         {
+             return spamLocation;
+         }
+         public static String hamLocation()
+         {
+             return hamLocation;
+         }
+         public boolean isArticleEnabled()
+         {
+             return isArticleEnabled;
+         }
+         public boolean isSectionEnabled()
+         {
+             return isSectionEnabled;
+         }
+         public boolean isQEEnabled(){return isQE;}
+         public qeType getQEType () {return qeTypeValue;}
+         public int getNumberOfReturnedEntity() {return numberOfReturnedEntity;}
 
-        public boolean isLevenSimEnabled() {
-            return isLevenSim;
-        }
+         public Integer getBiasFactor() {return biasFactor;}
+         public boolean isDiceEnabled() { return isDiceEnabled;}
+         public boolean isJaroSimilarityEnabled(){return isJaroEnabled;}
+         public boolean isJaccardSimilarityEnabled(){return isJaccardSimilarity;}
 
-        public String getQrelPath() {
-            return qrelPath;
-        }
-
-        public boolean isMrfEnabled() {
-            return isMrfEnabled;
-        }
-
-        public boolean isParallelEnabled() {
-            return isParallelEnabled;
-        }
-
-        public static boolean isSpamFilterEnabled() {
-            return isSpamFilterEnabled;
-        }
-
-        public static String SpamLocation() {
-            return spamLocation;
-        }
-
-        public static String hamLocation() {
-            return hamLocation;
-        }
-
-        public boolean isArticleEnabled() {
-            return isArticleEnabled;
-        }
-
-        public boolean isSectionEnabled() {
-            return isSectionEnabled;
-        }
-
-        public boolean isQEEnabled() {
-            return isQE;
-        }
-
-        public qeType getQEType() {
-            return qeTypeValue;
-        }
-
-        public int getNumberOfReturnedEntity() {
-            return numberOfReturnedEntity;
-        }
-
-        public Integer getBiasFactor() {
-            return biasFactor;
-        }
-
-        public boolean isDiceEnabled() {
-            return isDiceEnabled;
-        }
-
-        public boolean isJaroSimilarityEnabled() {
-            return isJaroEnabled;
-        }
-
-        public boolean isJaccardSimilarityEnabled() {
-            return isJaccardSimilarity;
-        }
-
-        public boolean isIDFReRankEnabled() {
-            return isIDFReRank;
-        }
-
-        public boolean isDFReRankEnabled() {
-            return isDFReRank;
-        }
+         public boolean isIDFReRankEnabled()
+         {
+             return isIDFReRank;
+         }
+         public boolean isDFReRankEnabled()
+         {
+             return isDFReRank;
+         }
 
         public String getIndexlocation() {
             return indexlocation;

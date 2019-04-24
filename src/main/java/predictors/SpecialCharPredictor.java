@@ -1,8 +1,13 @@
 package main.java.predictors;
 
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static main.java.utils.SearchUtils.createTokenList;
 
 public class SpecialCharPredictor extends StopWordLabelPredictor {
 
@@ -57,5 +62,16 @@ public class SpecialCharPredictor extends StopWordLabelPredictor {
      */
     public void evaluate(HashMap<String, String> spam, HashMap<String, String> ham, HashMap<String, String> docs) {
         bc.evaluateSpecialCharPredictor(spam, ham, docs);
+    }
+
+    public boolean isSpam(StopWordLabelPredictor predictor,  String text ) {
+
+        List<String> tokens = createTokenList(text, new WhitespaceAnalyzer());
+        String prediction = predictor.predict(tokens);
+        switch (prediction.toLowerCase()){
+            case "ham": { return false; }
+            case "spam": { return true; }
+            default: { return true; }
+        }
     }
 }
