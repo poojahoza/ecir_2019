@@ -2,6 +2,9 @@ package main.java.evaluators;
 
 import java.util.HashMap;
 
+/**
+ * Compute the MAP score of a classifier by comparing true labels with predicted labels.
+ */
 public class MAPEvaluator {
 
     private HashMap<String, String> correctLabels;

@@ -197,20 +197,14 @@ public class BaseBM25 extends BaseSearcher
     }
     private LabelPredictor createPredictor (){
         LabelPredictor bigramsPredictor = null ;
-        try {
-            SpamClassifier sc = new SpamClassifier();
-            HashMap<String, String> hamTrain = null;
+        SpamClassifier sc = new SpamClassifier();
+        HashMap<String, String> hamTrain = null;
 
-            hamTrain = sc.readIndex(RegisterCommands.CommandSearch.hamLocation());
-            HashMap<String, String> spamTrain = sc.readIndex(RegisterCommands.CommandSearch.SpamLocation());
+        hamTrain = sc.readIndex(RegisterCommands.CommandSearch.hamLocation());
+        HashMap<String, String> spamTrain = sc.readIndex(RegisterCommands.CommandSearch.SpamLocation());
 
-            bigramsPredictor = sc.classifyWithBigrams(spamTrain, hamTrain);
+        bigramsPredictor = sc.classifyWithBigrams(spamTrain, hamTrain);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
         return bigramsPredictor;
     }
 

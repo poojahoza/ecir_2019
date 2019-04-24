@@ -7,6 +7,10 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 
+/**
+ * This class was created to find extra spam training data from the paragraph corpus
+ * and is not part of the main pipeline.
+ */
 public class ClassifyUtils {
 
     public final HashMap<String, String> pidMap;
@@ -19,11 +23,12 @@ public class ClassifyUtils {
     }
 
 
-    private void extractText(Data.Paragraph p) throws IOException {
-
-        /*for (String key: pidMap.keySet()) {
-            System.out.println(key);
-        }*/
+    /**
+     * Desc: Helper function to get the text from a paragraph.
+     *
+     * @param p a paragraph from the corpus.
+     */
+    private void extractText(Data.Paragraph p) {
 
         final String content = p.getTextOnly();
         final String paraId = p.getParaId();
@@ -36,10 +41,7 @@ public class ClassifyUtils {
 
 
     /**
-     * Desc: Iterate through the qrels file and map pids to ham/spam labels according to their annotations.
-     * A pid of 2 indicates that a document is ham, whereas a pid of -1, -2, or -0 indicates that a
-     * document is spam.
-     *
+     * Desc: Iterate through the run file and build a HashMap of paragraph ids.
      */
     public void parseRunfile() {
 
@@ -67,8 +69,7 @@ public class ClassifyUtils {
 
 
     /**
-     * Desc: Iterate through the Lucene index and store all ids that are also found in the qrels.
-     *
+     * Desc: Parse the paragraph corpus and get tokens of all documents whose pids were just recorded.
      */
     public void buildTrainTestSets() throws IOException {
 
@@ -82,6 +83,9 @@ public class ClassifyUtils {
     }
 
 
+    /**
+     * Desc: Write the tokens saved in the previous step to a file for manual inspection.
+     */
     private void write() {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("/home/rachel/grad_courses/data_science/dump/dump_heavy_water.txt", true));

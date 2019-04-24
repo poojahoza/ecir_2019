@@ -15,10 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Abstract class meant to predict labels. Your prediction methods must extend this class!
- * This class also comes with some useful methods to retrieve corpus stats
- *
- * The IndexSearcher (searcher) is used to access a Lucene index containing training emails (spam and ham)
+ * Abstract class to predict labels.
  */
 abstract public class LabelPredictor {
 
@@ -26,24 +23,24 @@ abstract public class LabelPredictor {
     }
 
     /**
-     * Desc: Train classifier on ham emails.
+     * Desc: Train classifier on ham documents.
      *
      * @param tokens List of tokens in the document
      */
     public void trainHamTokens(List<String> tokens) {}
 
     /**
-     * Desc: Train classifier on ham emails.
+     * Desc: Train classifier on ham documents.
      *
      * @param tokens List of tokens in the document
      */
     public void trainSpamTokens(List<String> tokens) {}
 
     /**
-     * Desc: Predict whether a document is a ham or spam.
+     * Desc: Predict whether a document is ham or spam.
      *
      * @param tokens List of tokens in the document
-     * @return String The label ("spam" or "ham") that is predicted given the document  tokens
+     * @return String The label ("spam" or "ham") that is predicted given the document tokens
      */
     abstract public String predict(List<String> tokens);
 
@@ -55,10 +52,12 @@ abstract public class LabelPredictor {
      */
     abstract public ArrayList<Double> score(List<String> tokens);
 
-
     /**
      * Desc: When called, the LabelPredictor will be handed unlabelled documents to classify (using predict method)
-     * The labels will be used to compute the F1 Score of your label prediction method.
+     *       The labels will be used to compute the F1 Score of your label prediction method.
+     * @param spam test set in form of pid => tokens
+     * @param ham test set in form of pid => tokens
+     * @param docs containing spam and ham documents in form of pid => tokens
      */
     abstract public void evaluate(HashMap<String, String> spam, HashMap<String, String> ham, HashMap<String, String> docs);
 

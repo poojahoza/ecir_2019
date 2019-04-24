@@ -10,7 +10,7 @@ test = pd.read_csv("/home/rachel/grad_courses/data_science/test_data.csv")
 X_train = train.drop('Class', axis=1)
 y_train = train['Class']
 
-svclassifier = SVC(kernel='linear')
+svclassifier = SVC(kernel='rbf')
 svclassifier.fit(X_train, y_train)
 y_pred = svclassifier.predict(test)
 for prediction in y_pred:
@@ -22,11 +22,11 @@ features = data.drop('Class', axis=1)
 targets = data['Class']
 
 x_train, x_test, y_train, y_test = train_test_split(data, targets, test_size=0.3, random_state=109)
-svclassifier = SVC(kernel='linear')
+svclassifier = SVC(kernel='rbf')
 svclassifier.fit(x_train, y_train)
 y_pred = svclassifier.predict(x_test)
 
-print("####### Linear Kernal #######")
+print("####### Rbf Kernal #######")
 print("F1: ", metrics.f1_score(y_test, y_pred, average="macro"))
 print("Accuracy: ", metrics.accuracy_score(y_test, y_pred))
 print("Precision: ", metrics.precision_score(y_test, y_pred, average="macro"))

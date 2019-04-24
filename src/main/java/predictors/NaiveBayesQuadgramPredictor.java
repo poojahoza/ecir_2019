@@ -1,14 +1,11 @@
 package main.java.predictors;
 
-import main.java.predictors.BayesCounter;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.search.IndexSearcher;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class NaiveBayesQuadgramPredictor extends LabelPredictor {
+
     private BayesCounter bc = new BayesCounter();
 
     public NaiveBayesQuadgramPredictor() {
@@ -16,7 +13,7 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
     }
 
     /**
-     * Desc: Train classifier on ham emails.
+     * Desc: Train classifier on ham documents.
      *
      * @param tokens List of tokens in the document
      */
@@ -25,7 +22,7 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
     }
 
     /**
-     * Desc: Train classifier on spam emails.
+     * Desc: Train classifier on spam documents.
      *
      * @param tokens List of tokens in the document
      */
@@ -33,12 +30,11 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
         bc.buildQuadgramsHashMap("spam", tokens);
     }
 
-
     /**
      * Desc: Predict whether a document is a ham or spam.
      *
      * @param tokens List of tokens in the document
-     * @return String The label ("spam" or "ham") that is predicted given the document  tokens
+     * @return String The label ("spam" or "ham") that is predicted given the document tokens
      */
     @Override
     public String predict(List<String> tokens) {
@@ -57,7 +53,7 @@ public class NaiveBayesQuadgramPredictor extends LabelPredictor {
     }
 
     /**
-     * Desc: Get the F1 score of the Naive Bayes classifiers.
+     * Desc: Get the F1 and MAP scores of the classifier.
      *
      * @param spam, a hash map of the ham test data by itself.
      * @param ham, a hash map of the spam test data by itself.
