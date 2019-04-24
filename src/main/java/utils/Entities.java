@@ -372,7 +372,7 @@ public class Entities {
 
     public Double[] readRankLibModelFile(String filename){
 
-        Double[] mp = new Double[2];
+        Double[] mp = new Double[5];
 
         File fp = new File(filename);
         FileReader fr;
