@@ -418,6 +418,11 @@ public class RegisterCommands {
         boolean isHelp() {
             return help;
         }
+
+        public static boolean isIsSpecialCharSpamFilterEnabled()
+        {
+            return isSpecialCharSpamFilterEnabled;
+        }
     }
 
     @Parameters(separators = "=", commandDescription = "Command to create training and test data for the spam classifier")

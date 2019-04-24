@@ -32,7 +32,7 @@ public class BaseBM25 extends BaseSearcher
 {
 
     private boolean isSpamFilterEnabled = RegisterCommands.CommandSearch.isSpamFilterEnabled();
-    private boolean isSpecialCharSpamFilterEnabled = RegisterCommands.CommandSearch.isSpecialCharSpamFilterEnabled();
+    private boolean isSpecialCharSpamFilterEnabled = RegisterCommands.CommandSearch.isIsSpecialCharSpamFilterEnabled();
     private Map<String, Map<String, Container>> ranks=null;
     private int k;
 
