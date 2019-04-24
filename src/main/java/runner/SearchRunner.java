@@ -186,7 +186,17 @@ public class SearchRunner implements ProgramRunner
                 ranked_entities_score = e.getRerankedParas(ranked_entities_score);
 
                 WriteFile write_file = new WriteFile();
-                write_file.generateEntityRunFile(ranked_entities_score, "entityDegree");
+                String level = searchParser.isArticleEnabled()? "_article": "_section";
+                String datafile ="";
+                if(searchParser.getQueryfile().toLowerCase().contains("test".toLowerCase()))
+                {
+                    datafile = "_test";
+                }
+                else if(searchParser.getQueryfile().toLowerCase().contains("train".toLowerCase()))
+                {
+                    datafile = "_train";
+                }
+                write_file.generateEntityRunFile(ranked_entities_score, "entityDegree"+level+datafile);
 
             }catch (IOException ioe){
                 System.out.println(ioe.getMessage());
@@ -216,7 +226,17 @@ public class SearchRunner implements ProgramRunner
                 ranked_entities_score = e.getRerankedParas(ranked_entities_score);
 
                 WriteFile write_file = new WriteFile();
-                write_file.generateEntityRunFile(ranked_entities_score, "entitySim");
+                String level = searchParser.isArticleEnabled()? "_article": "_section";
+                String datafile ="";
+                if(searchParser.getQueryfile().toLowerCase().contains("test".toLowerCase()))
+                {
+                    datafile = "_test";
+                }
+                else if(searchParser.getQueryfile().toLowerCase().contains("train".toLowerCase()))
+                {
+                    datafile = "_train";
+                }
+                write_file.generateEntityRunFile(ranked_entities_score, "entitySim"+level+datafile);
 
             }catch (IOException ioe){
                 System.out.println(ioe.getMessage());
@@ -250,7 +270,17 @@ public class SearchRunner implements ProgramRunner
                 Map<String, Map<String, Container>> expanded_bm25_ranking = bm25.getRanking(expanded_query);
 
                 WriteFile write_file = new WriteFile();
-                write_file.generateBM25RunFile(expanded_bm25_ranking, "expandedBM25");
+                String level = searchParser.isArticleEnabled()? "_article": "_section";
+                String datafile ="";
+                if(searchParser.getQueryfile().toLowerCase().contains("test".toLowerCase()))
+                {
+                    datafile = "_test";
+                }
+                else if(searchParser.getQueryfile().toLowerCase().contains("train".toLowerCase()))
+                {
+                    datafile = "_train";
+                }
+                write_file.generateBM25RunFile(expanded_bm25_ranking, "expandedBM25"+level+datafile);
                 //write_file.generateEntityRunFile(ranked_entities_score, "entityDegree");
 
             }catch (IOException ioe){
