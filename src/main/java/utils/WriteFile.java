@@ -22,9 +22,11 @@ public class WriteFile {
     private void checkFileExistence(String output_file_name)
     {
         File e = new File(output_file_name);
+        System.out.println(output_file_name);
         if(e.exists())
         {
             e.delete();
+            System.out.println(output_file_name+" deleted");
         }
     }
 
@@ -38,7 +40,7 @@ public class WriteFile {
             directory.mkdir();
         }
         Path file = Paths.get(System.getProperty("user.dir")+"/"+result_dir, output_file);
-        checkFileExistence(output_file);
+        checkFileExistence(System.getProperty("user.dir")+"/"+result_dir+"/"+output_file);
         try {
             Files.createFile(file);
         }catch(IOException ioe)
@@ -74,7 +76,7 @@ public class WriteFile {
             directory.mkdir();
         }
         Path file = Paths.get(System.getProperty("user.dir")+"/"+result_dir, output_file);
-        checkFileExistence(output_file);
+        checkFileExistence(System.getProperty("user.dir")+"/"+result_dir+"/"+output_file);
         try {
             Files.createFile(file);
         }catch(IOException ioe)
@@ -111,7 +113,7 @@ public class WriteFile {
             directory.mkdir();
         }
         Path file = Paths.get(System.getProperty("user.dir")+"/"+result_dir, output_file);
-        checkFileExistence(output_file);
+        checkFileExistence(System.getProperty("user.dir")+"/"+result_dir+"/"+output_file);
         try {
             Files.createFile(file);
         }catch(IOException ioe)
@@ -137,7 +139,6 @@ public class WriteFile {
 
             }
             try {
-                System.out.println(rankings);
                 Files.write(file, rankings, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
             }
             catch (IOException io)
@@ -161,7 +162,7 @@ public class WriteFile {
         Path file = Paths.get(System.getProperty("user.dir")+"/"+result_dir, output_file);
         Entities entities = new Entities();
         Map<String, Map<String, String>> mp = entities.readEntityQrelFile(qrelfilepath);
-        checkFileExistence(output_file);
+        checkFileExistence(System.getProperty("user.dir")+"/"+result_dir+"/"+output_file);
         try {
             Files.createFile(file);
         }catch(IOException ioe)

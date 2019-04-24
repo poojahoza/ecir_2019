@@ -65,4 +65,16 @@ public class databaseWrapper {
         }
         return records;
     }
+
+    public Map<String, DBContainer> getRecordEntityTextContainer(String[] entities_ids){
+        Map<String, DBContainer> records = new LinkedHashMap<>();
+        DBCursor entity_cursor = queryDBWithID(entities_ids);
+        DBObject record;
+        while (entity_cursor.hasNext()){
+            record = entity_cursor.next();
+            records.put(record.get("Id").toString(), new DBContainer(record.get("Title").toString()));
+        }
+        return records;
+    }
+
 }

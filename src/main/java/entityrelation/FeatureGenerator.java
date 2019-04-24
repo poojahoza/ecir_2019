@@ -4,7 +4,6 @@ import com.mongodb.MongoClient;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -204,11 +203,14 @@ public class FeatureGenerator {
         int p = 0;
         Map<String, Map<String, Double[]>> query_entity_feature_vec = new ConcurrentHashMap<>();
 
-        /*query_entity_list.entrySet().parallelStream().forEach(m ->
-        { query_entity_feature_vec.put(m.getKey(), generateFeatureVectors(m.getValue(), m.getKey(), bm25_ranking));});*/
-
         query_entity_list.entrySet().parallelStream().forEach(m ->
-        { query_entity_feature_vec.put(m.getKey(), generateFeatureVectors(m.getValue(), m.getKey(), bm25_ranking)); });
+        { query_entity_feature_vec.put(m.getKey(), generateFeatureVectors(m.getValue(), m.getKey(), bm25_ranking));});
+
+        /*query_entity_list.entrySet().parallelStream().forEach(m ->
+        {
+            if(m.getKey().equals("enwiki:Ice%20bath/Techniques/Ice%20baths%20versus%20cold%20baths")){
+                query_entity_feature_vec.put(m.getKey(), generateFeatureVectors(m.getValue(), m.getKey(), bm25_ranking));
+            } });*/
 
        /*Map.Entry<String, Map<String, Integer>> m = query_entity_list.entrySet().iterator().next();
             p++;
@@ -226,6 +228,35 @@ public class FeatureGenerator {
         query_entity_normalized_vec = getFeatureVectors(query_entity_list, bm25_ranking);
         query_entity_normalized_vec = new Stats().normalizeData(query_entity_normalized_vec);
         return query_entity_normalized_vec;
+    }
+
+    public Map<String, Map<String, Double>> extractFeatures(Map<String, Map<String, Double[]>> feature_vec_list, int featureNum){
+        Map<String, Map<String, Double>> features = new LinkedHashMap<>();
+
+        for(Map.Entry<String, Map<String, Double[]>> mp : feature_vec_list.entrySet()){
+            for(Map.Entry<String, Double[]> np: mp.getValue().entrySet()){
+                if (features.containsKey(mp.getKey())) {
+                    Map<String, Double> extract = features.get(mp.getKey());
+                    //Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    extract.put(np.getKey(), np.getValue()[featureNum]);
+                } else {
+
+                    Map<String, Double> temp = new LinkedHashMap<>();
+                    //Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    temp.put(np.getKey(), np.getValue()[featureNum]);
+                    features.put(mp.getKey(), temp);
+                }
+            }
+        }
+        return features;
+    }
+
+    public Map<String, Map<String, Double>> sortFeatureVectors(Map<String, Map<String, Double>> feature_vec_list){
+        Map<String, Map<String, Double>> sorted_entity_list = new LinkedHashMap<>();
+        for(Map.Entry<String, Map<String, Double>> m : feature_vec_list.entrySet()) {
+            sorted_entity_list.put(m.getKey(), Entities.sortByValueWithLimit(m.getValue()));
+        }
+        return sorted_entity_list;
     }
 
     public Map<String, Map<String, Double>> generateDotProduct(String feature_vectors, String ranklib_model ){
@@ -258,13 +289,22 @@ public class FeatureGenerator {
         for(Map.Entry<String, Map<String, Double[]>> m : features.entrySet()){
             Map<String, Double> score = new LinkedHashMap<>();
             int entities_size = m.getValue().size();
-            Double[] centroid = new Double[] {0.0, 0.0};
+            Double[] centroid = new Double[] {0.0, 0.0, 0.0, 0.0};
             for(Map.Entry<String, Double[]> n: m.getValue().entrySet()) {
-                centroid[0] += n.getValue()[0];
-                centroid[1] += n.getValue()[1];
+                try {
+                    //System.out.println(n.getValue());
+                    centroid[0] += n.getValue()[0];
+                    centroid[1] += n.getValue()[1];
+                    centroid[2] += n.getValue()[2];
+                    centroid[3] += n.getValue()[3];
+                }catch (NullPointerException npe){
+                    System.out.println(npe.getMessage());
+                }
             }
             centroid[0] = centroid[0]/entities_size;
             centroid[1] = centroid[1]/entities_size;
+            centroid[2] = centroid[2]/entities_size;
+            centroid[3] = centroid[3]/entities_size;
 
 
             for(Map.Entry<String, Double[]> n: m.getValue().entrySet()) {

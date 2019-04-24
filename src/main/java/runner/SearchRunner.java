@@ -19,6 +19,7 @@ import main.java.graph.GraphDegreeConstructor;
 import main.java.wordsimilarityranker.*;
 import main.java.queryexpansion.QueryExpansion;
 import main.java.entityrelation.FeatureGenerator;
+import main.java.entityrelation.QueryExapansion;
 import main.java.wrapper.QueryExpansionReRanking;
 
 
@@ -247,6 +248,38 @@ public class SearchRunner implements ProgramRunner
             }
         }
 
+        if(searchParser.isEcmExpandEnabled()){
+            validate.ValidateEcmExpansion();
+            try{
+                Entities e = new Entities();
+                QueryExapansion qe = new QueryExapansion();
+                Map<String, Map<String, Double>> ecm_entities = e.readEntityRunFile(searchParser.getEcmentityfile());
+                Map<String, String> expanded_query = qe.expandQueryWithEntities(queryCBOR,
+                                                                                ecm_entities,
+                                                                                searchParser.getEcmqenum());
+
+                //BaseBM25 bm25 = new BaseBM25(100, searchParser.getIndexlocation());
+                BaseBM25 bm25 = new BaseBM25(searchParser.getkVAL(), searchParser.getIndexlocation());
+                Map<String, Map<String, Container>> expanded_bm25_ranking = bm25.getRanking(expanded_query);
+
+                WriteFile write_file = new WriteFile();
+                String level = searchParser.isArticleEnabled()? "_article": "_section";
+                String datafile ="";
+                if(searchParser.getQueryfile().toLowerCase().contains("test".toLowerCase()))
+                {
+                    datafile = "_test";
+                }
+                else if(searchParser.getQueryfile().toLowerCase().contains("train".toLowerCase()))
+                {
+                    datafile = "_train";
+                }
+                write_file.generateBM25RunFile(expanded_bm25_ranking, "EcmX-BM25"+level+datafile);
+
+            }catch (IOException ioe){
+                System.out.println(ioe.getMessage());
+            }
+        }
+
         if(searchParser.isEntityRelationEnabled()){
             validate.ValidateEntityRelation();
 
@@ -262,6 +295,10 @@ public class SearchRunner implements ProgramRunner
                 FeatureGenerator featuregenerator = new FeatureGenerator();
                 Map<String, Map<String, Double[]>> featureVectors = featuregenerator.getFeatureVectors(query_ent_list, bm25_ranking);
                 //Map<String, Map<String, Double[]>> featureVectors = featuregenerator.getNormalizedFeatureVectors(query_ent_list, bm25_ranking);
+                Map<String, Map<String, Double>> hopRelationfeatureVectors = featuregenerator.extractFeatures(featureVectors, 0);
+                Map<String, Map<String, Double>> comentionfeatureVectors = featuregenerator.extractFeatures(featureVectors, 1);
+                Map<String, Map<String, Double>> sortedhopRelationFeatureVectors = featuregenerator.sortFeatureVectors(hopRelationfeatureVectors);
+                Map<String, Map<String, Double>> sortedcomentionFeatureVectors = featuregenerator.sortFeatureVectors(comentionfeatureVectors);
 
                 WriteFile write_file = new WriteFile();
                 String level = searchParser.isArticleEnabled()? "_article": "_section";
@@ -274,8 +311,10 @@ public class SearchRunner implements ProgramRunner
                 {
                     datafile = "_train";
                 }
+                write_file.generateEntityRunFile(sortedhopRelationFeatureVectors, "1hoprelation_feature_vector"+level+datafile);
+                write_file.generateEntityRunFile(sortedcomentionFeatureVectors, "comention_feature_vector"+level+datafile);
                 write_file.generateFeatureVectorRunFile(featureVectors, "feature_vectors"+level+datafile);
-                //write_file.generateEntityRankLibRunFile(featureVectors, searchParser.getQrelfile(), "rank_lib"+level+datafile);
+                write_file.generateEntityRankLibRunFile(featureVectors, searchParser.getQrelfile(), "rank_lib"+level+datafile);
 
             }catch (Exception ioe){
                 ioe.printStackTrace();

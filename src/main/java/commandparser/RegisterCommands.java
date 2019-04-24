@@ -89,7 +89,14 @@ public class RegisterCommands
          @Parameter(names = {"-qrel", "--entity-qrel"}, description = "Entity qrel file")
          private String qrelfile = null;
 
-          @Parameter(names = "--help", help = true)
+         @Parameter(names = {"-ecm", "--ecm-run"}, description = "ECM Entity run file")
+         private String ecmentityfile = null;
+
+
+         @Parameter(names = {"-ecm-qe-num", "--ecm-query-expansion-terms-num"}, description = "ECM  Query Expansion Terms Number")
+         private Integer ecmqenum = 20;
+
+         @Parameter(names = "--help", help = true)
           private boolean help;
 
           @Parameter(names = {"-k","--candidate-set-val"}, description = "How many candidate set to retrieve using BM25")
@@ -167,6 +174,10 @@ public class RegisterCommands
 
          @Parameter(names = "--entity-expand",description ="Rerank the initial retrieved document using expanded query")
          private boolean isQueryExpand =false;
+
+         @Parameter(names = "--entity-ecm-expand",description ="Rerank the initial retrieved document using ecm entities to expand query")
+         private boolean isEcmExpandEnabled =false;
+
 
          @Parameter(names = "--entity-relation",description ="Generate the feature vectors and ranklib model")
          private boolean isEntityRelationEnabled =false;
@@ -295,6 +306,11 @@ public class RegisterCommands
              return qrelfile;
          }
 
+         public String getEcmentityfile()
+         {
+             return ecmentityfile;
+         }
+
          public String getFeaturevectorfile()
          {
              return featurevectorfile;
@@ -345,6 +361,8 @@ public class RegisterCommands
 
          public boolean isEntityFreqEnabled() { return isEntityFreq;}
 
+         public Integer getEcmqenum() { return  ecmqenum; }
+
          public boolean isEntityRelationEnabled()
          {
              return isEntityRelationEnabled;
@@ -359,6 +377,8 @@ public class RegisterCommands
          {
              return isEntityCentroidEnabled;
          }
+
+         public boolean isEcmExpandEnabled(){ return isEcmExpandEnabled;}
 
          public String getRankLibModelFile()
          {

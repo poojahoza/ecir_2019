@@ -81,6 +81,18 @@ public class ValidateCommands
             }
         }
 
+        public void ValidateEcmExpansion(){
+            if(searchParser.getIndexlocation()== null)
+            {
+                System.out.println("Please pass the paragraph index location path");
+                CALLEXIT(-1);
+            }
+            if(searchParser.getEcmentityfile() == null)
+            {
+                System.out.println("Please pass the ecm entity run file path");
+                CALLEXIT(-1);
+            }
+        }
         public void ValidateEntityDegree()
         {
             if(searchParser.getEntityIndLoc() == null)

@@ -7,6 +7,7 @@ public class DBContainer {
     private String outlinksIds = null;
     private String inlinksIds = null;
     private String entitiesId = null;
+    private String title = null;
 
     public DBContainer(String leadtext,
                        String outlinksIds,
@@ -16,6 +17,10 @@ public class DBContainer {
         this.inlinksIds = inlinksIds;
         this.outlinksIds = outlinksIds;
         this.leadtext = leadtext;
+    }
+
+    public DBContainer(String title){
+        this.title = title;
     }
 
     public String getLeadtext(){
@@ -33,4 +38,6 @@ public class DBContainer {
     public String getEntities_id(){
         return this.entitiesId;
     }
+
+    public String getEntitiesTitle() { return this.title; }
 }

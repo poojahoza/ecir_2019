@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Entities {
 
@@ -46,10 +47,12 @@ public class Entities {
                 EntityContainer e = n.getValue().getEntity();
                 String [] entity_ids = e.getEntityId().split("[\r\n]+");
                 for(int s = 0; s  < entity_ids.length; s++) {
-                    if(entity_list.containsKey(entity_ids[s])){
-                        entity_list.put(entity_ids[s], entity_list.get(entity_ids[s])+1);
-                    }else{
-                        entity_list.put(entity_ids[s], 1);
+                    if(!entity_ids[s].equals("")) {
+                        if (entity_list.containsKey(entity_ids[s])) {
+                            entity_list.put(entity_ids[s], entity_list.get(entity_ids[s]) + 1);
+                        } else {
+                            entity_list.put(entity_ids[s], 1);
+                        }
                     }
 
                 }
@@ -180,9 +183,9 @@ public class Entities {
         return edge_array;
     }
 
-    public List<String> getEntityIdsList(Map<String, Integer> entities_list){
+    public <T> List<String> getEntityIdsList(Map<String, T> entities_list){
         List<String> entities_ids = new ArrayList<String>();
-        for(Map.Entry<String, Integer> m: entities_list.entrySet())
+        for(Map.Entry<String, T> m: entities_list.entrySet())
         {
             if(!m.getKey().equals("")){ //handle empty entity string
                 //System.out.println("Empty entity");
@@ -202,9 +205,9 @@ public class Entities {
         return false;
     }
 
-    public Map<String, Map<String, Double[]>> readEntityRunFile(String filename){
+    public Map<String, Map<String, Double>> readEntityRunFile(String filename){
 
-        Map<String, Map<String, Double[]>> mp = new LinkedHashMap<>();
+        Map<String, Map<String, Double>> mp = new LinkedHashMap<>();
 
         File fp = new File(filename);
         FileReader fr;
@@ -231,14 +234,14 @@ public class Entities {
                 String outKey = words[0];
 
                 if (mp.containsKey(outKey)) {
-                    Map<String, Double[]> extract = mp.get(outKey);
-                    Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
-                    extract.put(words[2], features);
+                    Map<String, Double> extract = mp.get(outKey);
+                    //Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    extract.put(words[2], Double.parseDouble(words[4]));
                 } else {
 
-                    Map<String, Double[]> temp = new LinkedHashMap<>();
-                    Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
-                    temp.put(words[2], features);
+                    Map<String, Double> temp = new LinkedHashMap<>();
+                    //Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    temp.put(words[2], Double.parseDouble(words[4]));
                     mp.put(outKey, temp);
                 }
             } catch (NullPointerException n) {
@@ -330,12 +333,30 @@ public class Entities {
 
                 if (mp.containsKey(outKey)) {
                     Map<String, Double[]> extract = mp.get(outKey);
-                    Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    int features_num = words.length;
+                    //Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    Double[] features = new Double[features_num-2];
+                    int feature_counter = 0;
+                    for(int d = 2; d<features_num; d++ ){
+                        features[feature_counter] = Double.parseDouble(words[d]);
+                        feature_counter++;
+                    }
+                    //Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
                     extract.put(words[1], features);
                 } else {
 
                     Map<String, Double[]> temp = new LinkedHashMap<>();
-                    Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    //System.out.println(words.length);
+                    int features_num = words.length;
+                    //Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    Double[] features = new Double[features_num-2];
+                    int feature_counter = 0;
+                    //System.out.println(words);
+                    for(int d = 2; d<features_num; d++ ){
+                        //System.out.println(d+" "+words[d]);
+                        features[feature_counter] = Double.parseDouble(words[d]);
+                        feature_counter++;
+                    }
                     temp.put(words[1], features);
                     mp.put(outKey, temp);
                 }
@@ -390,6 +411,21 @@ public class Entities {
         }
         return mp;
 
+    }
+
+
+    /*taken from sortUtils*/
+    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValueWithLimit(Map<K, V> map) {
+        return map.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
+                .limit(100)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
     }
 
 }
