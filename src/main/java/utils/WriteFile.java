@@ -26,7 +26,7 @@ public class WriteFile {
         if(e.exists())
         {
             e.delete();
-            System.out.println(output_file_name+" deleted");
+            //System.out.println(output_file_name+" deleted");
         }
     }
 
