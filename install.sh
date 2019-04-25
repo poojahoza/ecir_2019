@@ -42,8 +42,8 @@ function change_path_target()
     java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path -we $embeddings_path -dim=50 -k=100 --bias-fact=20 -qe-type entityText --qe-reranking --parallel
     java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path -we $embeddings_path -dim=50 -k=100 --bias-fact=20 -qe-type entityID  --qe-reranking --parallel
     java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path -we $embeddings_path -dim=50 -k=100 --bias-fact=20 -qe-type entityTextID --qe-reranking --parallel
-    java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path --entity-ranklib -f /home/team1/prototype2/pooja_data/output_ranking_feature_vectors_section_test.txt -model /home/team1/prototype2/pooja_data/model_section_train.txt
-    java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path --entity-centroid -f /home/team1/prototype2/pooja_data/output_ranking_feature_vectors_section_test.txt
+    java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path --entity-ranklib -f /home/team1/prototype3/pooja_data/output_ranking_feature_vector_section_test_zscored_python.txt -model /home/team1/prototype3/pooja_data/momodel_section_train_prototyp3.txt
+    java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path --entity-centroid -f /home/team1/prototype3/pooja_data/output_ranking_feature_vector_section_test_python.txt -model /home/team1/prototype3/pooja_data/momodel_section_train_prototyp3.txt
 }
 
 if [ $# -eq 0 ]
