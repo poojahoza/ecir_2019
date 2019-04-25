@@ -7,6 +7,8 @@ import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
 import main.java.mrf.MarkovRandomField;
+import main.java.queryexp.*;
+import main.java.queryexp.rm3.RelevanceModel3;
 import main.java.reranker.ReRanker;
 import main.java.rerankerv2.docsimranker.DocumentFrequencySimilarity;
 import main.java.rerankerv2.docsimranker.EntitySimilarityRanker;
@@ -506,6 +508,54 @@ public class SearchRunner implements ProgramRunner
             }
 
          }
+
+        if(searchParser.isQueryExDFEnabled())
+        {
+            ExpandQuery exp = new ExpandQueryDF(searchParser,queryCBOR);
+            exp.doQueryExpansion();
+        }
+
+        if(searchParser.isQueryExIDFEnabled())
+        {
+            ExpandQuery exp = new ExpandQueryIDF(searchParser,queryCBOR);
+            exp.doQueryExpansion();
+        }
+
+        if(searchParser.isQueryExpEntityEnabled())
+        {
+            ExpandQuery exp = new ExpandQueryAbstract(searchParser,queryCBOR);
+            exp.doQueryExpansion();
+
+            exp = new ExpandQueryAbstractDF(searchParser,queryCBOR);
+            exp.doQueryExpansion();
+
+        }
+
+        if(searchParser.isQueryExpRm3())
+        {
+            ExpandQuery exp = new RelevanceModel3(searchParser,queryCBOR);
+            exp.doQueryExpansion();
+        }
+
+        if(searchParser.isTestEnabled())
+        {
+            DocumentFrequencySimilarity df = new DocumentFrequencySimilarity(searchParser,queryCBOR);
+            Map<String, Map<String,Container>> res = df.getDocumentFRequencyReRanker();
+
+            ExpandQuery exp = new ExpandQueryDF(searchParser,queryCBOR);
+            exp.doQueryExpansion(res);
+
+            exp = new ExpandQueryIDF(searchParser,queryCBOR);
+            exp.doQueryExpansion(res);
+
+            exp = new ExpandQueryAbstract(searchParser,queryCBOR);
+            exp.doQueryExpansion(res);
+
+            exp = new ExpandQueryAbstractDF(searchParser,queryCBOR);
+            exp.doQueryExpansion(res);
+
+        }
+
        }
     }
 

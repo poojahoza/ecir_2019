@@ -1,6 +1,8 @@
 package main.java.utils;
 
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -14,6 +16,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.tartarus.snowball.ext.PorterStemmer;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -200,4 +203,56 @@ public class CorpusStats
         }
         return sortedList;
     }
+
+    private String processedTerm(String content) throws IOException {
+        EnglishAnalyzer analyzer = new EnglishAnalyzer();
+        TokenStream tokenStream = analyzer.tokenStream("Text", new StringReader(content));
+        try {
+            tokenStream.reset();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String token = null;
+        while (tokenStream.incrementToken()) {
+            token = tokenStream.getAttribute(CharTermAttribute.class).toString();
+        }
+        return token;
+    }
+
+    public ArrayList<String> getDFStandardAnalyzer(ArrayList<String> strList) throws  IOException
+    {
+        Map<String,Long> unsorted = new LinkedHashMap<String,Long>();
+        for(String s:strList)
+        {
+            long val = getDF(processedTerm(s));
+            unsorted.put(s,val);
+        }
+        ArrayList<String> sortedList = new ArrayList<>();
+        for(Map.Entry<String,Long> un:SortUtils.sortByValue(unsorted).entrySet())
+        {
+            sortedList.add(un.getKey());
+        }
+        return sortedList;
+    }
+
+    public ArrayList<String> getIDFStandardAnalyzer(ArrayList<String> strList) throws  IOException
+    {
+        Map<String,Double> unsorted = new LinkedHashMap<String,Double>();
+        for(String s:strList)
+        {
+            Double val = getIDF(processedTerm(s));
+            if(!unsorted.containsKey(processedTerm(s)))
+            {
+                unsorted.put(s,val);
+            }
+        }
+        ArrayList<String> sortedList = new ArrayList<>();
+        for(Map.Entry<String,Double> un:SortUtils.sortByValue(unsorted).entrySet())
+        {
+            sortedList.add(un.getKey());
+        }
+        return sortedList;
+    }
+
+
 }

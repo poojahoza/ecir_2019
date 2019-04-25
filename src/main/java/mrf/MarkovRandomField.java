@@ -33,6 +33,7 @@ public class MarkovRandomField
     */
     private Map<String,Container> collectEvidences(Map<String, Container> unranked,String queryVal)
     {
+
         ArrayList<Double> ans = null;
 
         Map<String,Container> result = new LinkedHashMap<String,Container>();

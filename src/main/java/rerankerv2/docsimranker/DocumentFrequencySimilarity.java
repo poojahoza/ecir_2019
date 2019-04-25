@@ -48,6 +48,11 @@ public class DocumentFrequencySimilarity extends SimilarityRankerBase
         RunWriter.writeRunFile("DOC_FRE_RANK",res);
     }
 
+    public Map<String,Map<String,Container>> getDocumentFRequencyReRanker()
+    {
+        return rerank();
+    }
+
     public Map<String,Map<String,Container>> doDocumentFrequency(Map<String,Map<String,Container>> result)
     {
         System.out.println("Executing the Document Frequency Similarity");
