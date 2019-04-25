@@ -37,24 +37,57 @@ function change_path_target()
 	echo "**********************************************************"
 	pwdCurrent=$(pwd)
 	pwdCurrent=$pwdCurrent/target/cs953-team1-1.0-SNAPSHOT-jar-with-dependencies.jar
+	echo -e "\n \n"
+	echo "#################################################################################################################"
+	echo "############################## No Spam filter enabled ###########################################################"
+	echo "##############################    Page level ####################################################################"
+	echo "#################################################################################################################"
+	echo -e "\n \n"
 	echo "Running the BM25 method for article.."
+	echo -e "\n"
     java -jar -Xmx20g $pwdCurrent search article  -i $index_path -q $outlines_path -bm25
     echo "Running the Document Frequency query expansion.."
+    echo -e "\n"
     java -jar -Xmx20g $pwdCurrent search article  -i $index_path -q $outlines_path -we $embeddings_path -dim=300 --prf-val-term 200 --prf-val-k 200 --prf-val 5 --qe-exp-df --parallel
     echo "Running the Inverse Document Frequency query expansion..."
+    echo -e "\n"
     java -jar -Xmx20g $pwdCurrent search article  -i $index_path -q $outlines_path -we $embeddings_path -dim=300 --prf-val-term 200 --prf-val-k 200 --prf-val 5 --qe-exp-idf --parallel
     echo "Running the Entity Abstract query expansion with DF and IDF ..."
+    echo -e "\n"
     java -jar -Xmx20g $pwdCurrent search article  -i $index_path -q $outlines_path -we $embeddings_path -dim=300 --prf-val-term 200 --prf-val-k 200 --prf-val 5 --qe-exp-entity --parallel
     echo "Running the Relevance model 3 ..."
+    echo -e "\n"
     java -jar -Xmx20g $pwdCurrent search article  -i $index_path -q $outlines_path -we $embeddings_path -dim=300 --prf-val-term 200 --prf-val-k 200 --prf-val 5 --qe-exp-rm3 --parallel
-    echo "...."
-    echo "Running some methods with Spam filter enabled"
+    echo -e "\n \n \n"
+    echo -e "\n \n"
+	echo "#################################################################################################################"
+	echo "############################### Spam filter enabled   ###########################################################"
+	echo "##############################    Page level ####################################################################"
+	echo "#################################################################################################################"
+	echo -e "\n \n"
 
     echo "Running the BM25 method for article with spamilter enabled.."
+    echo -e "\n"
     java -jar -Xmx20g $pwdCurrent search article  -i $index_path -q $outlines_path -bm25 --spam-filter2 --spam-loc spamTrain --ham-loc hamTrain
+    echo -e "\n"
     echo "Running the Document Frequency query expansion with spam filer enabled"
+    echo -e "\n"
     java -jar -Xmx20g $pwdCurrent search article  -i $index_path -q $outlines_path -we $embeddings_path -dim=300 --prf-val-term 200 --prf-val-k 200 --prf-val 5 --qe-exp-df --parallel --spam-filter2 --spam-loc spamTrain --ham-loc hamTrain
+    echo -e "\n"
+    echo "Running the Entity abstract method for both DF and IDF with spam filter enabled"
+    java -jar -Xmx20g $pwdCurrent search article  -i $index_path -q $outlines_path -we $embeddings_path -dim=300 --prf-val-term 200 --prf-val-k 200 --prf-val 5 --qe-exp-entity --parallel --spam-filter2 --spam-loc spamTrain --ham-loc hamTrain
+    echo -e "\n"
+    echo "Running the Relevance model 3 with spam filer enabled"
+    echo -e "\n"
+    java -jar -Xmx20g $pwdCurrent search article  -i $index_path -q $outlines_path -we $embeddings_path -dim=300 --prf-val-term 200 --prf-val-k 200 --prf-val 5 --qe-exp-rm3 --parallel --spam-filter2 --spam-loc spamTrain --ham-loc hamTrain
+    echo -e "\n"
 
+    echo -e "\n \n"
+	echo "#################################################################################################################"
+	echo "############################### Entity methods        ###########################################################"
+	echo "##############################    section level #################################################################"
+	echo "#################################################################################################################"
+	echo -e "\n \n"
     java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path --entity-ranklib -f /home/team1/prototype3/pooja_data/output_ranking_feature_vector_section_test_zscored_python.txt -model /home/team1/prototype3/pooja_data/momodel_section_train_prototyp3.txt
     java -jar -Xmx20g $pwdCurrent search section  -i $index_path -q $outlines_path --entity-centroid -f /home/team1/prototype3/pooja_data/output_ranking_feature_vector_section_test_python.txt -model /home/team1/prototype3/pooja_data/momodel_section_train_prototyp3.txt
 }
