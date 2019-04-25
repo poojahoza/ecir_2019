@@ -22,6 +22,25 @@
 
     <dependencies>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-queryparser -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>7.7.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>apache-jena-libs</artifactId>
+            <version>3.1.0</version>
+            <!--<exclusions>-->
+            <!--<exclusion>-->
+            <!--<groupId>com.github.jsonld-java</groupId>-->
+            <!--<artifactId>jsonid-java</artifactId>-->
+            <!--</exclusion>-->
+            <!--</exclusions>-->
+        </dependency>
+
         <dependency>
             <groupId>com.github.TREMA-UNH</groupId>
             <artifactId>trec-car-tools-java</artifactId>
