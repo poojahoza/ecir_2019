@@ -466,7 +466,7 @@ public class RegisterCommands
             return help;
         }
 
-        public static boolean isIsSpecialCharSpamFilterEnabled()
+        public static boolean isSpecialCharSpamFilterEnabled()
         {
             return isSpecialCharSpamFilterEnabled;
         }

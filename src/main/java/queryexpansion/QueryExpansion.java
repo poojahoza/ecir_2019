@@ -89,7 +89,7 @@ public class QueryExpansion {
 
         }
 
-        String mname = "doc_reranking_BM25"+"_k"+this.searchcommand.getkVAL() + "_Spam_filter_enable_" + RegisterCommands.CommandSearch.isSpamFilterEnabled() + "_ISspecialCharSpamEnabled_" +  main.java.commandparser.RegisterCommands.CommandSearch.isSpecialCharSpamFilterEnabled() + "_top"+searchcommand.getNumberOfReturnedEntity();
+        String mname = "doc_reranking_BM25"+"_k"+this.searchcommand.getkVAL() + "_Spam_filter_enable_" + RegisterCommands.CommandSearch.isSpamFilterEnabled() + "_ISspecialCharSpamEnabled_" + RegisterCommands.CommandSearch.isSpecialCharSpamFilterEnabled() + "_top"+searchcommand.getNumberOfReturnedEntity();
         RunWriter.writeRunFile(mname,tempBM25);
 
         // issue Query expansion based on the selection method
