@@ -32,14 +32,10 @@
 <!--        <dependency>-->
 <!--            <groupId>org.apache.jena</groupId>-->
 <!--            <artifactId>apache-jena-libs</artifactId>-->
-<!--            <version>3.1.0</version>-->
-<!--            &lt;!&ndash;<exclusions>&ndash;&gt;-->
-<!--            &lt;!&ndash;<exclusion>&ndash;&gt;-->
-<!--            &lt;!&ndash;<groupId>com.github.jsonld-java</groupId>&ndash;&gt;-->
-<!--            &lt;!&ndash;<artifactId>jsonid-java</artifactId>&ndash;&gt;-->
-<!--            &lt;!&ndash;</exclusion>&ndash;&gt;-->
-<!--            &lt;!&ndash;</exclusions>&ndash;&gt;-->
+<!--            <type>pom</type>-->
+<!--            <version>3.10.0</version>-->
 <!--        </dependency>-->
+
 
         <dependency>
             <groupId>com.github.TREMA-UNH</groupId>

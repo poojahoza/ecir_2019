@@ -6,7 +6,7 @@ import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
-import main.java.dbpedia.DBpedia;
+//import main.java.dbpedia.DBpedia;
 import main.java.mrf.MarkovRandomField;
 import main.java.queryexp.*;
 import main.java.queryexp.rm3.RelevanceModel3;
@@ -20,7 +20,7 @@ import main.java.searcher.LeadtextSearcher;
 import main.java.graph.GraphSimConstructor;
 import main.java.graph.GraphDegreeConstructor;
 import main.java.wordsimilarityranker.*;
-import main.java.queryexpansion.QueryExpansion;
+//import main.java.queryexpansion.QueryExpansion;
 import main.java.entityrelation.FeatureGenerator;
 import main.java.entityrelation.QueryExapansion;
 import main.java.wrapper.QueryExpansionReRanking;
@@ -431,19 +431,19 @@ public class SearchRunner implements ProgramRunner
             }
         }
 
-        if(searchParser.isQEEnabled())
-        {
-            validate.ValidateQE();
-            QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
-            qe.doQueryExpansion();
-
-        }
-
-        if(searchParser.isExistinDBpedia())
-        {
-            DBpedia qe = new DBpedia(searchParser,queryCBOR);
-            qe.retriveExistanceinDBpeda(searchParser.isDBpediaContain());
-        }
+//        if(searchParser.isQEEnabled())
+//        {
+//            validate.ValidateQE();
+//            QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
+//            qe.doQueryExpansion();
+//
+//        }
+//
+//        if(searchParser.isExistinDBpedia())
+//        {
+//            DBpedia qe = new DBpedia(searchParser,queryCBOR);
+//            qe.retriveExistanceinDBpeda(searchParser.isDBpediaContain());
+//        }
 
 
         if(searchParser.isEntityDocSimEnabled())
@@ -470,17 +470,17 @@ public class SearchRunner implements ProgramRunner
             PrintUtils.displayQuery(queryCBOR);
         }
 
-        if(searchParser.is_qe_reranking())
-        {
-            validate.ValidateQE();
-            validate.ValidateReRank();
-            QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
-            Map<String,Map<String,Container >> res = qe.doQueryExpansion();
-            QueryExpansionReRanking geReRank = new QueryExpansionReRanking(searchParser,queryCBOR,res);
-            String mname= "qe_rerank_"+searchParser.getQEType().toString();
-            geReRank.getDocumentFrequencyReRanking(mname);
-
-        }
+//        if(searchParser.is_qe_reranking())
+//        {
+//            validate.ValidateQE();
+//            validate.ValidateReRank();
+//            QueryExpansion qe = new QueryExpansion(searchParser,queryCBOR);
+//            Map<String,Map<String,Container >> res = qe.doQueryExpansion();
+//            QueryExpansionReRanking geReRank = new QueryExpansionReRanking(searchParser,queryCBOR,res);
+//            String mname= "qe_rerank_"+searchParser.getQEType().toString();
+//            geReRank.getDocumentFrequencyReRanking(mname);
+//
+//        }
 
         if(searchParser.isQe_entity_degree_rerankingEnabled()) {
             validate.ValidateEntityDegree();
