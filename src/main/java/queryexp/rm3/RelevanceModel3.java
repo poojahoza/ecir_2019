@@ -134,7 +134,7 @@ public class RelevanceModel3 extends ExpandQueryBase implements ExpandQuery {
     @Override
     public String getExpandedTerms(String originalQuery, Map<String, Container> retrievedList) {
         ArrayList<DocStats> docStats = collectDocumentStats(retrievedList);
-        ArrayList<String> candidates = getCandidateTermsWithEntitiesAbstract(retrievedList);
+        ArrayList<String> candidates = getCandidateTerms(retrievedList);
         Map<String, Double> ans = getProbability(docStats, candidates);
         ArrayList<String> expansionterms = getRm3ExpansionTerms(ans, originalQuery);
 
