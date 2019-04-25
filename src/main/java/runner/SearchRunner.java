@@ -6,6 +6,7 @@ import main.java.commandparser.CommandParser;
 import main.java.commandparser.RegisterCommands;
 import main.java.commandparser.ValidateCommands;
 import main.java.containers.Container;
+import main.java.dbpedia.DBpedia;
 import main.java.mrf.MarkovRandomField;
 import main.java.reranker.ReRanker;
 import main.java.rerankerv2.docsimranker.DocumentFrequencySimilarity;
@@ -337,6 +338,13 @@ public class SearchRunner implements ProgramRunner
             qe.doQueryExpansion();
 
         }
+
+        if(searchParser.isExistinDBpedia())
+        {
+            DBpedia qe = new DBpedia(searchParser,queryCBOR);
+            qe.retriveExistanceinDBpeda(searchParser.isDBpediaContain());
+        }
+
 
         if(searchParser.isEntityDocSimEnabled())
         {

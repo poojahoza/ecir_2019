@@ -143,6 +143,12 @@ public class RegisterCommands
          @Parameter(names = {"--leven-sim"},description ="Rerank the document based on the NormalizedLevenshtein similarity between two strings")
          private boolean isLevenSim = false;
 
+         @Parameter(names = {"-dbpedia","--exist-dbpedia"},description ="Find out if an entity exist in dbpedia")
+         private boolean isExistDBpedia =false;
+
+         @Parameter(names = {"-dbpcontain","--dbpedia-contain"},description ="Change the search to contain")
+         private boolean isDBpediaContain =false;
+
          @Parameter(names = {"-qe","--query-expansion"},description ="Rerank the document using Query expansion")
          private boolean isQE =false;
 
@@ -261,6 +267,8 @@ public class RegisterCommands
          {
              return isSectionEnabled;
          }
+         public boolean isExistinDBpedia(){return isExistDBpedia;}
+         public boolean isDBpediaContain() {return isDBpediaContain;}
          public boolean isQEEnabled(){return isQE;}
          public qeType getQEType () {return qeTypeValue;}
          public int getNumberOfReturnedEntity() {return numberOfReturnedEntity;}
