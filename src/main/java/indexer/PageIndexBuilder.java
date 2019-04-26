@@ -1,15 +1,17 @@
 package main.java.indexer;
 
+/**
+ * @author poojaoza
+ **/
+
 /*Lucene imports*/
-import edu.unh.cs.TrecCarRepr;
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexOptions;
+
 
 /*TREC tools imports*/
 import edu.unh.cs.treccar_v2.Data;
 import edu.unh.cs.TrecCarPageRepr;
-import edu.unh.cs.TrecCarPage;
 import edu.unh.cs.lucene.TrecCarLuceneConfig;
 
 /*Project specific imports*/

@@ -1,5 +1,9 @@
 package main.java.indexer;
 
+/**
+ * @author poojaoza
+ **/
+
 /*Lucene imports*/
 import edu.unh.cs.*;
 import org.apache.lucene.document.*;

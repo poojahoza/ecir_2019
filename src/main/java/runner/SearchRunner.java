@@ -359,6 +359,18 @@ public class SearchRunner implements ProgramRunner
                 write_file.generateFeatureVectorRunFile(featureVectors, "feature_vectors"+level+datafile);
                 write_file.generateEntityRankLibRunFile(featureVectors, searchParser.getQrelfile(), "rank_lib"+level+datafile);
 
+                Map<String, Map<String, Double>> hop_entities_score = e.getParagraphsScoreDouble(bm25_ranking, sortedhopRelationFeatureVectors);
+                hop_entities_score = e.getRerankedParas(hop_entities_score);
+
+                write_file.generateEntityRunFile(hop_entities_score, "paragraph_1hoprelation_feature"+level+datafile);
+
+                Map<String, Map<String, Double>> comention_entities_score = e.getParagraphsScoreDouble(bm25_ranking, sortedcomentionFeatureVectors);
+                comention_entities_score = e.getRerankedParas(comention_entities_score);
+
+                write_file.generateEntityRunFile(comention_entities_score, "paragraph_comention_feature"+level+datafile);
+
+
+
             }catch (Exception ioe){
                 ioe.printStackTrace();
             }

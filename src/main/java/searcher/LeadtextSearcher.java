@@ -1,5 +1,9 @@
 package main.java.searcher;
 
+/**
+ * @author poojaoza
+ **/
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.ScoreDoc;
 
