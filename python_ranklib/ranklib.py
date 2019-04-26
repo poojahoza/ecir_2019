@@ -1,3 +1,7 @@
+'''
+@Author: poojaoza
+'''
+
 #! /usr/bin/evn/python3
 
 import sys
@@ -29,7 +33,7 @@ def write_feature_vector_file(merged_file, output_file_name):
                 for f in features:
                     feature_value += " "
                     feature_value += str(f)
-                output_line = query_id+" "+entity_id+feature_value+"\n"
+                output_line = query_id + " " + entity_id + feature_value + "\n"
                 print(output_line)
                 write_line.append(output_line)
                 # output_file.write(query_id+" "+entity_id+feature_value)
@@ -53,10 +57,10 @@ def write_ranklib_file(merged_file, qrel_file, output_file_name):
                         output_line += "0"
                 else:
                     output_line += "0"
-                output_line += " qid:"+str(query_counter)
-                for i,v in enumerate(features):
-                    output_line += " "+str(i+1)+":"+str(v)
-                output_line += " #"+m+"_"+e+"\n"
+                output_line += " qid:" + str(query_counter)
+                for i, v in enumerate(features):
+                    output_line += " " + str(i + 1) + ":" + str(v)
+                output_line += " #" + m + "_" + e + "\n"
                 lines.append(output_line)
             query_counter += 1
         of.writelines(lines)
@@ -152,8 +156,8 @@ def process_run_file(run_file):
             for f in rfile_dict:
                 for e in rfile_dict[f]:
                     fet = rfile_dict[f][e]
-                    if len(fet) < rcounter+1:
-                        difference = rcounter+1 - len(fet)
+                    if len(fet) < rcounter + 1:
+                        difference = rcounter + 1 - len(fet)
                         for d in range(difference):
                             fet.append(0.0)
                         rfile_dict[f][e] = fet
@@ -227,7 +231,7 @@ def process_qrel_file(qrel_file_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        "Please provide qrel file and the run files directory")
+        "Please provide qrel file and the run files location")
     parser.add_argument('--q', help='qrel file location')
     # parser.add_argument(
     #     '--f', help='feature vectors file list', action="append")
@@ -235,11 +239,15 @@ if __name__ == "__main__":
     parser.add_argument('--r', help='run file list', action="append")
     parser.add_argument(
         '-z', "--zscore", help='normalize the feature vectors with zscore', action="store_true")
-    parser.add_argument('--rp', help='output feature vector file path without zscore')
+    parser.add_argument(
+        '--rp', help='output feature vector file path without zscore')
     parser.add_argument('--zrp', help='output feature vector file path zscore')
     parser.add_argument('--ranklibp', help='output ranklib file path zscore')
     # parser.add_argument('-s',"-section", help='')
     args = parser.parse_args()
+    if len(sys.argv == 1):
+        parser.print_help(sys.stderr)
+        sys.exit(1)
     print(args)
     # print(args.f)
     print(args.r)
@@ -253,7 +261,7 @@ if __name__ == "__main__":
     # merged_results = merge_run_fv_files(
     #     run_file_result, feature_vec_result, len(args.r), number_features)
     # print(merged_results)
-    #if args.zscore:
+    # if args.zscore:
     # zscore_results = calculate_zscore(merged_results, number_features+len(args.r))
     # zscore_results = calculate_zscore(merged_results, len(args.r))
     # print(len(zscore_results))
@@ -267,7 +275,6 @@ if __name__ == "__main__":
     print(len(zscore_results))
     # write_feature_vector_file(zscore_results, "/media/poojaoza/ExtraDrive1/Data/projects/cs953-team1/result/output_ranking_feature_vector_section_train_zscored_python.txt")
     write_feature_vector_file(zscore_results, args.zrp)
-    
+
     # write_ranklib_file(zscore_results, qrel_result, "/media/poojaoza/ExtraDrive1/Data/projects/cs953-team1/result/output_ranking_ranklib_section_train_python.txt")
     write_ranklib_file(zscore_results, qrel_result, args.ranklibp)
-
