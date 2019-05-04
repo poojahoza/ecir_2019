@@ -113,4 +113,19 @@ public class Stats {
         return dotproduct;
     }
 
+    public double getEuclideanDistance(Double[] vec1, Double[] vec2){
+
+        double dotproduct = 0.0;
+
+        if(vec1.length != vec2.length){
+            return dotproduct;
+        }
+        for(int i = 0; i < vec1.length; i++){
+            dotproduct += Math.pow(vec2[i]-vec1[i], 2);
+        }
+        dotproduct = Math.sqrt(dotproduct);
+        return dotproduct;
+
+    }
+
 }

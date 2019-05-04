@@ -314,7 +314,8 @@ public class FeatureGenerator {
 
 
             for(Map.Entry<String, Double[]> n: m.getValue().entrySet()) {
-                score.put(n.getKey(), s.getDotProduct(n.getValue(), centroid));
+                //score.put(n.getKey(), s.getDotProduct(n.getValue(), centroid));
+                score.put(n.getKey(), s.getEuclideanDistance(n.getValue(), centroid));
             }
             query_entity_score.put(m.getKey(), SortUtils.sortByValue(score));
 
