@@ -101,17 +101,19 @@ public class FeatureGenerator {
         return relations;
     }
 
-    private double entityCoMentions(String first_entity,
+    private double[] entityCoMentions(String first_entity,
                                   String second_entity,
                                   Map<String, Container> bm25_ranking){
+        double rel_score = 0.0;
         double counter = 0.0;
         for(Map.Entry<String, Container> c:bm25_ranking.entrySet()){
             String[] para_entities = c.getValue().getEntity().getEntityId().split("[\r\n]+");
             if (Arrays.stream(para_entities).anyMatch(first_entity::equals) && Arrays.stream(para_entities).anyMatch(second_entity::equals)) {
-                counter += (double)1 / c.getValue().getRank();
+                rel_score += (double)1 / c.getValue().getRank();
+                counter += 1;
             }
         }
-        return counter;
+        return new double[]{rel_score, counter};
     }
 
     private Map<String, Double[]> generateFeatureVectors(Map<String, Integer> entities_list,
@@ -135,6 +137,7 @@ public class FeatureGenerator {
         int entity_length = entities_ids.length;
         //System.out.println(entity_length);
         Double hop_relations[] = new Double[] {0.0, 0.0};
+        double co_mention[] = new double[]{0.0, 0.0};
 
         //Map<String, Double[]> other_entities = new LinkedHashMap<>();
         for(int c = 0; c < entity_length; c++){
@@ -143,6 +146,7 @@ public class FeatureGenerator {
             double get1hoprelation_calc = 0.0;
             double get2hoprelation_calc = 0.0;
             double comention_calc = 0.0;
+            double rel_comention_cal = 0.0;
 
             for(int e = 0; e < entity_length; e++){
                 //System.out.println("Inside e "+entities_features.containsKey(entities_array.get(e))+ " "+c+" "+e+" "+entities_array.get(c));
@@ -160,10 +164,12 @@ public class FeatureGenerator {
                         Double[] val = other_entities_val.get(entities_array.get(c));
                         get1hoprelation_calc += val[0].doubleValue();
                         get2hoprelation_calc += val[1].doubleValue();
-                        comention_calc += val[2].doubleValue();
+                        rel_comention_cal += val[2].doubleValue();
+                        comention_calc += val[3].doubleValue();
                         features_list[0] = val[0].doubleValue();
                         features_list[1] = val[1].doubleValue();
                         features_list[2] = val[2].doubleValue();
+                        features_list[3] = val[3].doubleValue();
 
                         //System.out.println("=="+entities_array.get(e)+" "+entities_array.get(c)+" "+features_list[0]+" "+features_list[1]+" "+get1hoprelation_calc+" "+get2hoprelation_calc+" "+comention_calc);
                     }
@@ -173,14 +179,21 @@ public class FeatureGenerator {
                     hop_relations[0] = 0.0;
                     hop_relations[1] = 0.0;
 
+                    /*co_mention[0] = 0.0;
+                    co_mention[1] = 0.0;*/
+
                     hop_relations = getHopRelations(entities_array.get(c), entities_array.get(e), entities_details, hop_relations);
-                    features_list[2] = entityCoMentions(entities_array.get(c), entities_array.get(e), bm25_ranking.get(query_id));
+                    //features_list[2] = entityCoMentions(entities_array.get(c), entities_array.get(e), bm25_ranking.get(query_id));
+                    co_mention = entityCoMentions(entities_array.get(c), entities_array.get(e), bm25_ranking.get(query_id));
                     features_list[0] = hop_relations[0];
                     features_list[1] = hop_relations[1];
+                    features_list[2] = co_mention[0];
+                    features_list[3] = co_mention[1];
 
                     get1hoprelation_calc += features_list[0];
                     get2hoprelation_calc += features_list[1];
-                    comention_calc += features_list[2];
+                    rel_comention_cal += features_list[2];
+                    comention_calc += features_list[3];
                     //System.out.println(entities_array.get(c)+" "+entities_array.get(e)+" "+features_list[0]+" "+features_list[1]+" "+get1hoprelation_calc+" "+get2hoprelation_calc+" "+comention_calc);
                     other_entities.put(entities_array.get(e), ArrayUtils.toObject(features_list));
 
@@ -194,8 +207,9 @@ public class FeatureGenerator {
 
             entities_normalized_features.put(entities_array.get(c), new Double[] {get1hoprelation_calc/entity_length,
                     //get2hoprelation_calc/entity_length,
+                    rel_comention_cal/entity_length,
                     comention_calc/entity_length});
-            System.out.println("Features : "+query_id+" "+c+" "+entity_length+" "+get1hoprelation_calc/entity_length+" "+get2hoprelation_calc/entity_length+" "+comention_calc/entity_length);
+            System.out.println("Features : "+query_id+" "+c+" "+entity_length+" "+get1hoprelation_calc/entity_length+" "+get2hoprelation_calc/entity_length+" "+rel_comention_cal/entity_length+" "+comention_calc/entity_length);
         }
         return entities_normalized_features;
     }
