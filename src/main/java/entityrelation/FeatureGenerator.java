@@ -321,6 +321,8 @@ public class FeatureGenerator {
                     System.out.println(npe.getMessage());
                 }
             }
+            System.out.println("centroid vector before: "+entities_size+" "+centroid[0].toString()+" "+centroid[1].toString()+" "+centroid[2].toString()+" "+centroid[3].toString()+" "+centroid[4].toString()+" "+centroid[5].toString());
+
             centroid[0] = centroid[0]/entities_size;
             centroid[1] = centroid[1]/entities_size;
             centroid[2] = centroid[2]/entities_size;
@@ -328,7 +330,7 @@ public class FeatureGenerator {
             centroid[4] = centroid[4]/entities_size;
             centroid[5] = centroid[5]/entities_size;
 
-            System.out.println("centroid vector : "+centroid[0].toString()+" "+centroid[1].toString()+" "+centroid[2].toString()+" "+centroid[3].toString()+" "+centroid[4].toString()+" "+centroid[5].toString());
+            System.out.println("centroid vector : "+entities_size+" "+centroid[0].toString()+" "+centroid[1].toString()+" "+centroid[2].toString()+" "+centroid[3].toString()+" "+centroid[4].toString()+" "+centroid[5].toString());
 
 
             for(Map.Entry<String, Double[]> n: m.getValue().entrySet()) {
