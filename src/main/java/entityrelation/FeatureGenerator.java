@@ -307,7 +307,7 @@ public class FeatureGenerator {
         for(Map.Entry<String, Map<String, Double[]>> m : features.entrySet()){
             Map<String, Double> score = new LinkedHashMap<>();
             int entities_size = m.getValue().size();
-            Double[] centroid = new Double[] {0.0, 0.0, 0.0, 0.0, 0.0};
+            Double[] centroid = new Double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
             for(Map.Entry<String, Double[]> n: m.getValue().entrySet()) {
                 try {
                     //System.out.println(n.getValue());
@@ -316,6 +316,7 @@ public class FeatureGenerator {
                     centroid[2] += n.getValue()[2];
                     centroid[3] += n.getValue()[3];
                     centroid[4] += n.getValue()[4];
+                    centroid[5] += n.getValue()[5];
                 }catch (NullPointerException npe){
                     System.out.println(npe.getMessage());
                 }
@@ -325,6 +326,9 @@ public class FeatureGenerator {
             centroid[2] = centroid[2]/entities_size;
             centroid[3] = centroid[3]/entities_size;
             centroid[4] = centroid[4]/entities_size;
+            centroid[5] = centroid[5]/entities_size;
+
+            System.out.println("centroid vector : "+centroid[0].toString()+" "+centroid[1].toString()+" "+centroid[2].toString()+" "+centroid[3].toString()+" "+centroid[4].toString()+" "+centroid[5].toString());
 
 
             for(Map.Entry<String, Double[]> n: m.getValue().entrySet()) {
