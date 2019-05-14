@@ -153,7 +153,7 @@ public class FeatureGenerator {
                 if(e == c){
                     continue;
                 }
-                double[] features_list = new double[5];
+                double[] features_list = new double[] {0.0, 0.0, 0.0, 0.0, 0.0};
 
                 if(entities_features.containsKey(entities_array.get(e))){
 
@@ -208,9 +208,71 @@ public class FeatureGenerator {
             entities_normalized_features.put(entities_array.get(c), new Double[] {get1hoprelation_calc/entity_length,
                     //get2hoprelation_calc/entity_length,
                     rel_comention_cal/entity_length,
-                    comention_calc/entity_length});
-            System.out.println("Features : "+query_id+" "+c+" "+entity_length+" "+get1hoprelation_calc/entity_length+" "+get2hoprelation_calc/entity_length+" "+rel_comention_cal/entity_length+" "+comention_calc/entity_length);
+                    comention_calc/entity_length,
+                    0.0,
+                    0.0});
+            //System.out.println("Features : "+query_id+" "+c+" "+entity_length+" "+get1hoprelation_calc/entity_length+" "+get2hoprelation_calc/entity_length+" "+rel_comention_cal/entity_length+" "+comention_calc/entity_length);
         }
+        for(int a = 0; a < entity_length; a++){
+
+            if(entities_details.containsKey(entities_array.get(a))) {
+
+                String[] ent_det = entities_details.get(entities_array.get(a));
+                String[] outlink_Ids = ent_det[1].split("[\r\n]+");
+                String[] inlink_Ids = ent_det[2].split("[\r\n]+");
+
+
+                for (int s = 0; s < outlink_Ids.length; s++) {
+                    if(entities_features.containsKey(outlink_Ids[s])){
+                    Map<String, Double[]> outlink_id_detail = entities_features.get(outlink_Ids[s]);
+                    for (int p = 0; p < outlink_Ids.length; p++) {
+                        if (s == p) {
+                            continue;
+                        }
+                        if (outlink_id_detail.containsKey(outlink_Ids[p])) {
+                            Double[] outlink_val = outlink_id_detail.get(outlink_Ids[p]);
+                            if (outlink_val != null) {
+                                outlink_val[3] = outlink_val[3] + 1.0;
+                            }
+                            }
+                        }
+                    }
+                }
+
+                for (int q = 0; q < inlink_Ids.length; q++) {
+                    if(entities_features.containsKey(inlink_Ids[q])){
+                    Map<String, Double[]> inlink_id_detail = entities_features.get(inlink_Ids[q]);
+                    for (int r = 0; r < inlink_Ids.length; r++) {
+                        if (q == r) {
+                            continue;
+                        }
+                        if (inlink_id_detail.containsKey(inlink_Ids[r])) {
+                            Double[] inlink_val = inlink_id_detail.get(inlink_Ids[r]);
+                            if (inlink_val != null) {
+                                inlink_val[4] = inlink_val[4] + 1.0;
+                            }
+                        }
+                    }
+                    }
+                }
+            }
+
+
+        }
+
+        for(Map.Entry<String, Map<String, Double[]>> ent_f:entities_features.entrySet()){
+            double co_coupling = 0.0;
+            double biblo_co_coupling = 0.0;
+            for(Map.Entry<String, Double[]> ent_d: ent_f.getValue().entrySet()){
+                co_coupling += ent_d.getValue()[3];
+                biblo_co_coupling += ent_d.getValue()[4];
+            }
+            Double[] entity_feat = entities_normalized_features.get(ent_f.getKey());
+            entity_feat[3] = co_coupling/entity_length;
+            entity_feat[4] = biblo_co_coupling/entity_length;
+            System.out.println("Features : "+query_id+" "+ent_f.getKey()+" "+entity_length+" "+entity_feat[0]+" "+entity_feat[1]+" "+entity_feat[2]+" "+entity_feat[3]+" "+entity_feat[4]);
+        }
+
         return entities_normalized_features;
     }
 

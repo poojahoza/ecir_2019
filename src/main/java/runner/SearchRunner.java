@@ -341,9 +341,13 @@ public class SearchRunner implements ProgramRunner
                 Map<String, Map<String, Double>> hopRelationfeatureVectors = featuregenerator.extractFeatures(featureVectors, 0);
                 Map<String, Map<String, Double>> relComentionfeatureVectors = featuregenerator.extractFeatures(featureVectors, 1);
                 Map<String, Map<String, Double>> comentionfeatureVectors = featuregenerator.extractFeatures(featureVectors, 2);
+                Map<String, Map<String, Double>> cocouplingfeatureVectors = featuregenerator.extractFeatures(featureVectors, 3);
+                Map<String, Map<String, Double>> biblococouplingfeatureVectors = featuregenerator.extractFeatures(featureVectors, 4);
                 Map<String, Map<String, Double>> sortedhopRelationFeatureVectors = featuregenerator.sortFeatureVectors(hopRelationfeatureVectors);
                 Map<String, Map<String, Double>> sortedrelComentionFeatureVectors = featuregenerator.sortFeatureVectors(relComentionfeatureVectors);
                 Map<String, Map<String, Double>> sortedcomentionFeatureVectors = featuregenerator.sortFeatureVectors(comentionfeatureVectors);
+                Map<String, Map<String, Double>> sortedcocouplingFeatureVectors = featuregenerator.sortFeatureVectors(cocouplingfeatureVectors);
+                Map<String, Map<String, Double>> sortedbiblococouplingFeatureVectors = featuregenerator.sortFeatureVectors(biblococouplingfeatureVectors);
 
                 WriteFile write_file = new WriteFile();
                 String level = searchParser.isArticleEnabled()? "_article": "_section";
@@ -359,6 +363,8 @@ public class SearchRunner implements ProgramRunner
                 write_file.generateEntityRunFile(sortedhopRelationFeatureVectors, "1hoprelation_feature_vector"+level+datafile);
                 write_file.generateEntityRunFile(sortedrelComentionFeatureVectors, "rel_comention_feature_vector"+level+datafile);
                 write_file.generateEntityRunFile(sortedcomentionFeatureVectors, "count_comention_feature_vector"+level+datafile);
+                write_file.generateEntityRunFile(sortedcocouplingFeatureVectors, "co_coupling_feature_vector"+level+datafile);
+                write_file.generateEntityRunFile(sortedbiblococouplingFeatureVectors, "biblo_co_coupling_feature_vector"+level+datafile);
                 write_file.generateFeatureVectorRunFile(featureVectors, "feature_vectors"+level+datafile);
                 write_file.generateEntityRankLibRunFile(featureVectors, searchParser.getQrelfile(), "rank_lib"+level+datafile);
 
@@ -378,6 +384,15 @@ public class SearchRunner implements ProgramRunner
 
                 write_file.generateEntityRunFile(comention_entities_score, "paragraph_count_comention_feature"+level+datafile);
 
+                Map<String, Map<String, Double>> co_coupling_entities_score = e.getParagraphsScoreDouble(bm25_ranking, sortedcocouplingFeatureVectors);
+                co_coupling_entities_score = e.getRerankedParas(co_coupling_entities_score);
+
+                write_file.generateEntityRunFile(co_coupling_entities_score, "paragraph_co_coupling_feature"+level+datafile);
+
+                Map<String, Map<String, Double>> biblo_co_coupling_entities_score = e.getParagraphsScoreDouble(bm25_ranking, sortedbiblococouplingFeatureVectors);
+                biblo_co_coupling_entities_score = e.getRerankedParas(biblo_co_coupling_entities_score);
+
+                write_file.generateEntityRunFile(biblo_co_coupling_entities_score, "paragraph_biblo_co_coupling_feature"+level+datafile);
 
 
             }catch (Exception ioe){
