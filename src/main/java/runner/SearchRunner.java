@@ -343,11 +343,17 @@ public class SearchRunner implements ProgramRunner
                 Map<String, Map<String, Double>> comentionfeatureVectors = featuregenerator.extractFeatures(featureVectors, 2);
                 Map<String, Map<String, Double>> cocouplingfeatureVectors = featuregenerator.extractFeatures(featureVectors, 3);
                 Map<String, Map<String, Double>> biblococouplingfeatureVectors = featuregenerator.extractFeatures(featureVectors, 4);
+                Map<String, Map<String, Double>> outlinksDirectlinksfeatureVectors = featuregenerator.extractFeatures(featureVectors, 5);
+                Map<String, Map<String, Double>> inlinksDirectlinksfeatureVectors = featuregenerator.extractFeatures(featureVectors, 6);
+                Map<String, Map<String, Double>> bidirlinksDirectlinksfeatureVectors = featuregenerator.extractFeatures(featureVectors, 7);
                 Map<String, Map<String, Double>> sortedhopRelationFeatureVectors = featuregenerator.sortFeatureVectors(hopRelationfeatureVectors);
                 Map<String, Map<String, Double>> sortedrelComentionFeatureVectors = featuregenerator.sortFeatureVectors(relComentionfeatureVectors);
                 Map<String, Map<String, Double>> sortedcomentionFeatureVectors = featuregenerator.sortFeatureVectors(comentionfeatureVectors);
                 Map<String, Map<String, Double>> sortedcocouplingFeatureVectors = featuregenerator.sortFeatureVectors(cocouplingfeatureVectors);
                 Map<String, Map<String, Double>> sortedbiblococouplingFeatureVectors = featuregenerator.sortFeatureVectors(biblococouplingfeatureVectors);
+                Map<String, Map<String, Double>> sortedoutlinksDirectlinksFeatureVectors = featuregenerator.sortFeatureVectors(outlinksDirectlinksfeatureVectors);
+                Map<String, Map<String, Double>> sortedinlinksDirectlinksFeatureVectors = featuregenerator.sortFeatureVectors(inlinksDirectlinksfeatureVectors);
+                Map<String, Map<String, Double>> sortedbidirlinksDirectlinksFeatureVectors = featuregenerator.sortFeatureVectors(bidirlinksDirectlinksfeatureVectors);
 
                 WriteFile write_file = new WriteFile();
                 String level = searchParser.isArticleEnabled()? "_article": "_section";
@@ -365,6 +371,9 @@ public class SearchRunner implements ProgramRunner
                 write_file.generateEntityRunFile(sortedcomentionFeatureVectors, "count_comention_feature_vector"+level+datafile);
                 write_file.generateEntityRunFile(sortedcocouplingFeatureVectors, "co_coupling_feature_vector"+level+datafile);
                 write_file.generateEntityRunFile(sortedbiblococouplingFeatureVectors, "biblo_co_coupling_feature_vector"+level+datafile);
+                write_file.generateEntityRunFile(sortedoutlinksDirectlinksFeatureVectors, "outlinks_feature_vector"+level+datafile);
+                write_file.generateEntityRunFile(sortedinlinksDirectlinksFeatureVectors, "inlinks_feature_vector"+level+datafile);
+                write_file.generateEntityRunFile(sortedbidirlinksDirectlinksFeatureVectors, "bidirectional_feature_vector"+level+datafile);
                 write_file.generateFeatureVectorRunFile(featureVectors, "feature_vectors"+level+datafile);
                 write_file.generateEntityRankLibRunFile(featureVectors, searchParser.getQrelfile(), "rank_lib"+level+datafile);
 
