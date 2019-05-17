@@ -106,6 +106,37 @@ public class FeatureGenerator {
         return relations;
     }
 
+    private double[] getBibloCouplingFeatures(String first_entity,
+                                              String second_entity,
+                                              Map<String, String[]> entities_details,
+                                              Map<String, Double[]> entity_ranking){
+        double biblo_rel_score = 0.0;
+        double biblo_count_score = 0.0;
+
+        if(entities_details.containsKey(first_entity) && entities_details.containsKey(second_entity)) {
+            String[] first_ent_details = entities_details.get(first_entity);
+            String[] first_ent_outlinkIds = first_ent_details[1].split("[\r\n]+");
+
+            String[] second_ent_details = entities_details.get(second_entity);
+            String[] second_ent_outlinkIds = second_ent_details[1].split("[\r\n]+");
+
+            Set<String> first_ent_set = new HashSet<>(Arrays.asList(first_ent_outlinkIds));
+            Set<String> second_ent_set = new HashSet<>(Arrays.asList(second_ent_outlinkIds));
+            first_ent_set.retainAll(second_ent_set);
+
+            for(String temp_ent_set: first_ent_set){
+                if(entity_ranking.containsKey(temp_ent_set)){
+                    Double[] entity_ranking_details = entity_ranking.get(temp_ent_set);
+                    biblo_rel_score += entity_ranking_details[1];
+                    biblo_count_score += 1.0;
+                }
+            }
+
+        }
+        return new double[]{biblo_rel_score, biblo_count_score};
+
+    }
+
     private double[] entityCoMentions(String first_entity,
                                   String second_entity,
                                   Map<String, Container> bm25_ranking){
@@ -123,7 +154,8 @@ public class FeatureGenerator {
 
     private Map<String, Double[]> generateFeatureVectors(Map<String, Integer> entities_list,
                                                          String query_id,
-                                                         Map<String, Map<String, Container>> bm25_ranking){
+                                                         Map<String, Map<String, Container>> bm25_ranking,
+                                                         Map<String, Map<String, Double[]>> entity_ranking){
         Map<String, Map<String, Double[]>> entities_features = new LinkedHashMap<>();
         Map<String, Double[]> entities_normalized_features = new LinkedHashMap<>();
         Entities entities_utils = new Entities();
@@ -155,13 +187,15 @@ public class FeatureGenerator {
             double getoutlinksrelation_calc = 0.0;
             double getinlinksrelation_calc = 0.0;
             double getbidirlinksrelation_calc = 0.0;
+            double getbiblorelev_calc = 0.0;
+            double getbiblocount_calc = 0.0;
 
             for(int e = 0; e < entity_length; e++){
                 //System.out.println("Inside e "+entities_features.containsKey(entities_array.get(e))+ " "+c+" "+e+" "+entities_array.get(c));
                 if(e == c){
                     continue;
                 }
-                double[] features_list = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+                double[] features_list = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
                 if(entities_features.containsKey(entities_array.get(e))){
 
@@ -177,6 +211,9 @@ public class FeatureGenerator {
                         getoutlinksrelation_calc += val[4].doubleValue();
                         getinlinksrelation_calc += val[5].doubleValue();
                         getbidirlinksrelation_calc += val[6].doubleValue();
+                        getbidirlinksrelation_calc += val[7].doubleValue();
+                        getbiblorelev_calc += val[8].doubleValue();
+
                         features_list[0] = val[0].doubleValue();
                         features_list[1] = val[1].doubleValue();
                         features_list[2] = val[2].doubleValue();
@@ -184,6 +221,8 @@ public class FeatureGenerator {
                         features_list[4] += val[4].doubleValue();
                         features_list[5] += val[5].doubleValue();
                         features_list[6] += val[6].doubleValue();
+                        features_list[7] += val[7].doubleValue();
+                        features_list[8] += val[8].doubleValue();
 
                         //System.out.println("=="+entities_array.get(e)+" "+entities_array.get(c)+" "+features_list[0]+" "+features_list[1]+" "+get1hoprelation_calc+" "+get2hoprelation_calc+" "+comention_calc);
                     }
@@ -202,6 +241,7 @@ public class FeatureGenerator {
                     hop_relations = getHopRelations(entities_array.get(c), entities_array.get(e), entities_details, hop_relations);
                     //features_list[2] = entityCoMentions(entities_array.get(c), entities_array.get(e), bm25_ranking.get(query_id));
                     double co_mention[] = entityCoMentions(entities_array.get(c), entities_array.get(e), bm25_ranking.get(query_id));
+                    double biblo_relations[] = getBibloCouplingFeatures(entities_array.get(c), entities_array.get(e), entities_details, entity_ranking.get(query_id));
                     features_list[0] = hop_relations[0]; //undirectional direct links
                     features_list[1] = hop_relations[1];
                     features_list[2] = co_mention[0]; //co-occurrence relevance
@@ -209,6 +249,8 @@ public class FeatureGenerator {
                     features_list[4] = hop_relations[2]; //outlinks direct links
                     features_list[5] = hop_relations[3]; //inlinks direct links
                     features_list[6] = hop_relations[4]; //bidirectional direct links
+                    features_list[7] = biblo_relations[0];
+                    features_list[8] = biblo_relations[1];
 
                     get1hoprelation_calc += features_list[0];
                     get2hoprelation_calc += features_list[1];
@@ -217,6 +259,8 @@ public class FeatureGenerator {
                     getoutlinksrelation_calc += features_list[4];
                     getinlinksrelation_calc += features_list[5];
                     getbidirlinksrelation_calc += features_list[6];
+                    getbiblorelev_calc += features_list[7];
+                    getbiblocount_calc += features_list[8];
                     //System.out.println(entities_array.get(c)+" "+entities_array.get(e)+" "+features_list[0]+" "+features_list[1]+" "+get1hoprelation_calc+" "+get2hoprelation_calc+" "+comention_calc);
                     other_entities.put(entities_array.get(e), ArrayUtils.toObject(features_list));
 
@@ -233,7 +277,8 @@ public class FeatureGenerator {
                     rel_comention_cal/entity_length,
                     comention_calc/entity_length,
                     0.0,
-                    0.0,
+                    getbiblorelev_calc/entity_length,
+                    getbiblocount_calc/entity_length,
                     getoutlinksrelation_calc/entity_length,
                     getinlinksrelation_calc/entity_length,
                     getbidirlinksrelation_calc/entity_length});
@@ -265,7 +310,7 @@ public class FeatureGenerator {
                     }
                 }
 
-                for (int q = 0; q < inlink_Ids.length; q++) {
+                /*for (int q = 0; q < inlink_Ids.length; q++) {
                     if(entities_features.containsKey(inlink_Ids[q])){
                     Map<String, Double[]> inlink_id_detail = entities_features.get(inlink_Ids[q]);
                     for (int r = 0; r < inlink_Ids.length; r++) {
@@ -280,7 +325,7 @@ public class FeatureGenerator {
                         }
                     }
                     }
-                }
+                }*/
             }
 
 
@@ -288,17 +333,17 @@ public class FeatureGenerator {
 
         for(Map.Entry<String, Map<String, Double[]>> ent_f:entities_features.entrySet()){
             double co_coupling = 0.0;
-            double biblo_co_coupling = 0.0;
+            //double biblo_co_coupling = 0.0;
             for(Map.Entry<String, Double[]> ent_d: ent_f.getValue().entrySet()){
                 co_coupling += ent_d.getValue()[3];
-                biblo_co_coupling += ent_d.getValue()[4];
+                //biblo_co_coupling += ent_d.getValue()[4];
             }
             Double[] entity_feat = entities_normalized_features.get(ent_f.getKey());
             entity_feat[3] = co_coupling/entity_length;
-            entity_feat[4] = biblo_co_coupling/entity_length;
+            //entity_feat[4] = biblo_co_coupling/entity_length;
             System.out.println("Features : "+query_id+" "+ent_f.getKey()+" "+entity_length+" "+entity_feat[0]+" "+
                     entity_feat[1]+" "+entity_feat[2]+" "+entity_feat[3]+" "+entity_feat[4]+" "+entity_feat[5]
-            +" "+entity_feat[6]);
+            +" "+entity_feat[6]+" "+entity_feat[7]+" "+entity_feat[8]);
         }
 
         return entities_normalized_features;
@@ -306,13 +351,14 @@ public class FeatureGenerator {
 
 
     public Map<String, Map<String, Double[]>> getFeatureVectors(Map<String, Map<String, Integer>> query_entity_list,
-                                                                 Map<String, Map<String, Container>> bm25_ranking){
+                                                                 Map<String, Map<String, Container>> bm25_ranking,
+                                                                Map<String, Map<String, Double[]>> entity_ranking){
         System.out.println(query_entity_list.size());
         int p = 0;
         Map<String, Map<String, Double[]>> query_entity_feature_vec = new ConcurrentHashMap<>();
 
         query_entity_list.entrySet().parallelStream().forEach(m ->
-        { query_entity_feature_vec.put(m.getKey(), generateFeatureVectors(m.getValue(), m.getKey(), bm25_ranking));});
+        { query_entity_feature_vec.put(m.getKey(), generateFeatureVectors(m.getValue(), m.getKey(), bm25_ranking, entity_ranking));});
 
         /*query_entity_list.entrySet().parallelStream().forEach(m ->
         {
@@ -330,10 +376,11 @@ public class FeatureGenerator {
     }
 
     public Map<String, Map<String, Double[]>> getNormalizedFeatureVectors(Map<String, Map<String, Integer>> query_entity_list,
-                                                                       Map<String, Map<String, Container>> bm25_ranking){
+                                                                       Map<String, Map<String, Container>> bm25_ranking,
+                                                                          Map<String, Map<String, Double[]>> entity_ranking){
 
         Map<String, Map<String, Double[]>> query_entity_normalized_vec;
-        query_entity_normalized_vec = getFeatureVectors(query_entity_list, bm25_ranking);
+        query_entity_normalized_vec = getFeatureVectors(query_entity_list, bm25_ranking, entity_ranking);
         query_entity_normalized_vec = new Stats().normalizeData(query_entity_normalized_vec);
         return query_entity_normalized_vec;
     }

@@ -91,7 +91,7 @@ public class RegisterCommands
 
         @Parameter(names = "--help", help = true)
         private boolean help;
-         @Parameter(names = {"-ecm", "--ecm-run"}, description = "ECM Entity run file")
+         @Parameter(names = {"-entity-run", "--entity-run"}, description = "Entity run file")
          private String ecmentityfile = null;
 
 

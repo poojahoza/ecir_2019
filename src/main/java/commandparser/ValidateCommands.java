@@ -89,7 +89,7 @@ public class ValidateCommands
             }
             if(searchParser.getEcmentityfile() == null)
             {
-                System.out.println("Please pass the ecm entity run file path");
+                System.out.println("Please pass the entity run file path");
                 CALLEXIT(-1);
             }
         }
@@ -112,6 +112,11 @@ public class ValidateCommands
             if(searchParser.getQrelfile() == null)
             {
                 System.out.println("Please pass the entity qrel location path");
+                CALLEXIT(-1);
+            }
+            if(searchParser.getEcmentityfile() == null)
+            {
+                System.out.println("Please pass the entity run file path");
                 CALLEXIT(-1);
             }
 

@@ -257,6 +257,55 @@ public class Entities {
         return mp;
     }
 
+    public Map<String, Map<String, Double[]>> readEntityRunFileDetails(String filename){
+
+        Map<String, Map<String, Double[]>> mp = new LinkedHashMap<>();
+
+        File fp = new File(filename);
+        FileReader fr;
+        BufferedReader br = null;
+
+
+        try {
+            fr = new FileReader(fp);
+            br = new BufferedReader(fr);
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        while (true) {
+            try {
+                String line = br.readLine();
+
+                if (line == null) {
+                    break;
+                }
+
+                String[] words = line.split(" ");
+                String outKey = words[0];
+
+                if (mp.containsKey(outKey)) {
+                    Map<String, Double[]> extract = mp.get(outKey);
+                    //Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    extract.put(words[2], new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])});
+                } else {
+
+                    Map<String, Double[]> temp = new LinkedHashMap<>();
+                    //Double[] features = new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])};
+                    temp.put(words[2], new Double[] {Double.parseDouble(words[3]), Double.parseDouble(words[4])});
+                    mp.put(outKey, temp);
+                }
+            } catch (NullPointerException n) {
+                System.out.println(n.getMessage());
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+
+        }
+        return mp;
+    }
+
 
     public Map<String, Map<String, String>> readEntityQrelFile(String filename){
 
