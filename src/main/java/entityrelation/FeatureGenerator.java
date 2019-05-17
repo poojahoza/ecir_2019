@@ -125,10 +125,12 @@ public class FeatureGenerator {
             first_ent_set.retainAll(second_ent_set);
 
             for(String temp_ent_set: first_ent_set){
-                if(entity_ranking.containsKey(temp_ent_set)){
-                    Double[] entity_ranking_details = entity_ranking.get(temp_ent_set);
-                    biblo_rel_score += entity_ranking_details[1];
-                    biblo_count_score += 1.0;
+                if(entity_ranking != null) {
+                    if (entity_ranking.containsKey(temp_ent_set)) {
+                        Double[] entity_ranking_details = entity_ranking.get(temp_ent_set);
+                        biblo_rel_score += entity_ranking_details[1];
+                        biblo_count_score += 1.0;
+                    }
                 }
             }
 
@@ -362,15 +364,15 @@ public class FeatureGenerator {
 
         /*query_entity_list.entrySet().parallelStream().forEach(m ->
         {
-            if(m.getKey().equals("enwiki:Ice%20bath/Techniques/Ice%20baths%20versus%20cold%20baths")){
-                query_entity_feature_vec.put(m.getKey(), generateFeatureVectors(m.getValue(), m.getKey(), bm25_ranking));
+            if(m.getKey().equals("enwiki:Jerusalem%20artichoke/Pyramid%20scheme")){
+                query_entity_feature_vec.put(m.getKey(), generateFeatureVectors(m.getValue(), m.getKey(), bm25_ranking, entity_ranking));
             } });*/
 
        /*Map.Entry<String, Map<String, Integer>> m = query_entity_list.entrySet().iterator().next();
             p++;
             System.out.println(p);
             System.out.println(m.getKey());
-            query_entity_feature_vec.put(m.getKey(), generateFeatureVectors(m.getValue(), m.getKey(), bm25_ranking));*/
+            query_entity_feature_vec.put(m.getKey(), generateFeatureVectors(m.getValue(), m.getKey(), bm25_ranking, entity_ranking));*/
 
         return query_entity_feature_vec;
     }
