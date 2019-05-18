@@ -128,7 +128,8 @@ public class FeatureGenerator {
                 if(entity_ranking != null) {
                     if (entity_ranking.containsKey(temp_ent_set)) {
                         Double[] entity_ranking_details = entity_ranking.get(temp_ent_set);
-                        biblo_rel_score += entity_ranking_details[1];
+                        //biblo_rel_score += entity_ranking_details[1];
+                        biblo_rel_score += (double)1/entity_ranking_details[0];
                         biblo_count_score += 1.0;
                     }
                 }
