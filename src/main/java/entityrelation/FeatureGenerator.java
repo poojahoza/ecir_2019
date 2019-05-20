@@ -71,6 +71,9 @@ public class FeatureGenerator {
             if (Arrays.stream(outlinkIds).anyMatch(second_entity::equals) && Arrays.stream(inlinkIds).anyMatch(second_entity::equals)) {
                 relations[4] = relations[4] + 1.0;
             }
+            /*if(first_entity.equals("enwiki:Linearity")){
+              System.out.println("========"+relations[0]+" "+relations[1]+" "+relations[2]+" "+relations[3]+" "+relations[4]+"========");
+            }*/
 
             /*for(int out = 0; out < outlinkIds.length; out++){
 
@@ -128,8 +131,8 @@ public class FeatureGenerator {
                 if(entity_ranking != null) {
                     if (entity_ranking.containsKey(temp_ent_set)) {
                         Double[] entity_ranking_details = entity_ranking.get(temp_ent_set);
-                        //biblo_rel_score += entity_ranking_details[1];
-                        biblo_rel_score += (double)1/entity_ranking_details[0];
+                        biblo_rel_score += entity_ranking_details[1];
+                        //biblo_rel_score += (double)1/entity_ranking_details[0];
                         biblo_count_score += 1.0;
                     }
                 }
@@ -140,6 +143,41 @@ public class FeatureGenerator {
 
     }
 
+    private double[] getCoCouplingFeatures(String first_entity,
+                                              String second_entity,
+                                              Map<String, String[]> entities_details,
+                                              Map<String, Double[]> entity_ranking){
+        double co_rel_score = 0.0;
+        double co_count_score = 0.0;
+
+        if(entities_details.containsKey(first_entity) && entities_details.containsKey(second_entity)) {
+            String[] first_ent_details = entities_details.get(first_entity);
+            String[] first_ent_inlinkIds = first_ent_details[2].split("[\r\n]+");
+
+            String[] second_ent_details = entities_details.get(second_entity);
+            String[] second_ent_inlinkIds = second_ent_details[2].split("[\r\n]+");
+
+            Set<String> first_ent_set = new HashSet<>(Arrays.asList(first_ent_inlinkIds));
+            Set<String> second_ent_set = new HashSet<>(Arrays.asList(second_ent_inlinkIds));
+            first_ent_set.retainAll(second_ent_set);
+
+            for(String temp_ent_set: first_ent_set){
+                if(entity_ranking != null) {
+                    if (entity_ranking.containsKey(temp_ent_set)) {
+                        Double[] entity_ranking_details = entity_ranking.get(temp_ent_set);
+                        co_rel_score += entity_ranking_details[1];
+                        //biblo_rel_score += (double)1/entity_ranking_details[0];
+                        co_count_score += 1.0;
+                    }
+                }
+            }
+
+        }
+        return new double[]{co_rel_score, co_count_score};
+
+    }
+
+
     private double[] entityCoMentions(String first_entity,
                                   String second_entity,
                                   Map<String, Container> bm25_ranking){
@@ -148,6 +186,35 @@ public class FeatureGenerator {
         for(Map.Entry<String, Container> c:bm25_ranking.entrySet()){
             String[] para_entities = c.getValue().getEntity().getEntityId().split("[\r\n]+");
             if (Arrays.stream(para_entities).anyMatch(first_entity::equals) && Arrays.stream(para_entities).anyMatch(second_entity::equals)) {
+                /*if(first_entity.equals("enwiki:Ernst%20Antevs") || first_entity.equals("enwiki:Holocene") || first_entity.equals("enwiki:Paleobotany") ||
+                        first_entity.equals("enwiki:Pleistocene") || first_entity.equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
+                        first_entity.equals("enwiki:Two%20Creeks,%20Wisconsin") || first_entity.equals("enwiki:Wisconsin%20glaciation")) {
+                    if (second_entity.equals("enwiki:Ernst%20Antevs") || second_entity.equals("enwiki:Holocene") || second_entity.equals("enwiki:Paleobotany") ||
+                            second_entity.equals("enwiki:Pleistocene") || second_entity.equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
+                            second_entity.equals("enwiki:Two%20Creeks,%20Wisconsin") || second_entity.equals("enwiki:Wisconsin%20glaciation")) {
+                        System.out.println("====="+first_entity+" "+second_entity+" "+c.getValue().getRank()+" "+String.valueOf((double)1 / c.getValue().getRank())+" "+counter+" "+para_entities.length);
+                        for(int pe = 0; pe < para_entities.length; pe++){
+                            System.out.println(para_entities[pe]);
+                        }
+
+                    }
+                }*/
+                /*if(first_entity.equals("enwiki:Acatalasia") || first_entity.equals("enwiki:Active%20site") || first_entity.equals("enwiki:Catalase") ||
+                        first_entity.equals("enwiki:Chloroplast") || first_entity.equals("enwiki:Cytosol") || first_entity.equals("enwiki:Enzyme%20kinetics") ||
+                        first_entity.equals("enwiki:Eukaryote") || first_entity.equals("enwiki:Extracellular%20fluid") || first_entity.equals("enwiki:Genetic%20engineering") ||
+                        first_entity.equals("Hemolytic%20anemia") || first_entity.equals("enwiki:Hyperoxia") || first_entity.equals("enwiki:Manganese") ||
+                        first_entity.equals("enwiki:Eukaryote") || first_entity.equals("enwiki:Eukaryote") || first_entity.equals("enwiki:Eukaryote") ||
+                        first_entity.equals("enwiki:Eukaryote") || first_entity.equals("enwiki:Eukaryote") || first_entity.equals("enwiki:Eukaryote") ||
+                        first_entity.equals("enwiki:Eukaryote") || first_entity.equals("enwiki:Eukaryote") || first_entity.equals("enwiki:Eukaryote") ||
+                        first_entity.equals("enwiki:Eukaryote") || first_entity.equals("enwiki:Eukaryote") || first_entity.equals("enwiki:Eukaryote")) {
+                    if (second_entity.equals("enwiki:Ernst%20Antevs") || second_entity.equals("enwiki:Holocene") || second_entity.equals("enwiki:Paleobotany") ||
+                            second_entity.equals("enwiki:Pleistocene") || second_entity.equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
+                            second_entity.equals("enwiki:Two%20Creeks,%20Wisconsin") || second_entity.equals("enwiki:Wisconsin%20glaciation")) {
+                        System.out.println("====="+first_entity+" "+second_entity+" "+c.getValue().getRank()+" "+String.valueOf((double)1 / c.getValue().getRank())+" "+counter);
+
+                    }
+                }*/
+
                 rel_score += (double)1 / c.getValue().getRank();
                 counter += 1;
             }
@@ -192,13 +259,15 @@ public class FeatureGenerator {
             double getbidirlinksrelation_calc = 0.0;
             double getbiblorelev_calc = 0.0;
             double getbiblocount_calc = 0.0;
+            double getcocoupcount_calc = 0.0;
+            double getcocouprel_calc = 0.0;
 
             for(int e = 0; e < entity_length; e++){
                 //System.out.println("Inside e "+entities_features.containsKey(entities_array.get(e))+ " "+c+" "+e+" "+entities_array.get(c));
                 if(e == c){
                     continue;
                 }
-                double[] features_list = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+                double[] features_list = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
                 if(entities_features.containsKey(entities_array.get(e))){
 
@@ -216,6 +285,8 @@ public class FeatureGenerator {
                         getbidirlinksrelation_calc += val[6].doubleValue();
                         getbidirlinksrelation_calc += val[7].doubleValue();
                         getbiblorelev_calc += val[8].doubleValue();
+                        getcocoupcount_calc += val[9].doubleValue();
+                        getcocouprel_calc += val[10].doubleValue();
 
                         features_list[0] = val[0].doubleValue();
                         features_list[1] = val[1].doubleValue();
@@ -226,8 +297,21 @@ public class FeatureGenerator {
                         features_list[6] += val[6].doubleValue();
                         features_list[7] += val[7].doubleValue();
                         features_list[8] += val[8].doubleValue();
+                        features_list[9] += val[9].doubleValue();
+                        features_list[10] += val[10].doubleValue();
 
                         //System.out.println("=="+entities_array.get(e)+" "+entities_array.get(c)+" "+features_list[0]+" "+features_list[1]+" "+get1hoprelation_calc+" "+get2hoprelation_calc+" "+comention_calc);
+                        /*if(entities_array.get(c).equals("enwiki:Ernst%20Antevs") || entities_array.get(c).equals("enwiki:Holocene") || entities_array.get(c).equals("enwiki:Paleobotany") ||
+                                entities_array.get(c).equals("enwiki:Pleistocene") || entities_array.get(c).equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
+                                entities_array.get(c).equals("enwiki:Two%20Creeks,%20Wisconsin") || entities_array.get(c).equals("enwiki:Wisconsin%20glaciation")) {
+                            if (entities_array.get(e).equals("enwiki:Ernst%20Antevs") || entities_array.get(e).equals("enwiki:Holocene") || entities_array.get(e).equals("enwiki:Paleobotany") ||
+                                    entities_array.get(e).equals("enwiki:Pleistocene") || entities_array.get(e).equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
+                                    entities_array.get(e).equals("enwiki:Two%20Creeks,%20Wisconsin") || entities_array.get(e).equals("enwiki:Wisconsin%20glaciation")) {
+                                System.out.println(entities_array.get(c)+" "+entities_array.get(e)+" "+features_list[0]+" "+features_list[2]+" "+features_list[3]+" "+features_list[4]+" "+features_list[5]+" "+features_list[6]);
+
+                            }
+                        }*/
+
                     }
                     other_entities.put(entities_array.get(e), ArrayUtils.toObject(features_list));
                 }
@@ -245,7 +329,8 @@ public class FeatureGenerator {
                     //features_list[2] = entityCoMentions(entities_array.get(c), entities_array.get(e), bm25_ranking.get(query_id));
                     double co_mention[] = entityCoMentions(entities_array.get(c), entities_array.get(e), bm25_ranking.get(query_id));
                     double biblo_relations[] = getBibloCouplingFeatures(entities_array.get(c), entities_array.get(e), entities_details, entity_ranking.get(query_id));
-                    features_list[0] = hop_relations[0]; //undirectional direct links
+                    double cocoupling_relations[] = getCoCouplingFeatures(entities_array.get(c), entities_array.get(e), entities_details, entity_ranking.get(query_id));
+                    features_list[0] = hop_relations[0]; //undirected direct links
                     features_list[1] = hop_relations[1];
                     features_list[2] = co_mention[0]; //co-occurrence relevance
                     features_list[3] = co_mention[1]; //co-occurrence count
@@ -254,6 +339,8 @@ public class FeatureGenerator {
                     features_list[6] = hop_relations[4]; //bidirectional direct links
                     features_list[7] = biblo_relations[0];
                     features_list[8] = biblo_relations[1];
+                    features_list[9] = cocoupling_relations[0];
+                    features_list[10] = cocoupling_relations[1];
 
                     get1hoprelation_calc += features_list[0];
                     get2hoprelation_calc += features_list[1];
@@ -264,8 +351,20 @@ public class FeatureGenerator {
                     getbidirlinksrelation_calc += features_list[6];
                     getbiblorelev_calc += features_list[7];
                     getbiblocount_calc += features_list[8];
+                    getcocoupcount_calc += features_list[9];
+                    getcocouprel_calc += features_list[10];
                     //System.out.println(entities_array.get(c)+" "+entities_array.get(e)+" "+features_list[0]+" "+features_list[1]+" "+get1hoprelation_calc+" "+get2hoprelation_calc+" "+comention_calc);
                     other_entities.put(entities_array.get(e), ArrayUtils.toObject(features_list));
+                    /*if(entities_array.get(c).equals("enwiki:Ernst%20Antevs") || entities_array.get(c).equals("enwiki:Holocene") || entities_array.get(c).equals("enwiki:Paleobotany") ||
+                            entities_array.get(c).equals("enwiki:Pleistocene") || entities_array.get(c).equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
+                            entities_array.get(c).equals("enwiki:Two%20Creeks,%20Wisconsin") || entities_array.get(c).equals("enwiki:Wisconsin%20glaciation")) {
+                        if (entities_array.get(e).equals("enwiki:Ernst%20Antevs") || entities_array.get(e).equals("enwiki:Holocene") || entities_array.get(e).equals("enwiki:Paleobotany") ||
+                                entities_array.get(e).equals("enwiki:Pleistocene") || entities_array.get(e).equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
+                                entities_array.get(e).equals("enwiki:Two%20Creeks,%20Wisconsin") || entities_array.get(e).equals("enwiki:Wisconsin%20glaciation")) {
+                            System.out.println(entities_array.get(c)+" "+entities_array.get(e)+" "+features_list[0]+" "+features_list[2]+" "+features_list[3]+" "+features_list[4]+" "+features_list[5]+" "+features_list[6]);
+
+                        }
+                    }*/
 
                 }
 
@@ -274,79 +373,21 @@ public class FeatureGenerator {
             /*entities_normalized_features.put(entities_array.get(c), new Double[] {get1hoprelation_calc/entity_length,
                     get2hoprelation_calc/entity_length,
                     comention_calc/entity_length});*/
+            //System.out.println("Features : "+query_id+" "+entities_array.get(c)+" "+entity_length+" "+get1hoprelation_calc+" "+rel_comention_cal+" "+comention_calc+" "+getbiblorelev_calc+" "+
+              //      getbiblocount_calc+" "+getoutlinksrelation_calc+" "+getinlinksrelation_calc+" "+getbidirlinksrelation_calc);
 
             entities_normalized_features.put(entities_array.get(c), new Double[] {get1hoprelation_calc/entity_length,
                     //get2hoprelation_calc/entity_length,
                     rel_comention_cal/entity_length,
                     comention_calc/entity_length,
-                    0.0,
+                    getcocoupcount_calc/entity_length,
+                    getcocouprel_calc/entity_length,
                     getbiblorelev_calc/entity_length,
                     getbiblocount_calc/entity_length,
                     getoutlinksrelation_calc/entity_length,
                     getinlinksrelation_calc/entity_length,
                     getbidirlinksrelation_calc/entity_length});
             //System.out.println("Features : "+query_id+" "+c+" "+entity_length+" "+get1hoprelation_calc/entity_length+" "+get2hoprelation_calc/entity_length+" "+rel_comention_cal/entity_length+" "+comention_calc/entity_length);
-        }
-        for(int a = 0; a < entity_length; a++){
-
-            if(entities_details.containsKey(entities_array.get(a))) {
-
-                String[] ent_det = entities_details.get(entities_array.get(a));
-                String[] outlink_Ids = ent_det[1].split("[\r\n]+");
-                String[] inlink_Ids = ent_det[2].split("[\r\n]+");
-
-
-                for (int s = 0; s < outlink_Ids.length; s++) {
-                    if(entities_features.containsKey(outlink_Ids[s])){
-                    Map<String, Double[]> outlink_id_detail = entities_features.get(outlink_Ids[s]);
-                    for (int p = 0; p < outlink_Ids.length; p++) {
-                        if (s == p) {
-                            continue;
-                        }
-                        if (outlink_id_detail.containsKey(outlink_Ids[p])) {
-                            Double[] outlink_val = outlink_id_detail.get(outlink_Ids[p]);
-                            if (outlink_val != null) {
-                                outlink_val[3] = outlink_val[3] + 1.0;
-                            }
-                            }
-                        }
-                    }
-                }
-
-                /*for (int q = 0; q < inlink_Ids.length; q++) {
-                    if(entities_features.containsKey(inlink_Ids[q])){
-                    Map<String, Double[]> inlink_id_detail = entities_features.get(inlink_Ids[q]);
-                    for (int r = 0; r < inlink_Ids.length; r++) {
-                        if (q == r) {
-                            continue;
-                        }
-                        if (inlink_id_detail.containsKey(inlink_Ids[r])) {
-                            Double[] inlink_val = inlink_id_detail.get(inlink_Ids[r]);
-                            if (inlink_val != null) {
-                                inlink_val[4] = inlink_val[4] + 1.0;
-                            }
-                        }
-                    }
-                    }
-                }*/
-            }
-
-
-        }
-
-        for(Map.Entry<String, Map<String, Double[]>> ent_f:entities_features.entrySet()){
-            double co_coupling = 0.0;
-            //double biblo_co_coupling = 0.0;
-            for(Map.Entry<String, Double[]> ent_d: ent_f.getValue().entrySet()){
-                co_coupling += ent_d.getValue()[3];
-                //biblo_co_coupling += ent_d.getValue()[4];
-            }
-            Double[] entity_feat = entities_normalized_features.get(ent_f.getKey());
-            entity_feat[3] = co_coupling/entity_length;
-            //entity_feat[4] = biblo_co_coupling/entity_length;
-            System.out.println("Features : "+query_id+" "+ent_f.getKey()+" "+entity_length+" "+entity_feat[0]+" "+
-                    entity_feat[1]+" "+entity_feat[2]+" "+entity_feat[3]+" "+entity_feat[4]+" "+entity_feat[5]
-            +" "+entity_feat[6]+" "+entity_feat[7]+" "+entity_feat[8]);
         }
 
         return entities_normalized_features;
@@ -365,7 +406,7 @@ public class FeatureGenerator {
 
         /*query_entity_list.entrySet().parallelStream().forEach(m ->
         {
-            if(m.getKey().equals("enwiki:Jerusalem%20artichoke/Pyramid%20scheme")){
+            if(m.getKey().equals("enwiki:Radiocarbon%20dating/Use%20in%20archaeology/Notable%20applications/Pleistocene/Holocene%20boundary%20in%20Two%20Creeks%20Fossil%20Forest")){
                 query_entity_feature_vec.put(m.getKey(), generateFeatureVectors(m.getValue(), m.getKey(), bm25_ranking, entity_ranking));
             } });*/
 
