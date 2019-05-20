@@ -134,6 +134,19 @@ public class FeatureGenerator {
                         biblo_rel_score += entity_ranking_details[1];
                         //biblo_rel_score += (double)1/entity_ranking_details[0];
                         biblo_count_score += 1.0;
+                        /*if(first_entity.equals("enwiki:Ernst%20Antevs") || first_entity.equals("enwiki:Holocene") || first_entity.equals("enwiki:Paleobotany") ||
+                                first_entity.equals("enwiki:Pleistocene") || first_entity.equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
+                                first_entity.equals("enwiki:Two%20Creeks,%20Wisconsin") || first_entity.equals("enwiki:Wisconsin%20glaciation")) {
+                            if (second_entity.equals("enwiki:Ernst%20Antevs") || second_entity.equals("enwiki:Holocene") || second_entity.equals("enwiki:Paleobotany") ||
+                                    second_entity.equals("enwiki:Pleistocene") || second_entity.equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
+                                    second_entity.equals("enwiki:Two%20Creeks,%20Wisconsin") || second_entity.equals("enwiki:Wisconsin%20glaciation")) {
+                                System.out.println("####################"+first_entity+" "+second_entity+" "+String.valueOf(entity_ranking_details[0])+" "+biblo_rel_score+" "+biblo_count_score);
+                        for(int pe = 0; pe < para_entities.length; pe++){
+                            System.out.println(para_entities[pe]);
+                        }
+
+                            }
+                        }*/
                     }
                 }
             }
@@ -166,8 +179,21 @@ public class FeatureGenerator {
                     if (entity_ranking.containsKey(temp_ent_set)) {
                         Double[] entity_ranking_details = entity_ranking.get(temp_ent_set);
                         co_rel_score += entity_ranking_details[1];
-                        //biblo_rel_score += (double)1/entity_ranking_details[0];
+                        //co_rel_score += (double)1/entity_ranking_details[0];
                         co_count_score += 1.0;
+                        /*if(first_entity.equals("enwiki:Ernst%20Antevs") || first_entity.equals("enwiki:Holocene") || first_entity.equals("enwiki:Paleobotany") ||
+                                first_entity.equals("enwiki:Pleistocene") || first_entity.equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
+                                first_entity.equals("enwiki:Two%20Creeks,%20Wisconsin") || first_entity.equals("enwiki:Wisconsin%20glaciation")) {
+                            if (second_entity.equals("enwiki:Ernst%20Antevs") || second_entity.equals("enwiki:Holocene") || second_entity.equals("enwiki:Paleobotany") ||
+                                    second_entity.equals("enwiki:Pleistocene") || second_entity.equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
+                                    second_entity.equals("enwiki:Two%20Creeks,%20Wisconsin") || second_entity.equals("enwiki:Wisconsin%20glaciation")) {
+                                System.out.println("******"+first_entity+" "+second_entity+" "+String.valueOf(entity_ranking_details[0])+" "+String.valueOf(co_rel_score)+" "+co_count_score);
+                        for(int pe = 0; pe < para_entities.length; pe++){
+                            System.out.println(para_entities[pe]);
+                        }
+
+                            }
+                        }*/
                     }
                 }
             }
@@ -307,7 +333,8 @@ public class FeatureGenerator {
                             if (entities_array.get(e).equals("enwiki:Ernst%20Antevs") || entities_array.get(e).equals("enwiki:Holocene") || entities_array.get(e).equals("enwiki:Paleobotany") ||
                                     entities_array.get(e).equals("enwiki:Pleistocene") || entities_array.get(e).equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
                                     entities_array.get(e).equals("enwiki:Two%20Creeks,%20Wisconsin") || entities_array.get(e).equals("enwiki:Wisconsin%20glaciation")) {
-                                System.out.println(entities_array.get(c)+" "+entities_array.get(e)+" "+features_list[0]+" "+features_list[2]+" "+features_list[3]+" "+features_list[4]+" "+features_list[5]+" "+features_list[6]);
+                                System.out.println(entities_array.get(c)+" "+entities_array.get(e)+" "+features_list[0]+" "+features_list[2]+" "+features_list[3]+" "+features_list[4]+" "+features_list[5]+" "+features_list[6]
+                                +" "+features_list[9]+" "+features_list[10]);
 
                             }
                         }*/
@@ -361,7 +388,8 @@ public class FeatureGenerator {
                         if (entities_array.get(e).equals("enwiki:Ernst%20Antevs") || entities_array.get(e).equals("enwiki:Holocene") || entities_array.get(e).equals("enwiki:Paleobotany") ||
                                 entities_array.get(e).equals("enwiki:Pleistocene") || entities_array.get(e).equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
                                 entities_array.get(e).equals("enwiki:Two%20Creeks,%20Wisconsin") || entities_array.get(e).equals("enwiki:Wisconsin%20glaciation")) {
-                            System.out.println(entities_array.get(c)+" "+entities_array.get(e)+" "+features_list[0]+" "+features_list[2]+" "+features_list[3]+" "+features_list[4]+" "+features_list[5]+" "+features_list[6]);
+                            System.out.println(entities_array.get(c)+" "+entities_array.get(e)+" "+features_list[0]+" "+features_list[2]+" "+features_list[3]+" "+features_list[4]+" "+features_list[5]+" "+features_list[6]
+                            +" "+features_list[9]+" "+features_list[10]);
 
                         }
                     }*/
@@ -373,8 +401,8 @@ public class FeatureGenerator {
             /*entities_normalized_features.put(entities_array.get(c), new Double[] {get1hoprelation_calc/entity_length,
                     get2hoprelation_calc/entity_length,
                     comention_calc/entity_length});*/
-            //System.out.println("Features : "+query_id+" "+entities_array.get(c)+" "+entity_length+" "+get1hoprelation_calc+" "+rel_comention_cal+" "+comention_calc+" "+getbiblorelev_calc+" "+
-              //      getbiblocount_calc+" "+getoutlinksrelation_calc+" "+getinlinksrelation_calc+" "+getbidirlinksrelation_calc);
+            System.out.println("Features : "+query_id+" "+entities_array.get(c)+" "+entity_length+" "+get1hoprelation_calc+" "+rel_comention_cal+" "+comention_calc+" "+getbiblorelev_calc+" "+
+                    getbiblocount_calc+" "+getoutlinksrelation_calc+" "+getinlinksrelation_calc+" "+getbidirlinksrelation_calc);
 
             entities_normalized_features.put(entities_array.get(c), new Double[] {get1hoprelation_calc/entity_length,
                     //get2hoprelation_calc/entity_length,
