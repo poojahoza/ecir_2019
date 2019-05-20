@@ -199,7 +199,8 @@ public class FeatureGenerator {
             }
 
         }
-        return new double[]{co_rel_score, co_count_score};
+        //return new double[]{co_rel_score, co_count_score};
+        return new double[]{co_count_score, co_rel_score};
 
     }
 
