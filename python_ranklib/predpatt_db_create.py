@@ -20,7 +20,7 @@ def get_paragraphs(paragraphs_file):
             #      else elem.anchor_text
             #      for elem in p.bodies]
             texts = p.get_text()
-            print(texts)
+            #print(texts)
             yield p.para_id+'|__|'+texts
 
 
@@ -32,18 +32,23 @@ def generatePredPattAnnDB(input_file):
 		sentences = sent_tokenize(lines_split[1])
 		final_predpatt_json = []
 		for sent in sentences:
-			p = PredPatt.from_sentence(sent)
+			#print("*****",sent)
+			
 			sent_dict = {}
 			sent_dict['text'] = sent
 			sent_dict['relations'] = []
-			for x in p.instances:
-				pred_relation_dict = {}
-				pred_relation_dict['predicate'] = {'predicate':x, 'predicate_phrase':x.phrase()}
-				pred_relation_dict['arguments'] = []
-				for arg in x.arguments:
-					arg_json = {'argument':arg, 'argument_phrase': arg.phrase()}
-					pred_relation_dict['arguments'].append(arg_json)
-				sent_dict['relations'].append(pred_relation_dict)
+			try:
+				p = PredPatt.from_sentence(sent.encode())
+				for x in p.instances:
+					pred_relation_dict = {}
+					pred_relation_dict['predicate'] = {'predicate':str(x), 'predicate_phrase':x.phrase()}
+					pred_relation_dict['arguments'] = []
+					for arg in x.arguments:
+						arg_json = {'argument':str(arg), 'argument_phrase': arg.phrase()}
+						pred_relation_dict['arguments'].append(arg_json)
+					sent_dict['relations'].append(pred_relation_dict)
+			except KeyError:
+				print("KeyError for the paragraph : ",lines_split[0])
 			final_predpatt_json.append(sent_dict)
 		para_detail = {
 			'para_id': lines_split[0],
