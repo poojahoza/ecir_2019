@@ -224,8 +224,7 @@ def process_qrel_file(qrel_file_path):
     with open(qrel_file_path, 'r') as qrel_file:
         for line in qrel_file:
             line_split = line.strip('\n').split()
-            if int(line_split[2]) == 1:
-                qrel_dict[line_split[0]].append(line_split[2])
+            qrel_dict[line_split[0]].append(line_split[2])
     # print(qrel_dict)
     return qrel_dict
 
