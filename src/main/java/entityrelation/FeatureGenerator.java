@@ -126,6 +126,8 @@ public class FeatureGenerator {
             Set<String> first_ent_set = new HashSet<>(Arrays.asList(first_ent_outlinkIds));
             Set<String> second_ent_set = new HashSet<>(Arrays.asList(second_ent_outlinkIds));
             first_ent_set.retainAll(second_ent_set);
+            //Set<String> common_outlinks = Sets.intersection(first_ent_set, second_ent_set);
+            biblo_count_score = first_ent_set.size();
 
             for(String temp_ent_set: first_ent_set){
                 if(entity_ranking != null) {
@@ -133,7 +135,7 @@ public class FeatureGenerator {
                         Double[] entity_ranking_details = entity_ranking.get(temp_ent_set);
                         biblo_rel_score += entity_ranking_details[1];
                         //biblo_rel_score += (double)1/entity_ranking_details[0];
-                        biblo_count_score += 1.0;
+                        //biblo_count_score += 1.0;
                         /*if(first_entity.equals("enwiki:Ernst%20Antevs") || first_entity.equals("enwiki:Holocene") || first_entity.equals("enwiki:Paleobotany") ||
                                 first_entity.equals("enwiki:Pleistocene") || first_entity.equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
                                 first_entity.equals("enwiki:Two%20Creeks,%20Wisconsin") || first_entity.equals("enwiki:Wisconsin%20glaciation")) {
@@ -173,6 +175,8 @@ public class FeatureGenerator {
             Set<String> first_ent_set = new HashSet<>(Arrays.asList(first_ent_inlinkIds));
             Set<String> second_ent_set = new HashSet<>(Arrays.asList(second_ent_inlinkIds));
             first_ent_set.retainAll(second_ent_set);
+            //Set<String> common_inlinks = Sets.intersection(first_ent_set, second_ent_set);
+            co_count_score = first_ent_set.size();
 
             for(String temp_ent_set: first_ent_set){
                 if(entity_ranking != null) {
@@ -180,7 +184,7 @@ public class FeatureGenerator {
                         Double[] entity_ranking_details = entity_ranking.get(temp_ent_set);
                         co_rel_score += entity_ranking_details[1];
                         //co_rel_score += (double)1/entity_ranking_details[0];
-                        co_count_score += 1.0;
+                        //co_count_score += 1.0;
                         /*if(first_entity.equals("enwiki:Ernst%20Antevs") || first_entity.equals("enwiki:Holocene") || first_entity.equals("enwiki:Paleobotany") ||
                                 first_entity.equals("enwiki:Pleistocene") || first_entity.equals("enwiki:Two%20Creeks%20Buried%20Forest%20State%20Natural%20Area") ||
                                 first_entity.equals("enwiki:Two%20Creeks,%20Wisconsin") || first_entity.equals("enwiki:Wisconsin%20glaciation")) {
@@ -307,8 +311,10 @@ public class FeatureGenerator {
                         get2hoprelation_calc += val[1].doubleValue();
                         rel_comention_cal += val[2].doubleValue();
                         comention_calc += val[3].doubleValue();
-                        getoutlinksrelation_calc += val[4].doubleValue();
-                        getinlinksrelation_calc += val[5].doubleValue();
+                        //getoutlinksrelation_calc += val[4].doubleValue();
+                        //getinlinksrelation_calc += val[5].doubleValue();
+                        getoutlinksrelation_calc += val[5].doubleValue();
+                        getinlinksrelation_calc += val[4].doubleValue();
                         getbidirlinksrelation_calc += val[6].doubleValue();
                         getbidirlinksrelation_calc += val[7].doubleValue();
                         getbiblorelev_calc += val[8].doubleValue();
@@ -319,8 +325,10 @@ public class FeatureGenerator {
                         features_list[1] = val[1].doubleValue();
                         features_list[2] = val[2].doubleValue();
                         features_list[3] = val[3].doubleValue();
-                        features_list[4] += val[4].doubleValue();
-                        features_list[5] += val[5].doubleValue();
+                        //features_list[4] += val[4].doubleValue();
+                        //features_list[5] += val[5].doubleValue();
+                        features_list[4] += val[5].doubleValue();
+                        features_list[5] += val[4].doubleValue();
                         features_list[6] += val[6].doubleValue();
                         features_list[7] += val[7].doubleValue();
                         features_list[8] += val[8].doubleValue();
